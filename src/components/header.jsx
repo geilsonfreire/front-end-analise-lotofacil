@@ -10,8 +10,8 @@ import MenuDropDownPerfil from "../components/MenuDropDownPerfil";
 
 // Imports icons e imagens
 import LogoPerfil from "../assets/img/Ge.jpg";
+import Banner from "../assets/img/banner.png";
 import {
-    MdOutlineSearch,
     MdNotifications,
     MdArrowCircleDown,
     MdArrowCircleUp
@@ -45,37 +45,25 @@ const Header = () => {
     return (
         <header className="Header-painel">
             {/* <!-- Header Left --> */}
-            <div className="search-bar">
-                <i>
-                    <MdOutlineSearch />
-                </i>
-                <input type="text" placeholder="Pesquisa" />
-            </div>
+            <img src={Banner} alt="" />
 
             {/* <!-- Header Right --> */}
             <div className="header-right">
+
+                <div className="profile">
+                    <div className="perfill-name-img">
+                        <img src={LogoPerfil} alt="User Profile" />
+                        <span>
+                            Geilson Freire
+                        </span>
+                    </div>
+                </div>
+
                 <div className="notifications">
                     <i>
                         <MdNotifications />
                     </i>
                     <span className="notification-count">6</span>
-                </div>
-
-                <div className="profile">
-                    <div className="perfill-name-img">
-                        <img src={LogoPerfil} alt="User Profile" />
-                        <div className="pefill-adim-span">
-                            <span
-                                className="user-name">
-                                { ""}
-                            </span>
-                            <span
-                                className="user-type">
-                                {""}
-
-                            </span>
-                        </div>
-                    </div>
                 </div>
 
                 <div className="menu-dropdow"
@@ -90,7 +78,7 @@ const Header = () => {
                     <MenuDropDownPerfil
                         isDropdownOpen={isDropdownOpen}
                         setIsDropdownOpen={setIsDropdownOpen}
-                        
+
                     />
                 )}
             </div>

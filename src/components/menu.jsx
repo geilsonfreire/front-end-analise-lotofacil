@@ -44,7 +44,7 @@ const Menu = () => {
                 <Icon
                     to="/adminEstoques"
                     icon={<MdOutlineGridOn />}
-                    title="Estoques"
+                    title="Resultados"
                 />
                 <Icon
                     to="/adminMovimentacaoEstoque"

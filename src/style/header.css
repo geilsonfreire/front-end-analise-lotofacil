@@ -2,6 +2,15 @@
     z-index: 1000;
 }
 
+.Header-painel img {
+    width: 10rem;
+    height: 3rem;
+    margin-left: 1rem;
+    margin-top: 1rem;
+    cursor: pointer;
+    transition: all 0.5s ease-in-out;
+}
+
 /* Lado direito Menu naigation */
 .header-right {
     display: flex;
@@ -14,7 +23,7 @@
 .notifications {
     position: relative;
     cursor: pointer;
-    margin-right: 1rem;
+    margin: 1rem;
 }
 
 .notifications:hover {
@@ -22,7 +31,7 @@
 }
 
 .notifications i {
-    color: #3749A6;
+    color: #FF00FF;
     font-size: 1.5rem;
 }
 
@@ -40,9 +49,8 @@
 
 /*Perfil */
 .profile {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
+    width: 100%;
+    height: 100%;
 }
 
 .perfill-name-img {
@@ -50,25 +58,23 @@
     align-items: center;
     justify-content: center;
     gap: 1rem;
-    padding: 0 1rem;
     cursor: pointer;
 }
 
-.profile img {
+.perfill-name-img img {
     width: 35px;
     height: 35px;
     border-radius: 50%;
 }
 
-.profile img:hover {
+.perfill-name-img img:hover {
     transform: scale(1.1);
 }
 
-.pefill-adim-span {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
+.perfill-name-img span{
+    color: #000;
+    font-size: 10px;
+    margin-top: 1rem;
 }
 
 .user-name {
@@ -91,7 +97,7 @@
 }
 
 .user-type:hover {
-    color: blue;
+    color: #FF00FF;
 }
 
 /* Menu DropDow */
@@ -105,7 +111,7 @@
 }
 
 .menu-dropdow i {
-    color: #3749A6;
+    color: #FF00FF;
     font-size: 1.5rem;
     cursor: pointer;
 }
