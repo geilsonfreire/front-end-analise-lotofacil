@@ -3,7 +3,7 @@
 // import { toast } from "react-toastify";
 
 // Imports Css
-import "../style/adminProducts.css";
+import "../style/resultLotofacil.css";
 
 // Imports de Icones
 
@@ -12,13 +12,13 @@ import "../style/adminProducts.css";
 
 
 
-const AdminProducts = () => {
+const ResultLotofacil = () => {
 
     return (
-        <main className="Page-Product">
+        <main className="Container-Geral">
            
         </main >
     );
 };
 
-export default AdminProducts;
+export default ResultLotofacil
