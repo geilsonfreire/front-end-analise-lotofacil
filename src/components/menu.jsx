@@ -42,12 +42,12 @@ const Menu = () => {
                     title="DashBoard"
                 />
                 <Icon
-                    to="/adminEstoques"
+                    to="/resultLotofacil"
                     icon={<MdOutlineGridOn />}
                     title="Resultados"
                 />
                 <Icon
-                    to="/adminMovimentacaoEstoque"
+                    to="/outro"
                     icon={<MdOutlinePointOfSale />}
                     title="Movimentações"
                 />

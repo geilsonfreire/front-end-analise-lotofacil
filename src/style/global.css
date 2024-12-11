@@ -101,30 +101,6 @@ section {
 }
 
 
-/*Button */
-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #000;
-    padding: .2rem 1rem;
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    outline: none;
-}
-
-button:hover {
-    background-color: #1e3194;
-}
-
-button i {
-    font-size: 1.5rem;
-    margin-right: 1rem;
-}
-
-
 /*Modal */
 .modal-overlay {
     position: fixed;
