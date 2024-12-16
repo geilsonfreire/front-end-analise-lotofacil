@@ -4,8 +4,9 @@ import { StrictMode } from "react";
 
 // Import Componentes
 import Home from '../pages/home.jsx';
-import ResultLotofafil from '../pages/resultlotofacil.jsx';
 import AdminDashBoard from "../pages/AdminDashBoard.jsx";
+import ResultLotofafil from '../pages/resultlotofacil.jsx';
+import MeusJogos from '../pages/meus-jogos.jsx';
 
 
 
@@ -15,7 +16,8 @@ const MyRoutes = () => {
             <Routes>
                 <Route path="/" element={<Home />}>
                     <Route index  element={<AdminDashBoard />} />
-                    <Route path="/adminEstoques" element={<ResultLotofafil />} />
+                    <Route path="/result-lotofacil" element={<ResultLotofafil />} />
+                    <Route path="/meus-jogos" element={<MeusJogos />} />
                 </Route>
             </Routes>
         </StrictMode>

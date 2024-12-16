@@ -12,9 +12,9 @@ import "../style/menu.css";
 // Import icon
 import {
     MdSpaceDashboard,
-    MdOutlinePointOfSale,
     MdOutlineGridOn
 } from "react-icons/md";
+import { TbClover } from "react-icons/tb";
 
 const Menu = () => {
 
@@ -42,14 +42,14 @@ const Menu = () => {
                     title="DashBoard"
                 />
                 <Icon
-                    to="/resultLotofacil"
+                    to="/result-lotofacil"
                     icon={<MdOutlineGridOn />}
                     title="Resultados"
                 />
                 <Icon
-                    to="/outro"
-                    icon={<MdOutlinePointOfSale />}
-                    title="Movimentações"
+                    to="/meus-jogos"
+                    icon={<TbClover />}
+                    title="Meus Jogos"
                 />
             </ul>
         </nav>

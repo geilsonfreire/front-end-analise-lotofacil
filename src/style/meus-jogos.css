@@ -1,6 +1,5 @@
 .Container-Geral {
     display: flex;
-    flex-direction: column;
     justify-content: space-between;
     align-items: center;
 }
@@ -66,57 +65,53 @@
 }
 
 
-/*Seção ultimo resultado */
-.latest-result {
-    display: flex;
-    flex-direction: column;
-    border-bottom: solid 2px #8B008B;
+/*Table Lista de estoque */
+.Page-Product .stock-list {
+    background: #fff;
     border-radius: 10px;
-    padding: 0 1rem;
-    gap: 1rem;
-}
-
-.latest-result h1 {
-    display: flex;
-    justify-content: space-between;
-    font-size: 1rem;
-    color: #8B008B;
-    background-color: #FF00FF;
-    color: #fff;
-    padding: 0.5rem 1.5rem;
-    border-top-left-radius: 40px;
-    border-top-right-radius: 40px;
-}
-
-.latest-result-value {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    border-left: solid 2px #8B008B;
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-}
-
-.latest-result h2 {
-    font-size: .6rem;
-    color: #8B008B;
-    padding: 0 1rem;
-}
-
-.dezenas {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-}
-
-.dezenas span {
+    border-bottom: solid 1px #05187a;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
     font-size: .7rem;
+}
+
+.Page-Product .stock-list table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.Page-Product .stock-list table thead {
+    border-bottom: solid 1px #1e3194;
+    font-family: 'Roboto', sans-serif;
+    font-weight: normal;
+    color: #000;
+}
+
+.Page-Product .stock-list table thead th {
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 10px;
+    width: auto;
+    background-color: #1e3194;
     color: #fff;
-    background-color: #FF00FF;
-    padding: .3rem;
-    border-radius: 50%;
+}
+
+.Page-Product .stock-list table tbody tr td {
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 10px;
+    width: auto;
+    color: #000
+}
+
+.Page-Product .stock-list table tbody tr:nth-child(even) {
+    background-color: #635f5f71;
+    color: #000;
 }

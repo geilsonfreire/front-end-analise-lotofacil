@@ -29,6 +29,35 @@ const ResultLotofacil = () => {
                     </button>
                 </div>
             </section>
+            <section className="latest-result">
+                <h1>Ultimo Resultado <span>Data: { }</span></h1>
+                <div className="latest-result-value">
+                    <div className="data-result-latest">
+                        <h2>Concurso - <span>{ }</span></h2>
+                        <h2>Ganhadores - <span>{ }</span></h2>
+                        <h2>Local Dos Ganhadores - <span>{ }</span></h2>
+                        <h2>Acumulou - <span>{ }</span></h2>
+                    </div>
+                    <div className="dezenas">
+                        <span>01</span>
+                        <span>02</span>
+                        <span>03</span>
+                        <span>04</span>
+                        <span>05</span>
+                        <span>06</span>
+                        <span>07</span>
+                        <span>08</span>
+                        <span>09</span>
+                        <span>10</span>
+                        <span>11</span>
+                        <span>12</span>
+                        <span>13</span>
+                        <span>14</span>
+                        <span>15</span>
+                    </div>
+                </div>
+
+            </section>
 
         </main >
     );
