@@ -130,7 +130,7 @@
 /*Dezenas */
 .dezenas {
     display: flex;
-    flex: 1;
+    justify-content: center;
     align-items: center;
     gap: .5rem;
     padding: .5rem;
@@ -198,13 +198,50 @@
     font-size: .6rem;
     font-weight: bold;
     text-align: center;
+    color: #fff;
 }
 
 .premiacoes-table td {
     border: 1px solid #ff00ff;
-    padding: 8px;
     text-align: left;
     font-size: .5rem;
     color: #8B008B;
+    padding-left: 1rem;
 }
 
+/*Tabela de analise de Possibilidades */
+.possibility-result-info-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: .5rem;
+    border-left: solid 2px #8B008B;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.possibility-result-info-body table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+}
+
+.possibility-result-info-body th {
+    background-color: #FF00FF;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    font-size: .6rem;
+    font-weight: bold;
+    text-align: center;
+    color: #fff;
+}
+
+.possibility-result-info-body td {
+    border: 1px solid #ff00ff;
+    text-align: left;
+    font-size: .5rem;
+    color: #8B008B;
+    padding-left: 1rem;
+}

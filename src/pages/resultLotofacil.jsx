@@ -11,13 +11,35 @@ import { MdOutlineSearch } from "react-icons/md";
 
 // Importando o componente
 import apiServices from "../services/apiServices";
+import { calculateCombinations } from "../utils/mathPossibility";
 
 
 const ResultLotofacil = () => {
     // Estado para armazenar os resultados
     const [latestResult, setLatestResult] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [sorteios, setSorteios] = useState([]);
 
+    // Calcula as combinações
+    const totalCombinations = calculateCombinations(25, 15);
+
+    // Busca todos os sorteios da API
+    useEffect(() => {
+        const fetchSorteios = async () => {
+            try {
+                const allResults = await apiServices.getAllResults();
+                setSorteios(allResults);
+            } catch (error) {
+                console.error("Erro ao buscar os sorteios:", error.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchSorteios();
+    }, []);
+    // Calcula o restante de possibilidades (dinâmico)
+    const remainingCombinations = totalCombinations - sorteios.length;
+   
 
     // Função para buscar o último resultado
     const fetchLatestResult = async () => {
@@ -131,6 +153,42 @@ const ResultLotofacil = () => {
                 ) : (
                     <h1>Nenhum resultado disponível.</h1> // Caso não haja dados
                 )}
+            </section>
+
+            <section className="analise-result">
+                <div className="latest-result-info-header">
+                    <h1>Análise de Possibilidades / Probabilidades </h1>
+                </div>
+
+                <div className="possibility-result-info-body">
+                    {loading ? (
+                        <p>Carregando dados...</p>
+                    ) : (
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Descrição</th>
+                                    <th>Quantidade</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Total de possibilidades de jogos</td>
+                                    <td>{totalCombinations.toLocaleString()}</td>
+                                </tr>
+                                <tr>
+                                    <td>Total de sorteios já realizados</td>
+                                    <td>{sorteios.length.toLocaleString()}</td>
+                                </tr>
+                                <tr>
+                                    <td>Possibilidades restantes</td>
+                                    <td>{remainingCombinations.toLocaleString()}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    )}
+                </div>
+
             </section>
 
         </main >
