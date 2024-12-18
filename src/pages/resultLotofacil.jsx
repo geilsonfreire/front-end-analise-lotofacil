@@ -1,6 +1,6 @@
 // Imports Bibliotecas
-import {useEffect, useState} from "react";
-import {toast} from "react-toastify";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 // Imports Css
 import "../style/resultLotofacil.css";
@@ -10,41 +10,37 @@ import { MdOutlineSearch } from "react-icons/md";
 
 
 // Importando o componente
-import { getLatestCombinedResults } from "../services/apiServices";
+import apiServices from "../services/apiServices";
 
 
 const ResultLotofacil = () => {
     // Estado para armazenar os resultados
-    const [latestResult, setLatestResult] = useState(null); 
+    const [latestResult, setLatestResult] = useState(null);
     const [loading, setLoading] = useState(true);
+
 
     // Função para buscar o último resultado
     const fetchLatestResult = async () => {
-        setLoading(true); // Inicia o carregamento
         try {
-            const data = await getLatestCombinedResults(); // Faz a requisição
-            if (data && data.status === "success" && data.data.length > 0) {
-                const latest = data.data[data.data.length - 1]; // Pega o último item do array
-                setLatestResult(latest); // Define no estado
+            const latestResult = await apiServices.getLatestResult(); // Chama a API
+            if (latestResult) {
+                setLatestResult(latestResult);
             } else {
-                toast.warn("Nenhum resultado encontrado.");
+                toast.error("Erro ao carregar o último resultado.");
             }
         } catch (error) {
-            if (error.code === 'ECONNABORTED') {
-                toast.error("A requisição demorou demais. Tente novamente mais tarde.");
-            } else {
-                toast.error("Erro ao carregar os dados.");
-            }
-            console.error("Erro ao carregar o último resultado:", error);
+            console.error("Erro na requisição:", error);
+            toast.error("Erro na comunicação com o servidor.");
         } finally {
-            setLoading(false); // Finaliza o carregamento
+            setLoading(false);
         }
     };
 
-    // useEffect - Carrega os dados ao montar o componente
+    // useEffect para buscar o resultado ao montar o componente
     useEffect(() => {
         fetchLatestResult();
     }, []);
+
 
 
     return (
@@ -61,21 +57,24 @@ const ResultLotofacil = () => {
                     </button>
                 </div>
             </section>
+
             <section className="latest-result">
                 {loading ? (
                     <h1>Carregando...</h1> // Exibe enquanto carrega
                 ) : latestResult ? (
                     <>
-                        <h1>
-                            Último Resultado <span>Data: {latestResult.data_concurso || "N/A"}</span>
-                        </h1>
-                        <div className="latest-result-value">
+                        <div className="latest-result-info-header">
+                            <h1>Ultimo Resultado</h1>
+                            <p>Data do concurso: <span>{latestResult.data || "N/A"}</span></p>
+                            <p>Data do próximo concurso: <span>{latestResult.dataProximoConcurso || "N/A"}</span></p>
+                        </div>
+
+                        <div className="latest-result-info-body">
                             <div className="data-result-latest">
-                                <h2>Concurso - <span>{latestResult.concurso || "N/A"}</span></h2>
-                                <h2>Ganhadores - <span>{latestResult.ganhadores || "N/A"}</span></h2>
-                                <h2>Local Dos Ganhadores - <span>{latestResult.local_ganhadores || "N/A"}</span></h2>
-                                <h2>Acumulou - <span>{latestResult.acumulou ? "Sim" : "Não"}</span></h2>
+                                <h2>Concurso: - <span>{latestResult.concurso || "N/A"}</span></h2>
+                                <h2>Local do sorteio: - <span>{latestResult.local || "N/A"}</span></h2>
                             </div>
+
                             <div className="dezenas">
                                 {latestResult.dezenas && latestResult.dezenas.length > 0 ? (
                                     latestResult.dezenas.map((dezena, index) => (
@@ -85,7 +84,49 @@ const ResultLotofacil = () => {
                                     <span>N/A</span> // Caso não haja dezenas
                                 )}
                             </div>
+
                         </div>
+
+                        <div className="local-ganhadores">
+                            <h2>Local dos Ganhadores:</h2>
+                            <div className="local-ganhadores-info">
+                            {latestResult.localGanhadores && latestResult.localGanhadores.length > 0 ? (
+                                latestResult.localGanhadores.map((ganhador, index) => (
+                                    <p key={index}>
+                                        <span>{ganhador.municipio}</span>
+                                    </p>
+                                ))
+                            ) : (
+                                <span>N/A</span>
+                            )}
+                            </div>
+                        </div>
+
+                            <div className="premiacoes">
+                                <h2>Premiações:</h2>
+                                {latestResult.premiacoes && latestResult.premiacoes.length > 0 ? (
+                                    <table className="premiacoes-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Descrição</th>
+                                                <th>Ganhadores</th>
+                                                <th>Valor do Prêmio</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {latestResult.premiacoes.map((premiacao, index) => (
+                                                <tr key={index}>
+                                                    <td>{premiacao.descricao}</td>
+                                                    <td>{premiacao.ganhadores}</td>
+                                                    <td>R$ {premiacao.valorPremio.toFixed(2)}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                ) : (
+                                    <span>N/A</span>
+                                )}
+                            </div>
                     </>
                 ) : (
                     <h1>Nenhum resultado disponível.</h1> // Caso não haja dados

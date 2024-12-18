@@ -73,27 +73,42 @@
     border-bottom: solid 2px #8B008B;
     border-radius: 10px;
     padding: 0 1rem;
-    gap: 1rem;
 }
 
-.latest-result h1 {
+.latest-result-info-header {
     display: flex;
-    justify-content: space-between;
-    font-size: 1rem;
-    color: #8B008B;
+    justify-content: space-around;
+    align-items: center;
     background-color: #FF00FF;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+.latest-result-info-header h1 {
+    font-size: 1rem;
     color: #fff;
-    padding: 0.5rem 1.5rem;
-    border-top-left-radius: 40px;
-    border-top-right-radius: 40px;
+    letter-spacing: 2px;
+    font-weight: 700;
 }
 
-.latest-result-value {
+.latest-result-info-header p {
+    font-size: .6rem;
+    color: #ffffff77;
+    letter-spacing: 1px;
+}
+
+.latest-result-info-header p span {
+    font-size: .7rem;
+    color: #00ff00;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.latest-result-info-body {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 1rem;
-    margin-bottom: 1rem;
+    padding: .5rem 0;
     border-left: solid 2px #8B008B;
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
@@ -101,17 +116,24 @@
 
 .latest-result h2 {
     font-size: .6rem;
-    color: #8B008B;
+    color: black;
     padding: 0 1rem;
+    letter-spacing: 2px;
+    font-weight: bold;
+}
+.latest-result h2 span {
+    font-size: .5rem;
+    color: #FF00FF;
+    font-weight: 700;
 }
 
 /*Dezenas */
 .dezenas {
     display: flex;
-    justify-content: space-between;
+    flex: 1;
     align-items: center;
-    gap: 1rem;
-    padding: 1rem;
+    gap: .5rem;
+    padding: .5rem;
 }
 
 .dezenas span {
@@ -121,3 +143,68 @@
     padding: .3rem;
     border-radius: 50%;
 }
+
+/*Local doas ganhadores */
+.local-ganhadores {
+    width: 100%;
+    display: flex;
+    justify-items: flex-start;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: solid 1px #8B008B;
+    color: #8B008B;
+}
+
+.local-ganhadores h2 {
+    font-size: .6rem;
+    letter-spacing: 2px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.local-ganhadores p {
+    display: flex;
+    align-items: center;
+    font-size: .5rem;
+    letter-spacing: 2px;
+}
+
+.local-ganhadores-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    width: 50%;
+    margin-left: 10rem;
+}
+
+/*Premiações */
+.premiacoes h2 {
+    color: #8B008B;
+    margin-top: .4rem;
+}
+
+.premiacoes-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+}
+
+.premiacoes-table th {
+    background-color: #FF00FF;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    font-size: .6rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.premiacoes-table td {
+    border: 1px solid #ff00ff;
+    padding: 8px;
+    text-align: left;
+    font-size: .5rem;
+    color: #8B008B;
+}
+
