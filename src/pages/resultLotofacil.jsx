@@ -13,6 +13,7 @@ import { MdOutlineSearch } from "react-icons/md";
 import apiServices from "../services/apiServices";
 import { calculateCombinations } from "../utils/mathPossibility";
 import { processResults } from "../utils/analiyzeOddEven";
+import { calculateOddEven } from "../utils/latestResultOddEven";
 
 
 const ResultLotofacil = () => {
@@ -134,7 +135,6 @@ const ResultLotofacil = () => {
                                     <span>N/A</span> // Caso não haja dezenas
                                 )}
                             </div>
-
                         </div>
 
                         <div className="local-ganhadores">
@@ -180,6 +180,20 @@ const ResultLotofacil = () => {
                     </>
                 ) : (
                     <h1>Nenhum resultado disponível.</h1> // Caso não haja dados
+                )}
+                {latestResult && latestResult.dezenas ? (
+                    (() => {
+                        const { even, odd } = calculateOddEven(latestResult.dezenas);
+                        return (
+                            <p>
+                                O sorteio contém 
+                                <span>{even}</span> pares e 
+                                <span>{odd}</span> ímpares.
+                            </p>
+                        );
+                    })()
+                ) : (
+                    <p>Não há dados disponíveis para análise.</p>
                 )}
             </section>
 
