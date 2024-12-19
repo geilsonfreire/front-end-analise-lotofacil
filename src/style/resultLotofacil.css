@@ -127,6 +127,11 @@
 }
 
 /*Dezenas */
+.container-dezenas {
+    display: flex;
+    flex-direction: column;
+}
+
 .dezenas {
     display: flex;
     justify-content: center;
@@ -141,6 +146,29 @@
     background-color: #FF00FF;
     padding: .3rem;
     border-radius: 50%;
+}
+
+.odd-even {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: .5rem;
+}
+
+.odd-even p {
+    font-size: .6rem;
+    color: #8B008B;
+    letter-spacing: 2px;
+    font-weight: bold;
+}   
+
+.odd-even span {
+    font-size: .8rem;
+    color: #FF00FF;
+    font-weight: 700;
+    border: solid 1px #FF00FF;
+    padding: .1rem .3rem;
+    border-radius: 5px;
 }
 
 /*Local doas ganhadores */

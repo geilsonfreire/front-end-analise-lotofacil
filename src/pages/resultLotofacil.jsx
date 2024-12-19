@@ -126,14 +126,34 @@ const ResultLotofacil = () => {
                                 <h2>Local do sorteio: - <span>{latestResult.local || "N/A"}</span></h2>
                             </div>
 
-                            <div className="dezenas">
-                                {latestResult.dezenas && latestResult.dezenas.length > 0 ? (
-                                    latestResult.dezenas.map((dezena, index) => (
-                                        <span key={index}>{dezena}</span>
-                                    ))
-                                ) : (
-                                    <span>N/A</span> // Caso não haja dezenas
-                                )}
+                            <div className="container-dezenas">
+                                <div className="dezenas">
+                                    {latestResult.dezenas && latestResult.dezenas.length > 0 ? (
+                                        latestResult.dezenas.map((dezena, index) => (
+                                            <span key={index}>{dezena}</span>
+                                        ))
+                                    ) : (
+                                        <span>N/A</span> // Caso não haja dezenas
+                                    )}
+                                </div>
+                                <div className="odd-even">
+                                    {latestResult && latestResult.dezenas ? (
+                                        (() => {
+                                            const { even, odd } = calculateOddEven(latestResult.dezenas);
+                                            return (
+                                                <>
+                                                    <p>O sorteio contém:</p>
+                                                    <span>{even}</span>
+                                                    <p>pares e</p>
+                                                    <span>{odd}</span>
+                                                    <p>ímpares.</p>
+                                                </>
+                                            );
+                                        })()
+                                    ) : (
+                                        <p>Não há dados disponíveis para análise.</p>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
@@ -180,20 +200,6 @@ const ResultLotofacil = () => {
                     </>
                 ) : (
                     <h1>Nenhum resultado disponível.</h1> // Caso não haja dados
-                )}
-                {latestResult && latestResult.dezenas ? (
-                    (() => {
-                        const { even, odd } = calculateOddEven(latestResult.dezenas);
-                        return (
-                            <p>
-                                O sorteio contém 
-                                <span>{even}</span> pares e 
-                                <span>{odd}</span> ímpares.
-                            </p>
-                        );
-                    })()
-                ) : (
-                    <p>Não há dados disponíveis para análise.</p>
                 )}
             </section>
 
