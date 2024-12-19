@@ -12,6 +12,7 @@ import { MdOutlineSearch } from "react-icons/md";
 // Importando o componente
 import apiServices from "../services/apiServices";
 import { calculateCombinations } from "../utils/mathPossibility";
+import { processResults } from "../utils/analiyzeOddEven";
 
 
 const ResultLotofacil = () => {
@@ -19,9 +20,11 @@ const ResultLotofacil = () => {
     const [latestResult, setLatestResult] = useState(null);
     const [loading, setLoading] = useState(true);
     const [sorteios, setSorteios] = useState([]);
+    const [analysis, setAnalysis] = useState(null);
 
     // Calcula as combinações
     const totalCombinations = calculateCombinations(25, 15);
+
 
     // Busca todos os sorteios da API
     useEffect(() => {
@@ -29,17 +32,42 @@ const ResultLotofacil = () => {
             try {
                 const allResults = await apiServices.getAllResults();
                 setSorteios(allResults);
+
+                // Processa os resultados para análise
+                const analysisResult = await processResults(allResults);
+                setAnalysis(analysisResult); // Define os resultados da análise
             } catch (error) {
                 console.error("Erro ao buscar os sorteios:", error.message);
+                toast.error("Erro ao buscar dados da API.");
             } finally {
                 setLoading(false);
             }
         };
         fetchSorteios();
     }, []);
+
     // Calcula o restante de possibilidades (dinâmico)
     const remainingCombinations = totalCombinations - sorteios.length;
-   
+
+    // Verifica a quantidade de sorteios com sequências repetidas
+    const countRepeatedSequences = () => {
+        const seenSequences = new Set(); // Armazena sequências únicas
+        let repeatedCount = 0;
+
+        sorteios.forEach((sorteio) => {
+            const sortedDezenas = sorteio.dezenas.sort().join(","); // Ordena e une as dezenas
+            if (seenSequences.has(sortedDezenas)) {
+                repeatedCount += 1; // Incrementa se a sequência já foi vista
+            } else {
+                seenSequences.add(sortedDezenas); // Adiciona sequência única
+            }
+        });
+
+        return repeatedCount;
+    };
+
+    const repeatedCount = countRepeatedSequences();
+
 
     // Função para buscar o último resultado
     const fetchLatestResult = async () => {
@@ -112,43 +140,43 @@ const ResultLotofacil = () => {
                         <div className="local-ganhadores">
                             <h2>Local dos Ganhadores:</h2>
                             <div className="local-ganhadores-info">
-                            {latestResult.localGanhadores && latestResult.localGanhadores.length > 0 ? (
-                                latestResult.localGanhadores.map((ganhador, index) => (
-                                    <p key={index}>
-                                        <span>{ganhador.municipio}</span>
-                                    </p>
-                                ))
-                            ) : (
-                                <span>N/A</span>
-                            )}
-                            </div>
-                        </div>
-
-                            <div className="premiacoes">
-                                <h2>Premiações:</h2>
-                                {latestResult.premiacoes && latestResult.premiacoes.length > 0 ? (
-                                    <table className="premiacoes-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Descrição</th>
-                                                <th>Ganhadores</th>
-                                                <th>Valor do Prêmio</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {latestResult.premiacoes.map((premiacao, index) => (
-                                                <tr key={index}>
-                                                    <td>{premiacao.descricao}</td>
-                                                    <td>{premiacao.ganhadores}</td>
-                                                    <td>R$ {premiacao.valorPremio.toFixed(2)}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                {latestResult.localGanhadores && latestResult.localGanhadores.length > 0 ? (
+                                    latestResult.localGanhadores.map((ganhador, index) => (
+                                        <p key={index}>
+                                            <span>{ganhador.municipio}</span>
+                                        </p>
+                                    ))
                                 ) : (
                                     <span>N/A</span>
                                 )}
                             </div>
+                        </div>
+
+                        <div className="premiacoes">
+                            <h2>Premiações:</h2>
+                            {latestResult.premiacoes && latestResult.premiacoes.length > 0 ? (
+                                <table className="premiacoes-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Descrição</th>
+                                            <th>Ganhadores</th>
+                                            <th>Valor do Prêmio</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {latestResult.premiacoes.map((premiacao, index) => (
+                                            <tr key={index}>
+                                                <td>{premiacao.descricao}</td>
+                                                <td>{premiacao.ganhadores}</td>
+                                                <td>R$ {premiacao.valorPremio.toFixed(2)}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            ) : (
+                                <span>N/A</span>
+                            )}
+                        </div>
                     </>
                 ) : (
                     <h1>Nenhum resultado disponível.</h1> // Caso não haja dados
@@ -184,8 +212,51 @@ const ResultLotofacil = () => {
                                     <td>Possibilidades restantes</td>
                                     <td>{remainingCombinations.toLocaleString()}</td>
                                 </tr>
+                                <tr>
+                                    <td>Sorteios com sequências repetidas</td>
+                                    <td>{repeatedCount.toLocaleString()}</td>
+                                </tr>
                             </tbody>
                         </table>
+                    )}
+                </div>
+
+            </section>
+
+            <section className="analise-result">
+                <div className="latest-result-info-header">
+                    <h1>Análise de Quantitativo / Impares & Pares </h1>
+                </div>
+
+                <div className="possibility-result-info-body">
+                    {loading ? (
+                        <p>Carregando dados...</p>
+                    ) : analysis ? (
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Descrição</th>
+                                    <th>Pares</th>
+                                    <th>Ímpares</th>
+                                    <th>Quantidade</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {Object.entries(analysis).map(([key, count], index) => {
+                                    const [even, odd] = key.match(/\d+/g); // Extrai pares e ímpares da descrição
+                                    return (
+                                        <tr key={index}>
+                                            <td>{key}</td>
+                                            <td>{even}</td>
+                                            <td>{odd}</td>
+                                            <td>{count}</td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    ) : (
+                        <p>Erro: Não foi possível carregar os dados da análise.</p>
                     )}
                 </div>
 
