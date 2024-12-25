@@ -246,6 +246,7 @@
     border-left: solid 2px #8B008B;
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
+    
 }
 
 .possibility-result-info-body table {
@@ -254,6 +255,8 @@
     border-radius: 5px;
     margin-bottom: 1rem;
 }
+
+
 
 .possibility-result-info-body th {
     background-color: #FF00FF;
@@ -271,4 +274,43 @@
     font-size: .5rem;
     color: #8B008B;
     padding-left: 1rem;
+ 
+}
+
+.projecoes {
+    display: flex;
+    flex-direction: column;
+}
+
+.projecoes h3 {
+    font-size: .5rem;
+    color: #8B008B;
+    letter-spacing: 2px;
+}
+
+.projecoes h3 span {
+    font-size: .8rem;
+    color: #8B008B;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.projections-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+
+}
+
+.scrollable-tbody {
+    display: block;
+    height: 8rem;
+    overflow-y: auto
+}
+
+.scrollable-tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
 }

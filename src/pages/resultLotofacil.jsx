@@ -1,6 +1,7 @@
 // Imports Bibliotecas
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { toast } from "react-toastify";
+
 
 // Imports Css
 import "../style/resultLotofacil.css";
@@ -14,6 +15,7 @@ import apiServices from "../services/apiServices";
 import { calculateCombinations } from "../utils/mathPossibility";
 import { processResults } from "../utils/analiyzeOddEven";
 import { calculateOddEven } from "../utils/oddEvenAnalyzer";
+import { updateUnrealizedDraws } from "../services/projetionService";
 
 
 const ResultLotofacil = () => {
@@ -22,10 +24,43 @@ const ResultLotofacil = () => {
     const [loading, setLoading] = useState(true);
     const [sorteios, setSorteios] = useState([]);
     const [analysis, setAnalysis] = useState(null);
+    const [projections, setProjections] = useState([]);
+    const [visibleProjections, setVisibleProjections] = useState([]);
+    const tableRef = useRef(null);
+    const rowsPerPage = 50;
 
     // Calcula as combinações
     const totalCombinations = calculateCombinations(25, 15);
 
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            const data = await updateUnrealizedDraws();
+            setProjections(data);
+            setLoading(false);
+        };
+
+        fetchData();
+    }, []);
+
+    // Atualiza as projeções visíveis
+    useEffect(() => {
+        // Inicializar com as primeiras linhas
+        setVisibleProjections(projections.slice(0, rowsPerPage));
+    }, [projections]);
+    // Função para carregar mais projeções
+    const handleScroll = () => {
+        const table = tableRef.current;
+        if (table.scrollTop + table.clientHeight >= table.scrollHeight - 50 && !loading) {
+            setLoading(true);
+            // Carregar mais dados
+            const nextRows = projections.slice(visibleProjections.length, visibleProjections.length + rowsPerPage);
+            setTimeout(() => {
+                setVisibleProjections((prev) => [...prev, ...nextRows]);
+                setLoading(false);
+            }, 1000); // Simula um delay de carregamento
+        }
+    };
 
     // Busca todos os sorteios da API
     useEffect(() => {
@@ -284,36 +319,38 @@ const ResultLotofacil = () => {
 
             <section className="analise-result">
                 <div className="latest-result-info-header">
-                    <h1>projeção de sorteios não ocorridos </h1>
+                    <h1>Projeção de sorteios não ocorridos</h1>
                 </div>
 
-                <div className="possibility-result-info-body">
-                    {loading ? (
-                        <p>Carregando dados...</p>
-                    ) : analysis ? (
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Dezenas</th>
-                                    <th>Pares</th>
-                                    <th>Ímpares</th>
-                                    <th>Quantidade</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr key={""}>
-                                    <td>{""}</td>
-                                    <td>{""}</td>
-                                    <td>{""}</td>
-                                    <td>{""}</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <div className="possibility-result-info-body projecoes">
+                    {loading && <p>Carregando dados...</p>}
+                    {projections && projections.length > 0 ? (
+                        <>
+                            <h3>
+                                Projeção de sorteios não realizados: <span>{projections.length.toLocaleString("pt-BR")}</span>
+                            </h3>
+                            <table className="projections-table">
+                                <thead>
+                                    <tr>
+                                        <th>Dezenas / Pares / Impares </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="scrollable-tbody" ref={tableRef} onScroll={handleScroll}>
+                                    {visibleProjections.map((projection, index) => (
+                                        <tr key={index}>
+                                            <td>{projection.dezenas.join(", ")}</td>
+                                            <td>{projection.even}</td>
+                                            <td>{projection.odd}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                            {loading && <p>Carregando mais...</p>}
+                        </>
                     ) : (
-                        <span>Estamos recalculando e carregar os dados de análise.</span>
+                        <span>Estamos recalculando e carregando os dados de análise.</span>
                     )}
                 </div>
-
             </section>
 
         </main >
