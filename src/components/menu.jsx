@@ -15,6 +15,7 @@ import {
     MdOutlineGridOn
 } from "react-icons/md";
 import { TbClover } from "react-icons/tb";
+import { GrAnalytics } from "react-icons/gr";
 
 const Menu = () => {
 
@@ -45,6 +46,11 @@ const Menu = () => {
                     to="/result-lotofacil"
                     icon={<MdOutlineGridOn />}
                     title="Resultados"
+                />
+                <Icon
+                    to="/analise-impa-par"
+                    icon={<GrAnalytics />}
+                    title="Analise Impa / Par"
                 />
                 <Icon
                     to="/meus-jogos"

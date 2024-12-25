@@ -7,6 +7,7 @@ import Home from '../pages/home.jsx';
 import AdminDashBoard from "../pages/AdminDashBoard.jsx";
 import ResultLotofafil from '../pages/resultlotofacil.jsx';
 import MeusJogos from '../pages/meus-jogos.jsx';
+import AnaliseImpaPar from '../pages/analiseImparPar.jsx';
 
 
 
@@ -18,6 +19,7 @@ const MyRoutes = () => {
                     <Route index  element={<AdminDashBoard />} />
                     <Route path="/result-lotofacil" element={<ResultLotofafil />} />
                     <Route path="/meus-jogos" element={<MeusJogos />} />
+                    <Route path="/analise-impa-par" element={<AnaliseImpaPar />} />
                 </Route>
             </Routes>
         </StrictMode>
