@@ -13,7 +13,7 @@ import { MdOutlineSearch } from "react-icons/md";
 import apiServices from "../services/apiServices";
 import { calculateCombinations } from "../utils/mathPossibility";
 import { processResults } from "../utils/analiyzeOddEven";
-import { calculateOddEven } from "../utils/latestResultOddEven";
+import { calculateOddEven } from "../utils/oddEvenAnalyzer";
 
 
 const ResultLotofacil = () => {
@@ -133,7 +133,7 @@ const ResultLotofacil = () => {
                                             <span key={index}>{dezena}</span>
                                         ))
                                     ) : (
-                                        <span>N/A</span> // Caso não haja dezenas
+                                        <span>Dezenas não identificada</span> // Caso não haja dezenas
                                     )}
                                 </div>
                                 <div className="odd-even">
@@ -167,7 +167,7 @@ const ResultLotofacil = () => {
                                         </p>
                                     ))
                                 ) : (
-                                    <span>N/A</span>
+                                    <span>Dados informado</span>
                                 )}
                             </div>
                         </div>
@@ -276,7 +276,41 @@ const ResultLotofacil = () => {
                             </tbody>
                         </table>
                     ) : (
-                        <p>Erro: Não foi possível carregar os dados da análise.</p>
+                        <span>Estamos recalculando e carregar os dados de análise.</span>
+                    )}
+                </div>
+
+            </section>
+
+            <section className="analise-result">
+                <div className="latest-result-info-header">
+                    <h1>projeção de sorteios não ocorridos </h1>
+                </div>
+
+                <div className="possibility-result-info-body">
+                    {loading ? (
+                        <p>Carregando dados...</p>
+                    ) : analysis ? (
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Dezenas</th>
+                                    <th>Pares</th>
+                                    <th>Ímpares</th>
+                                    <th>Quantidade</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr key={""}>
+                                    <td>{""}</td>
+                                    <td>{""}</td>
+                                    <td>{""}</td>
+                                    <td>{""}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    ) : (
+                        <span>Estamos recalculando e carregar os dados de análise.</span>
                     )}
                 </div>
 
