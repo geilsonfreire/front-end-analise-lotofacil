@@ -170,4 +170,284 @@ section {
     transform: scale(1.1);
 }
 
-/*Scroll para */
+/*Style de todas as pages  */
+.Container-Geral {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/*Header e filtros */
+.header-filter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    height: 3rem;
+    border-radius: 10px;
+}
+
+.header-filter .search {
+    display: flex;
+    align-items: center;
+}
+
+/* Input */
+.search input {
+    border: none;
+    border-bottom: 1px solid #8B008B;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 5px;
+    padding: 0.2rem 1rem;
+    outline: none;
+    font-size: .7rem;
+    color: #000;
+}
+
+.search input:hover {
+    border-bottom: 2px solid #8B008B;
+}
+
+.search input::placeholder {
+    color: #00000038;
+    font-size: .5rem;
+}
+
+/*Button */
+.search button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #8B008B;
+    padding: .2rem 1rem;
+    font-size: .7rem;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    outline: none;
+}
+
+.search button:hover {
+    background-color: #FF00FF;
+}
+
+.search button svg {
+    font-size: 1rem;
+    margin-right: .5rem;
+}
+
+
+/*Seção ultimo resultado */
+.latest-result {
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    padding: 0 1rem;
+}
+
+.latest-result-info-header {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #FF00FF;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.latest-result-info-header h1 {
+    font-size: 1rem;
+    color: #fff;
+    letter-spacing: 2px;
+    font-weight: 700;
+}
+
+.latest-result-info-header p {
+    font-size: .6rem;
+    color: #ffffff77;
+    letter-spacing: 1px;
+}
+
+.latest-result-info-header p span {
+    font-size: .7rem;
+    color: #00ff00;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.latest-result-info-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: .5rem 0;
+    border-left: solid 2px #8B008B;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.latest-result h2 {
+    font-size: .6rem;
+    color: black;
+    padding: 0 1rem;
+    letter-spacing: 2px;
+    font-weight: bold;
+}
+
+.latest-result h2 span {
+    font-size: .5rem;
+    color: #FF00FF;
+    font-weight: 700;
+}
+
+/*Dezenas */
+.container-dezenas {
+    display: flex;
+    flex-direction: column;
+}
+
+.dezenas {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: .5rem;
+    padding: .5rem;
+}
+
+.dezenas span {
+    font-size: .7rem;
+    color: #fff;
+    background-color: #FF00FF;
+    padding: .3rem;
+    border-radius: 50%;
+}
+
+.odd-even {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: .5rem;
+}
+
+.odd-even p {
+    font-size: .6rem;
+    color: #8B008B;
+    letter-spacing: 2px;
+    font-weight: bold;
+}
+
+.odd-even span {
+    font-size: .8rem;
+    color: #FF00FF;
+    font-weight: 700;
+    border: solid 1px #FF00FF;
+    padding: .1rem .3rem;
+    border-radius: 5px;
+}
+
+/*Local doas ganhadores */
+.local-ganhadores {
+    width: 100%;
+    display: flex;
+    justify-items: flex-start;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: solid 1px #8B008B;
+    color: #8B008B;
+}
+
+.local-ganhadores h2 {
+    font-size: .6rem;
+    letter-spacing: 2px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.local-ganhadores p {
+    display: flex;
+    align-items: center;
+    font-size: .5rem;
+    letter-spacing: 2px;
+}
+
+.local-ganhadores-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    width: 50%;
+    margin-left: 10rem;
+}
+
+/*Premiações */
+.premiacoes h2 {
+    color: #8B008B;
+    margin-top: .4rem;
+}
+
+.premiacoes-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+}
+
+.premiacoes-table th {
+    background-color: #FF00FF;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    font-size: .6rem;
+    font-weight: bold;
+    text-align: center;
+    color: #fff;
+}
+
+.premiacoes-table td {
+    border: 1px solid #ff00ff;
+    text-align: left;
+    font-size: .5rem;
+    color: #8B008B;
+    padding-left: 1rem;
+}
+
+/*Tabela de analise de Possibilidades */
+.possibility-result-info-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: .5rem;
+    border-left: solid 2px #8B008B;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+
+}
+
+.possibility-result-info-body table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+}
+
+
+
+.possibility-result-info-body th {
+    background-color: #FF00FF;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    font-size: .6rem;
+    font-weight: bold;
+    text-align: center;
+    color: #fff;
+}
+
+.possibility-result-info-body td {
+    border: 1px solid #ff00ff;
+    text-align: left;
+    font-size: .5rem;
+    color: #8B008B;
+    padding-left: 1rem;
+
+}

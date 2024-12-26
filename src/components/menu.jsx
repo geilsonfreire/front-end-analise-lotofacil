@@ -16,6 +16,7 @@ import {
 } from "react-icons/md";
 import { TbClover } from "react-icons/tb";
 import { GrAnalytics } from "react-icons/gr";
+import { LuProjector } from "react-icons/lu";
 
 const Menu = () => {
 
@@ -51,6 +52,11 @@ const Menu = () => {
                     to="/analise-impa-par"
                     icon={<GrAnalytics />}
                     title="Analise Impa / Par"
+                />
+                <Icon
+                    to="/sorteios-nao-realizados"
+                    icon={<LuProjector />}
+                    title="Sorteios nao realizados"
                 />
                 <Icon
                     to="/meus-jogos"

@@ -8,6 +8,7 @@ import AdminDashBoard from "../pages/AdminDashBoard.jsx";
 import ResultLotofafil from '../pages/resultlotofacil.jsx';
 import MeusJogos from '../pages/meus-jogos.jsx';
 import AnaliseImpaPar from '../pages/analiseImparPar.jsx';
+import SorteioNaoRealisado from '../pages/projetSorteios.jsx';
 
 
 
@@ -20,6 +21,7 @@ const MyRoutes = () => {
                     <Route path="/result-lotofacil" element={<ResultLotofafil />} />
                     <Route path="/meus-jogos" element={<MeusJogos />} />
                     <Route path="/analise-impa-par" element={<AnaliseImpaPar />} />
+                    <Route path="/sorteios-nao-realizados" element={<SorteioNaoRealisado />} />
                 </Route>
             </Routes>
         </StrictMode>

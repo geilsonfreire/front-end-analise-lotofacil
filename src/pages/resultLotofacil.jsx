@@ -1,5 +1,5 @@
 // Imports Bibliotecas
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 
@@ -12,74 +12,23 @@ import { MdOutlineSearch } from "react-icons/md";
 
 // Importando o componente
 import apiServices from "../services/apiServices";
+import { fetchSorteios } from "../utils/fetchSorteios";
 import { calculateCombinations } from "../utils/mathPossibility";
-import { processResults } from "../utils/analiyzeOddEven";
 import { calculateOddEven } from "../utils/oddEvenAnalyzer";
-import { updateUnrealizedDraws } from "../services/projetionService";
+
 
 
 const ResultLotofacil = () => {
     // Estado para armazenar os resultados
     const [latestResult, setLatestResult] = useState(null);
-    const [loading, setLoading] = useState(true);
     const [sorteios, setSorteios] = useState([]);
-    const [analysis, setAnalysis] = useState(null);
-    const [projections, setProjections] = useState([]);
-    const [visibleProjections, setVisibleProjections] = useState([]);
-    const tableRef = useRef(null);
-    const rowsPerPage = 50;
 
     // Calcula as combinações
     const totalCombinations = calculateCombinations(25, 15);
-
+   
+   
     useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            const data = await updateUnrealizedDraws();
-            setProjections(data);
-            setLoading(false);
-        };
-
-        fetchData();
-    }, []);
-
-    // Atualiza as projeções visíveis
-    useEffect(() => {
-        // Inicializar com as primeiras linhas
-        setVisibleProjections(projections.slice(0, rowsPerPage));
-    }, [projections]);
-    // Função para carregar mais projeções
-    const handleScroll = () => {
-        const table = tableRef.current;
-        if (table.scrollTop + table.clientHeight >= table.scrollHeight - 50 && !loading) {
-            setLoading(true);
-            // Carregar mais dados
-            const nextRows = projections.slice(visibleProjections.length, visibleProjections.length + rowsPerPage);
-            setTimeout(() => {
-                setVisibleProjections((prev) => [...prev, ...nextRows]);
-                setLoading(false);
-            }, 1000); // Simula um delay de carregamento
-        }
-    };
-
-    // Busca todos os sorteios da API
-    useEffect(() => {
-        const fetchSorteios = async () => {
-            try {
-                const allResults = await apiServices.getAllResults();
-                setSorteios(allResults);
-
-                // Processa os resultados para análise
-                const analysisResult = await processResults(allResults);
-                setAnalysis(analysisResult); // Define os resultados da análise
-            } catch (error) {
-                console.error("Erro ao buscar os sorteios:", error.message);
-                toast.error("Erro ao buscar dados da API.");
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchSorteios();
+        fetchSorteios(setSorteios);
     }, []);
 
     // Calcula o restante de possibilidades (dinâmico)
@@ -107,10 +56,12 @@ const ResultLotofacil = () => {
 
     // Função para buscar o último resultado
     const fetchLatestResult = async () => {
+        const loadingToast = toast.info("Carregando último resultado...", { autoClose: false });
         try {
             const latestResult = await apiServices.getLatestResult(); // Chama a API
             if (latestResult) {
                 setLatestResult(latestResult);
+                toast.success("Último resultado carregado com sucesso!");
             } else {
                 toast.error("Erro ao carregar o último resultado.");
             }
@@ -118,7 +69,7 @@ const ResultLotofacil = () => {
             console.error("Erro na requisição:", error);
             toast.error("Erro na comunicação com o servidor.");
         } finally {
-            setLoading(false);
+            toast.dismiss(loadingToast);
         }
     };
 
@@ -145,9 +96,7 @@ const ResultLotofacil = () => {
             </section>
 
             <section className="latest-result">
-                {loading ? (
-                    <h1>Carregando...</h1> // Exibe enquanto carrega
-                ) : latestResult ? (
+                {latestResult ? (
                     <>
                         <div className="latest-result-info-header">
                             <h1>Ultimo Resultado</h1>
@@ -168,7 +117,7 @@ const ResultLotofacil = () => {
                                             <span key={index}>{dezena}</span>
                                         ))
                                     ) : (
-                                        <span>Dezenas não identificada</span> // Caso não haja dezenas
+                                        <span>Dezenas não identificadas</span>
                                     )}
                                 </div>
                                 <div className="odd-even">
@@ -202,7 +151,7 @@ const ResultLotofacil = () => {
                                         </p>
                                     ))
                                 ) : (
-                                    <span>Dados informado</span>
+                                    <span>Dados não informados</span>
                                 )}
                             </div>
                         </div>
@@ -234,7 +183,7 @@ const ResultLotofacil = () => {
                         </div>
                     </>
                 ) : (
-                    <h1>Nenhum resultado disponível.</h1> // Caso não haja dados
+                    <h1>Nenhum resultado disponível.</h1>
                 )}
             </section>
 
@@ -244,116 +193,37 @@ const ResultLotofacil = () => {
                 </div>
 
                 <div className="possibility-result-info-body">
-                    {loading ? (
-                        <p>Carregando dados...</p>
-                    ) : (
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Descrição</th>
-                                    <th>Quantidade</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Total de possibilidades de jogos</td>
-                                    <td>{totalCombinations.toLocaleString()}</td>
-                                </tr>
-                                <tr>
-                                    <td>Total de sorteios já realizados</td>
-                                    <td>{sorteios.length.toLocaleString()}</td>
-                                </tr>
-                                <tr>
-                                    <td>Possibilidades restantes</td>
-                                    <td>{remainingCombinations.toLocaleString()}</td>
-                                </tr>
-                                <tr>
-                                    <td>Sorteios com sequências repetidas</td>
-                                    <td>{repeatedCount.toLocaleString()}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    )}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Descrição</th>
+                                <th>Quantidade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Total de possibilidades de jogos</td>
+                                <td>{totalCombinations.toLocaleString()}</td>
+                            </tr>
+                            <tr>
+                                <td>Total de sorteios já realizados</td>
+                                <td>{sorteios.length.toLocaleString()}</td>
+                            </tr>
+                            <tr>
+                                <td>Possibilidades restantes</td>
+                                <td>{remainingCombinations.toLocaleString()}</td>
+                            </tr>
+                            <tr>
+                                <td>Sorteios com sequências repetidas</td>
+                                <td>{repeatedCount.toLocaleString()}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
             </section>
 
-            <section className="analise-result">
-                <div className="latest-result-info-header">
-                    <h1>Análise de Quantitativo / Impares & Pares </h1>
-                </div>
-
-                <div className="possibility-result-info-body">
-                    {loading ? (
-                        <p>Carregando dados...</p>
-                    ) : analysis ? (
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Descrição</th>
-                                    <th>Pares</th>
-                                    <th>Ímpares</th>
-                                    <th>Quantidade</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {Object.entries(analysis).map(([key, count], index) => {
-                                    const [even, odd] = key.match(/\d+/g); // Extrai pares e ímpares da descrição
-                                    return (
-                                        <tr key={index}>
-                                            <td>{key}</td>
-                                            <td>{even}</td>
-                                            <td>{odd}</td>
-                                            <td>{count}</td>
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
-                    ) : (
-                        <span>Estamos recalculando e carregar os dados de análise.</span>
-                    )}
-                </div>
-
-            </section>
-
-            <section className="analise-result">
-                <div className="latest-result-info-header">
-                    <h1>Projeção de sorteios não ocorridos</h1>
-                </div>
-
-                <div className="possibility-result-info-body projecoes">
-                    {loading && <p>Carregando dados...</p>}
-                    {projections && projections.length > 0 ? (
-                        <>
-                            <h3>
-                                Projeção de sorteios não realizados: <span>{projections.length.toLocaleString("pt-BR")}</span>
-                            </h3>
-                            <table className="projections-table">
-                                <thead>
-                                    <tr>
-                                        <th>Dezenas / Pares / Impares </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="scrollable-tbody" ref={tableRef} onScroll={handleScroll}>
-                                    {visibleProjections.map((projection, index) => (
-                                        <tr key={index}>
-                                            <td>{projection.dezenas.join(", ")}</td>
-                                            <td>{projection.even}</td>
-                                            <td>{projection.odd}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                            {loading && <p>Carregando mais...</p>}
-                        </>
-                    ) : (
-                        <span>Estamos recalculando e carregando os dados de análise.</span>
-                    )}
-                </div>
-            </section>
-
-        </main >
+        </main>
     );
 };
 

@@ -4,61 +4,50 @@ import { toast } from "react-toastify";
 
 
 // Imports Css
-import "../style/resultLotofacil.css";
+import "../style/analiseImpaPar.css";
 
 // Imports de Icones
 
 
 
 // Importando o componente
-import apiServices from "../services/apiServices";
+import { fetchSorteios } from "../utils/fetchSorteios";
 import { processResults } from "../utils/analiyzeOddEven";  
 
 
 
-const ResultLotofacil = () => {
+const AnaliseImpaPar = () => {
     // Estado para armazenar os resultados
-    const [loading, setLoading] = useState(true);
     const [analysis, setAnalysis] = useState(null);
 
 
-
-    // Busca todos os sorteios da API
     useEffect(() => {
-        const fetchSorteios = async () => {
-            try {
-                const allResults = await apiServices.getAllResults();
-
-                // Processa os resultados para análise
+        const fetchAndAnalyze = async () => {
+            await fetchSorteios(async (allResults) => {
                 const analysisResult = await processResults(allResults);
-                setAnalysis(analysisResult); // Define os resultados da análise
-            } catch (error) {
-                console.error("Erro ao buscar os sorteios:", error.message);
-                toast.error("Erro ao buscar dados da API.");
-            } finally {
-                setLoading(false);
-            }
+                setAnalysis(analysisResult);
+                toast.success("Análise concluída com sucesso!");
+            });
         };
-        fetchSorteios();
+
+        fetchAndAnalyze();
     }, []);
 
     return (
         <main className="Container-Geral">
             <section className="header-filter">
                 <div className="Title">
-                    <h1>Análise -<span> Impar - Par</span></h1>
+                    <h1>Análise -<span> Ímpar - Par</span></h1>
                 </div>
             </section>
 
             <section className="analise-result">
                 <div className="latest-result-info-header">
-                    <h1>Análise de Quantitativo / Impares & Pares</h1>
+                    <h1>Análise de Quantitativo / Ímpares & Pares</h1>
                 </div>
 
                 <div className="possibility-result-info-body">
-                    {loading ? (
-                        <p>Carregando dados...</p>
-                    ) : analysis ? (
+                    {analysis ? (
                         <table>
                             <thead>
                                 <tr>
@@ -83,13 +72,12 @@ const ResultLotofacil = () => {
                             </tbody>
                         </table>
                     ) : (
-                        <span>Estamos recalculando e carregando os dados de análise.</span>
+                        <span></span>
                     )}
                 </div>
             </section>
-
-        </main >
+        </main>
     );
 };
 
-export default ResultLotofacil
+export default AnaliseImpaPar
