@@ -207,7 +207,7 @@ const DezenasQuentes = () => {
                             </table>
                         </div>
 
-                        <h2>Maior Atraso Entre as Dezenas</h2>
+                        <h2>As 5 com Maior Atraso Entre as Dezenas</h2>
                         <div className="result-info-table">
                             <table>
                                 <thead>
@@ -217,10 +217,23 @@ const DezenasQuentes = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>Dez {maiorAtraso.dezena}</td>
-                                        <td>{maiorAtraso.intervaloAtraso} sorteios</td>
-                                    </tr>
+                                    {intervalosAtraso
+                                        .map((intervalo, index) => ({ dezena: index + 1, intervalo }))
+                                        .sort((a, b) => b.intervalo - a.intervalo) // Ordena pelo maior intervalo
+                                        .slice(0, 5) // Pega as 5 maiores
+                                        .map((item, index) => {
+                                            // A cada iteração, vamos atualizar o maior intervalo
+                                            if (item.intervalo > maiorAtraso.intervaloAtraso) {
+                                                setMaiorAtraso({ dezena: item.dezena, intervaloAtraso: item.intervalo });
+                                            }
+
+                                            return (
+                                                <tr key={index}>
+                                                    <td>Dez {item.dezena}</td> {/* Dezena */}
+                                                    <td>{item.intervalo} sorteios</td> {/* Intervalo de atraso */}
+                                                </tr>
+                                            );
+                                        })}
                                 </tbody>
                             </table>
                         </div>
