@@ -22,6 +22,8 @@ const DezenasQuentes = () => {
     const [frequencias, setFrequencias] = useState(null);
     const [error, setError] = useState(null);
     const [topQuentes, setTopQuentes] = useState([]);
+    const [intervalosAtraso, setIntervalosAtraso] = useState([]);
+    const [maiorAtraso, setMaiorAtraso] = useState({ dezena: null, intervaloAtraso: 0 });
 
     // Função para calcular a frequência das dezenas
     const calcularFrequenciaDezenas = (resultados) => {
@@ -36,7 +38,27 @@ const DezenasQuentes = () => {
         return frequencia;
     };
 
-    // Função para buscar os resultados e calcular as frequências
+    // Função para calcular os intervalos de atraso de cada dezena
+    const calcularIntervalosAtraso = (resultados) => {
+        let ultimaOcorrencia = Array(25).fill(-1); // Armazena o último sorteio onde cada dezena apareceu
+        let intervaloCalculado = Array(25).fill(0); // Intervalos de atraso das dezenas
+
+        resultados.forEach((resultado, idx) => {
+            resultado.dezenas.forEach((dezena) => {
+                // Se a dezena já apareceu antes, calcula o intervalo
+                if (ultimaOcorrencia[dezena - 1] !== -1) {
+                    intervaloCalculado[dezena - 1] = idx - ultimaOcorrencia[dezena - 1];
+                }
+                ultimaOcorrencia[dezena - 1] = idx; // Atualiza a última ocorrência da dezena
+            });
+        });
+
+        // Atualiza o estado com os intervalos calculados
+        return intervaloCalculado;
+    };
+
+
+    // Função para buscar os resultados e calcular as frequências e intervalos
     useEffect(() => {
         const fetchResults = async () => {
             const loadingToast = toast.loading("Carregando dados...");
@@ -46,6 +68,10 @@ const DezenasQuentes = () => {
                 const frequencia = calcularFrequenciaDezenas(resultados); // Calcula a frequência
                 setFrequencias(frequencia);
 
+                // Calcula os intervalos de atraso
+                const intervalosCalculados = calcularIntervalosAtraso(resultados);
+                setIntervalosAtraso(intervalosCalculados);
+
                 // Calcula as 5 dezenas mais quentes
                 const topQuentesCalculadas = frequencia
                     .map((freq, idx) => ({ dezena: idx + 1, frequencia: freq }))
@@ -53,6 +79,16 @@ const DezenasQuentes = () => {
                     .slice(0, 5);
 
                 setTopQuentes(topQuentesCalculadas);
+
+                // Encontra o maior intervalo de atraso
+                const maiorIntervalo = intervalosCalculados.reduce((max, intervalo, idx) => {
+                    if (intervalo > max.intervaloAtraso) {
+                        return { dezena: idx + 1, intervaloAtraso: intervalo };
+                    }
+                    return max;
+                }, { dezena: null, intervaloAtraso: 0 });
+
+                setMaiorAtraso(maiorIntervalo);
 
                 toast.update(loadingToast, {
                     render: "Dados carregados com sucesso!",
@@ -74,7 +110,6 @@ const DezenasQuentes = () => {
 
         fetchResults();
     }, []);
-
 
 
     return (
@@ -138,6 +173,54 @@ const DezenasQuentes = () => {
                                             <td>{item.frequencia}</td> {/* Frequência */}
                                         </tr>
                                     ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </>
+                )}
+            </section>
+
+
+            <section className="conteiner-section">
+                <div className="title-result-info">
+                    <h1>Intervalo de Atraso das Dezenas</h1>
+                </div>
+                {error && <p>{error}</p>}
+                {intervalosAtraso && (
+                    <>
+                        <div className="result-info-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        {intervalosAtraso.map((_, index) => (
+                                            <th key={index}>Dez {index + 1}</th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        {intervalosAtraso.map((intervalo, index) => (
+                                            <td key={index}>{intervalo}</td>
+                                        ))}
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h2>Maior Atraso Entre as Dezenas</h2>
+                        <div className="result-info-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Dezena</th>
+                                        <th>Intervalo de Atraso</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Dez {maiorAtraso.dezena}</td>
+                                        <td>{maiorAtraso.intervaloAtraso} sorteios</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
