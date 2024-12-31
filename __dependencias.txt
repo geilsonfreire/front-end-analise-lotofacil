@@ -5,3 +5,4 @@ npm install --save prop-types
 npm install axios
 npm install react-apexcharts apexcharts
 npm install react-virtualized
+npm install react-chartjs-2 chart.js

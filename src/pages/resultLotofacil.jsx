@@ -98,7 +98,7 @@ const ResultLotofacil = () => {
             <section className="latest-result">
                 {latestResult ? (
                     <>
-                        <div className="latest-result-info-header">
+                        <div className="title-result-info">
                             <h1>Ultimo Resultado</h1>
                             <p>Data do concurso: <span>{latestResult.data || "N/A"}</span></p>
                             <p>Data do próximo concurso: <span>{latestResult.dataProximoConcurso || "N/A"}</span></p>
@@ -187,12 +187,12 @@ const ResultLotofacil = () => {
                 )}
             </section>
 
-            <section className="analise-result">
-                <div className="latest-result-info-header">
+            <section className="conteiner-section">
+                <div className="title-result-info">
                     <h1>Análise de Possibilidades / Probabilidades </h1>
                 </div>
 
-                <div className="possibility-result-info-body">
+                <div className="result-info-table">
                     <table>
                         <thead>
                             <tr>

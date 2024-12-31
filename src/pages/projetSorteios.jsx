@@ -74,12 +74,12 @@ const Projetions = () => {
 
     // Função para renderizar uma seção de resultados
     const renderSection = (title, data, visibleData, type) => (
-        <section className="analise-result">
-            <div className="latest-result-info-header">
+        <section className="conteiner-section">
+            <div className="title-result-info">
                 <h1>{title}</h1>
             </div>
 
-            <div className="possibility-result-info-body projecoes">
+            <div className="result-info-table projecoes">
                 {data && data.length > 0 ? (
                     <>
                         <div className="projecoes-possiveis">

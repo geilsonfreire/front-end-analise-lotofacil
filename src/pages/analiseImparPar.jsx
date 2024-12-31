@@ -41,12 +41,12 @@ const AnaliseImpaPar = () => {
                 </div>
             </section>
 
-            <section className="analise-result">
-                <div className="latest-result-info-header">
+            <section className="conteiner-section">
+                <div className="title-result-info">
                     <h1>Análise de Quantitativo / Ímpares & Pares</h1>
                 </div>
 
-                <div className="possibility-result-info-body">
+                <div className="result-info-table">
                     {analysis ? (
                         <table>
                             <thead>

@@ -9,6 +9,7 @@ import ResultLotofafil from '../pages/resultlotofacil.jsx';
 import MeusJogos from '../pages/meus-jogos.jsx';
 import AnaliseImpaPar from '../pages/analiseImparPar.jsx';
 import SorteioNaoRealisado from '../pages/projetSorteios.jsx';
+import DezenasQuentes from '../pages/dezenasQuentes.jsx';
 
 
 
@@ -22,6 +23,7 @@ const MyRoutes = () => {
                     <Route path="/meus-jogos" element={<MeusJogos />} />
                     <Route path="/analise-impa-par" element={<AnaliseImpaPar />} />
                     <Route path="/sorteios-nao-realizados" element={<SorteioNaoRealisado />} />
+                    <Route path="/dezenas-quentes" element={<DezenasQuentes />} />
                 </Route>
             </Routes>
         </StrictMode>

@@ -17,6 +17,7 @@ import {
 import { TbClover } from "react-icons/tb";
 import { GrAnalytics } from "react-icons/gr";
 import { LuProjector } from "react-icons/lu";
+import { FaSortNumericUpAlt } from "react-icons/fa";
 
 const Menu = () => {
 
@@ -57,6 +58,11 @@ const Menu = () => {
                     to="/sorteios-nao-realizados"
                     icon={<LuProjector />}
                     title="Sorteios nao realizados"
+                />
+                <Icon
+                    to="/dezenas-quentes"
+                    icon={<FaSortNumericUpAlt />}
+                    title="Dezenas Quentes"
                 />
                 <Icon
                     to="/meus-jogos"
