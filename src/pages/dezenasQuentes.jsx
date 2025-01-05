@@ -23,7 +23,9 @@ const DezenasQuentes = () => {
     const [error, setError] = useState(null);
     const [topQuentes, setTopQuentes] = useState([]);
     const [intervalosAtraso, setIntervalosAtraso] = useState([]);
-    const [maiorAtraso, setMaiorAtraso] = useState({ dezena: null, intervaloAtraso: 0 });
+    const [maiorAtraso, setMaiorAtraso] = useState(null);
+    const [atrasoAtual, setAtrasoAtual] = useState([]);
+
 
     // Função para calcular a frequência das dezenas
     const calcularFrequenciaDezenas = (resultados) => {
@@ -38,23 +40,59 @@ const DezenasQuentes = () => {
         return frequencia;
     };
 
-    // Função para calcular os intervalos de atraso de cada dezena
+
+    // Função para calcular o maior atraso e o atraso atual de cada dezena
     const calcularIntervalosAtraso = (resultados) => {
         let ultimaOcorrencia = Array(25).fill(-1); // Armazena o último sorteio onde cada dezena apareceu
-        let intervaloCalculado = Array(25).fill(0); // Intervalos de atraso das dezenas
+        let maiorAtraso = Array(25).fill(0); // Maior intervalo de atraso para cada dezena
 
         resultados.forEach((resultado, idx) => {
             resultado.dezenas.forEach((dezena) => {
-                // Se a dezena já apareceu antes, calcula o intervalo
                 if (ultimaOcorrencia[dezena - 1] !== -1) {
-                    intervaloCalculado[dezena - 1] = idx - ultimaOcorrencia[dezena - 1];
+                    // Calcula o intervalo de atraso
+                    const intervalo = (idx - 1) - ultimaOcorrencia[dezena - 1];
+
+                    // Verifica se o intervalo calculado é maior que o maior já registrado
+                    if (intervalo > maiorAtraso[dezena - 1]) {
+                        maiorAtraso[dezena - 1] = intervalo;
+                    }
                 }
-                ultimaOcorrencia[dezena - 1] = idx; // Atualiza a última ocorrência da dezena
+
+                // Atualiza a última ocorrência da dezena
+                ultimaOcorrencia[dezena - 1] = idx;
             });
         });
 
-        // Atualiza o estado com os intervalos calculados
-        return intervaloCalculado;
+        return maiorAtraso;
+    };
+    
+    // Função para calcular o atraso atual de cada dezena (levando em consideração os últimos concursos)
+    const calcularAtrasoAtual = (resultados) => {
+
+        const totalConcursos = resultados.length;  // Número total de sorteios
+        const atrasoAtual = Array(25).fill(0); // Array de 25 posições com valores iniciais 0
+
+        resultados.forEach((resultado, idx) => {
+            resultado.dezenas.forEach((dezena) => {
+                // Atualiza o atraso de cada dezena com base no último concurso em que foi sorteada
+                if (atrasoAtual[dezena - 1] === 0) {
+                    // Se for o primeiro sorteio que a dezena aparece, atribui o atraso correto
+                    atrasoAtual[dezena - 1] = totalConcursos - idx;
+                }
+            });
+        });
+
+        // Calcula o atraso de cada dezena
+        atrasoAtual.forEach((atraso, dezenaIdx) => {
+            // Verifica se a dezena apareceu, se não apareceu, o atraso será o total de sorteios
+            if (atraso === 0) {
+                atrasoAtual[dezenaIdx] = totalConcursos;
+            } else {
+                atrasoAtual[dezenaIdx] = totalConcursos - atraso; // Atraso é a diferença entre o total de sorteios e a última vez que a dezena apareceu
+            }
+        });
+
+        return atrasoAtual;
     };
 
 
@@ -64,13 +102,21 @@ const DezenasQuentes = () => {
             const loadingToast = toast.loading("Carregando dados...");
             setError(null);
             try {
+                // Busca os resultados da API
                 const resultados = await apiService.getAllResults(); // Obtém todos os resultados
+
+                // Calcula a frequência das dezenas
                 const frequencia = calcularFrequenciaDezenas(resultados); // Calcula a frequência
                 setFrequencias(frequencia);
 
-                // Calcula os intervalos de atraso
-                const intervalosCalculados = calcularIntervalosAtraso(resultados);
-                setIntervalosAtraso(intervalosCalculados);
+                // Calcula o maior atraso
+                const maiorAtraso = calcularIntervalosAtraso(resultados);
+                setIntervalosAtraso(maiorAtraso); // Aqui, você está chamando setIntervalosAtraso para atualizar o estado
+
+                // Calcula o atraso atual
+                const atrasoAtual = calcularAtrasoAtual(resultados);
+                setAtrasoAtual(atrasoAtual);
+
 
                 // Calcula as 5 dezenas mais quentes
                 const topQuentesCalculadas = frequencia
@@ -80,15 +126,14 @@ const DezenasQuentes = () => {
 
                 setTopQuentes(topQuentesCalculadas);
 
-                // Encontra o maior intervalo de atraso
-                const maiorIntervalo = intervalosCalculados.reduce((max, intervalo, idx) => {
-                    if (intervalo > max.intervaloAtraso) {
-                        return { dezena: idx + 1, intervaloAtraso: intervalo };
+                // Encontra a dezena com o maior intervalo de atraso
+                const maiorAtrasoGlobal = maiorAtraso.reduce((max, atraso, idx) => {
+                    if (atraso > max.intervaloAtraso) {
+                        return { dezena: idx + 1, intervaloAtraso: atraso };
                     }
                     return max;
                 }, { dezena: null, intervaloAtraso: 0 });
-
-                setMaiorAtraso(maiorIntervalo);
+                setMaiorAtraso(maiorAtrasoGlobal);
 
                 toast.update(loadingToast, {
                     render: "Dados carregados com sucesso!",
@@ -186,22 +231,56 @@ const DezenasQuentes = () => {
                     <h1>Intervalo de Atraso das Dezenas</h1>
                 </div>
                 {error && <p>{error}</p>}
-                {intervalosAtraso && (
+                {intervalosAtraso && intervalosAtraso.length > 0 && (
                     <>
+                        <br />
+                        <h2>O maior intervalo de atraso entre as Dezenas</h2>
                         <div className="result-info-table">
                             <table>
                                 <thead>
                                     <tr>
-                                        {intervalosAtraso.map((_, index) => (
+                                        {intervalosAtraso && intervalosAtraso.length > 0 ? (
+                                            intervalosAtraso.map((_, index) => (
+                                                <th key={index}>Dez {index + 1}</th>
+                                            ))
+                                        ) : (
+                                            <th colSpan="25">Nenhum dado disponível</th>
+                                        )}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        {intervalosAtraso && intervalosAtraso.length > 0 ? (
+                                            intervalosAtraso.map((intervalo, index) => (
+                                                <td key={index}>{intervalo}</td>
+                                            ))
+                                        ) : (
+                                            <td colSpan="25">Nenhum dado disponível</td>
+                                        )}
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h2>Intervalo atual de atraso entre as Dezenas</h2>
+                        <div className="result-info-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        {atrasoAtual.length > 0 && atrasoAtual.map((_, index) => (
                                             <th key={index}>Dez {index + 1}</th>
                                         ))}
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        {intervalosAtraso.map((intervalo, index) => (
-                                            <td key={index}>{intervalo}</td>
-                                        ))}
+                                        {atrasoAtual.length > 0 ? (
+                                            atrasoAtual.map((atraso, index) => (
+                                                <td key={index}>{atraso}</td>
+                                            ))
+                                        ) : (
+                                            <td colSpan="25">Nenhum dado disponível</td>
+                                        )}
                                     </tr>
                                 </tbody>
                             </table>
