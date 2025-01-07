@@ -1,117 +1,78 @@
-.Container-Geral {
+/* Estilo para o gerador de jogos */
+.gerador-jogos {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/*Header e filtros */
-.header-filter {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 0;
-    height: 3rem;
-    border-radius: 10px;
-}
-
-.header-filter .search {
-    display: flex;
-    align-items: center;
-}
-
-/* Input */
-.search input {
-    border: none;
-    border-bottom: 1px solid #8B008B;
-    border-bottom-left-radius: 15px;
-    border-bottom-right-radius: 5px;
-    padding: 0.2rem 1rem;
-    outline: none;
-    font-size: .7rem;
-    color: #000;
-}
-
-.search input:hover {
-    border-bottom: 2px solid #8B008B;
-}
-
-.search input::placeholder {
-    color: #00000038;
-    font-size: .5rem;
-}
-
-/*Button */
-.search button {
-    display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    padding: 1rem;
+}
+
+.btn-gerar {
+    width: 100%;
     background: #8B008B;
-    padding: .2rem 1rem;
     font-size: .7rem;
     color: #fff;
     border: none;
     border-radius: 10px;
     cursor: pointer;
     outline: none;
+    padding: .2rem;
 }
 
-.search button:hover {
-    background-color: #FF00FF;
+.btn-gerar:hover {
+    background: #FF00FF;
+    transform: scale(1.05);
 }
 
-.search button svg {
-    font-size: 1rem;
-    margin-right: .5rem;
+/* Container dos jogos */
+.jogos-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
 }
 
-
-/*Table Lista de estoque */
-.Page-Product .stock-list {
+.jogo-box {
     background: #fff;
     border-radius: 10px;
-    border-bottom: solid 1px #05187a;
+    padding: 1rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow-x: auto;
-    font-size: .7rem;
 }
 
-.Page-Product .stock-list table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: auto;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
+.jogo-titulo {
+    font-size: 0.9rem;
+    color: #8B008B;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
 }
 
-.Page-Product .stock-list table thead {
-    border-bottom: solid 1px #1e3194;
-    font-family: 'Roboto', sans-serif;
+.numeros-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.numero-bolinha {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #8B008B;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.numero-bolinha:hover {
+    background: #FF00FF;
+    transform: scale(1.1);
+}
+
+.jogo-info {
+    font-size: 0.6rem;
+    color: #666;
+    margin-left: 0.5rem;
     font-weight: normal;
-    color: #000;
-}
-
-.Page-Product .stock-list table thead th {
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding: 10px;
-    width: auto;
-    background-color: #1e3194;
-    color: #fff;
-}
-
-.Page-Product .stock-list table tbody tr td {
-    text-align: left;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding: 10px;
-    width: auto;
-    color: #000
-}
-
-.Page-Product .stock-list table tbody tr:nth-child(even) {
-    background-color: #635f5f71;
-    color: #000;
 }
