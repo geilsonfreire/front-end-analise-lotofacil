@@ -25,6 +25,10 @@ const DezenasQuentes = () => {
     const [intervalosAtraso, setIntervalosAtraso] = useState([]);
     const [maiorAtraso, setMaiorAtraso] = useState(null);
     const [atrasoAtual, setAtrasoAtual] = useState([]);
+    const [sequencias, setSequencias] = useState({});
+    const [loading, setLoading] = useState(true);
+    const [totalConcursos, setTotalConcursos] = useState(0);
+    const [estatisticasRepeticoes, setEstatisticasRepeticoes] = useState(null);
 
 
     // Função para calcular a frequência das dezenas
@@ -65,7 +69,7 @@ const DezenasQuentes = () => {
 
         return maiorAtraso;
     };
-    
+
     // Função para calcular o atraso atual de cada dezena (levando em consideração os últimos concursos)
     const calcularAtrasoAtual = (resultados) => {
 
@@ -104,6 +108,7 @@ const DezenasQuentes = () => {
             try {
                 // Busca os resultados da API
                 const resultados = await apiService.getAllResults(); // Obtém todos os resultados
+                setTotalConcursos(resultados.length);
 
                 // Calcula a frequência das dezenas
                 const frequencia = calcularFrequenciaDezenas(resultados); // Calcula a frequência
@@ -135,6 +140,10 @@ const DezenasQuentes = () => {
                 }, { dezena: null, intervaloAtraso: 0 });
                 setMaiorAtraso(maiorAtrasoGlobal);
 
+                // Análise das dezenas repetidas
+                const repetidasInfo = analisarDezenasRepetidas(resultados);
+                setEstatisticasRepeticoes(repetidasInfo);
+
                 toast.update(loadingToast, {
                     render: "Dados carregados com sucesso!",
                     type: "success",
@@ -156,6 +165,133 @@ const DezenasQuentes = () => {
         fetchResults();
     }, []);
 
+    const analisarSequencias = (sorteios) => {
+        const estatisticasPorTamanho = {};
+
+        // Para cada sorteio
+        sorteios.forEach(sorteio => {
+            const dezenas = sorteio.dezenas.map(Number).sort((a, b) => a - b);
+            let sequenciaAtual = [];
+            const sequenciasNesteSorteio = new Set(); // Conjunto para rastrear tamanhos únicos neste sorteio
+
+            // Analisa as sequências no sorteio atual
+            for (let i = 0; i < dezenas.length; i++) {
+                if (i === 0 || dezenas[i] === dezenas[i - 1] + 1) {
+                    sequenciaAtual.push(dezenas[i]);
+                } else {
+                    if (sequenciaAtual.length >= 2) {
+                        const tamanho = sequenciaAtual.length;
+                        sequenciasNesteSorteio.add(tamanho); // Marca que encontramos uma sequência deste tamanho
+                    }
+                    sequenciaAtual = [dezenas[i]];
+                }
+            }
+
+            // Verifica a última sequência do sorteio
+            if (sequenciaAtual.length >= 2) {
+                const tamanho = sequenciaAtual.length;
+                sequenciasNesteSorteio.add(tamanho);
+            }
+
+            // Atualiza as estatísticas para cada tamanho encontrado neste sorteio
+            sequenciasNesteSorteio.forEach(tamanho => {
+                if (!estatisticasPorTamanho[tamanho]) {
+                    estatisticasPorTamanho[tamanho] = {
+                        ocorrenciasPorConcurso: [],
+                        maximo: 0,
+                        minimo: Infinity,
+                        media: 0
+                    };
+                }
+                estatisticasPorTamanho[tamanho].ocorrenciasPorConcurso.push(1);
+            });
+        });
+
+        // Calcula as estatísticas finais
+        Object.values(estatisticasPorTamanho).forEach(estat => {
+            const totalOcorrencias = estat.ocorrenciasPorConcurso.length;
+            estat.maximo = totalOcorrencias; // Número de concursos onde apareceu
+            estat.minimo = totalOcorrencias;
+            estat.media = totalOcorrencias;
+        });
+
+        return estatisticasPorTamanho;
+    };
+
+    useEffect(() => {
+        const buscarSorteios = async () => {
+            try {
+                setLoading(true);
+                const resultados = await apiService.getAllResults();
+                const estatisticasPorTamanho = analisarSequencias(resultados);
+                setSequencias(estatisticasPorTamanho);
+            } catch (error) {
+                console.error("Erro ao buscar sorteios:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        buscarSorteios();
+    }, []);
+
+    const analisarDezenasRepetidas = (resultados) => {
+        if (resultados.length < 2) return null;
+
+        // Objeto para contar frequência de cada quantidade de repetições
+        const frequenciaRepeticoes = {
+            atual: {
+                quantidade: 0,
+                dezenas: [],
+                percentual: 0
+            },
+            historico: Array(16).fill(0) // Array para contar ocorrências de 0 a 15 repetições
+        };
+
+        // Analisa todos os pares de concursos consecutivos
+        for (let i = 0; i < resultados.length - 1; i++) {
+            const concursoAtual = resultados[i].dezenas.map(Number);
+            const concursoAnterior = resultados[i + 1].dezenas.map(Number);
+
+            const repetidas = concursoAtual.filter(dezena =>
+                concursoAnterior.includes(dezena)
+            );
+
+            frequenciaRepeticoes.historico[repetidas.length]++;
+
+            // Se for o concurso mais recente, guarda os detalhes
+            if (i === 0) {
+                frequenciaRepeticoes.atual = {
+                    quantidade: repetidas.length,
+                    dezenas: repetidas.sort((a, b) => a - b),
+                    percentual: ((repetidas.length / 15) * 100).toFixed(1)
+                };
+            }
+        }
+
+        // Calcula a quantidade de repetições mais frequente
+        const maisFrequente = frequenciaRepeticoes.historico
+            .map((qtd, index) => ({ quantidade: index, ocorrencias: qtd }))
+            .reduce((max, atual) =>
+                atual.ocorrencias > max.ocorrencias ? atual : max
+            );
+
+        // Calcula percentuais para cada quantidade de repetições
+        const totalConcursos = resultados.length - 1;
+        const percentuais = frequenciaRepeticoes.historico.map(qtd =>
+            ((qtd / totalConcursos) * 100).toFixed(1)
+        );
+
+        return {
+            atual: frequenciaRepeticoes.atual,
+            historico: frequenciaRepeticoes.historico.map((qtd, index) => ({
+                quantidade: index,
+                ocorrencias: qtd,
+                percentual: percentuais[index]
+            })).filter(item => item.ocorrencias > 0), // Remove quantidades que nunca ocorreram
+            maisFrequente
+        };
+    };
 
     return (
         <main className="Container-Geral">
@@ -224,7 +360,6 @@ const DezenasQuentes = () => {
                     </>
                 )}
             </section>
-
 
             <section className="conteiner-section">
                 <div className="title-result-info">
@@ -319,6 +454,107 @@ const DezenasQuentes = () => {
                     </>
                 )}
             </section>
+
+            <section className="conteiner-section">
+                <div className="title-result-info">
+                    <h1>Dezenas Sequenciadas</h1>
+                </div>
+
+                {loading ? (
+                    <div>Carregando...</div>
+                ) : (
+                    <>
+                        <div className="result-info-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Tamanho da Sequência</th>
+                                        <th>Ocorrência em Concursos</th>
+                                        <th>% dos Concursos</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {Object.entries(sequencias)
+                                        .sort((a, b) => b[0] - a[0]) // Ordena por tamanho decrescente
+                                        .map(([tamanho, estat]) => {
+                                            const percentual = ((estat.maximo / totalConcursos) * 100).toFixed(1);
+                                            return (
+                                                <tr key={tamanho}>
+                                                    <td>{tamanho} números</td>
+                                                    <td>{estat.maximo} concursos</td>
+                                                    <td>{percentual}%</td>
+                                                </tr>
+                                            );
+                                        })}
+                                </tbody>
+                            </table>
+                        </div>
+                    </>
+                )}
+            </section>
+
+            <section className="conteiner-section">
+                <div className="title-result-info">
+                    <h1>Dezenas que se repetem em relação ao concurso anterior</h1>
+                </div>
+
+                {loading ? (
+                    <div>Carregando...</div>
+                ) : (
+                    <>
+                        <div className="result-info-table repet-conatiner">
+
+                            <div className="flex-container">
+                                <h2>Repetições no último concurso</h2>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Quant. por repetição</th>
+                                            <th>Dezenas</th>
+                                            <th>% das ocorrências</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {estatisticasRepeticoes?.atual && (
+                                            <tr>
+                                                <td>{estatisticasRepeticoes.atual.quantidade}</td>
+                                                <td>{estatisticasRepeticoes.atual.dezenas.join(', ')}</td>
+                                                <td>{estatisticasRepeticoes.atual.percentual}%</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div className="flex-container">
+                                <h3>Histórico de repetições</h3>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Quantidade de repetições</th>
+                                            <th>Ocorrências</th>
+                                            <th>% dos concursos</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {estatisticasRepeticoes?.historico.map(item => (
+                                            <tr key={item.quantidade}
+                                                className={item.quantidade === estatisticasRepeticoes.maisFrequente.quantidade ? 'destaque' : ''}>
+                                                <td>{item.quantidade} dezenas</td>
+                                                <td>{item.ocorrencias} vezes</td>
+                                                <td>{item.percentual}%</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </>
+                )}
+            </section>
+
+
+
         </main>
     );
 };

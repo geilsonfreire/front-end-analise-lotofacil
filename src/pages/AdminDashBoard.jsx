@@ -4,11 +4,11 @@
 import '../style/AdminDashBoard.css'
 
 // Imports Componenets
-import Admincharts from '../components/AdminApexcharts'
+import AdminApexcharts from "../components/AdminApexcharts"
 
 // imports icons and images
 import { BsGraphUpArrow } from "react-icons/bs";
-import { 
+import {
     MdGroups,
     MdOutlineTrendingUp,
     MdChecklist,
@@ -72,7 +72,7 @@ const AdminDashBoard = () => {
 
                 <section className='Apexcharts'>
                     <div className="container-charts">
-                        <Admincharts /> 
+                        <AdminApexcharts />
                     </div>
                 </section>
 
@@ -112,7 +112,7 @@ const AdminDashBoard = () => {
                         </thead>
                         <tbody>
                             <tr>
-                                <td><img src="https://cambuci.vtexassets.com/arquivos/ids/1033160/Bola-de-Futsal-Penalty-S11-R1-XXIV.jpg?v=638372870109700000" alt="Bola Penalty"/></td>
+                                <td><img src="https://cambuci.vtexassets.com/arquivos/ids/1033160/Bola-de-Futsal-Penalty-S11-R1-XXIV.jpg?v=638372870109700000" alt="Bola Penalty" /></td>
                                 <td>Produto 1</td>
                                 <td>Local 1</td>
                                 <td>01/01/2021</td>

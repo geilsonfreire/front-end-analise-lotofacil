@@ -4,3 +4,11 @@
     letter-spacing: 2px;
     font-weight: 700;
 }
+
+.repet-conatiner {
+    gap: 1rem
+}
+
+.flex-container {
+    width: 100%;
+}
