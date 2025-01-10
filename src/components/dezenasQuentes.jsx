@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import "../style/dezenasQuentes.css";
 
 // Imports de Icones
-import { MdOutlineSearch } from "react-icons/md";
+
 
 
 // Importando o componente de serviço
@@ -295,21 +295,6 @@ const DezenasQuentes = () => {
 
     return (
         <main className="Container-Geral">
-            <section className="header-filter">
-                <div className="Title">
-                    <h1>
-                        Dezenas <span>Quentes</span>
-                    </h1>
-                </div>
-                <div className="search">
-                    <input type="text" placeholder="Concurso aqui!" />
-                    <button>
-                        <MdOutlineSearch />
-                        Buscar
-                    </button>
-                </div>
-            </section>
-
             <section className="conteiner-section">
                 <div className="title-result-info">
                     <h1>Dezenas e suas frequências de ocorrência</h1>

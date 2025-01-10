@@ -10,14 +10,9 @@ import Logo from "../assets/img/logo.png";
 import "../style/menu.css";
 
 // Import icon
-import {
-    MdSpaceDashboard,
-    MdOutlineGridOn
-} from "react-icons/md";
+import { MdSpaceDashboard } from "react-icons/md";
 import { TbClover } from "react-icons/tb";
 import { GrAnalytics } from "react-icons/gr";
-import { LuProjector } from "react-icons/lu";
-import { FaSortNumericUpAlt } from "react-icons/fa";
 
 const Menu = () => {
 
@@ -44,25 +39,11 @@ const Menu = () => {
                     icon={<MdSpaceDashboard />}
                     title="DashBoard"
                 />
-                <Icon
-                    to="/result-lotofacil"
-                    icon={<MdOutlineGridOn />}
-                    title="Resultados"
-                />
+               
                 <Icon
                     to="/analise-impa-par"
                     icon={<GrAnalytics />}
                     title="Analise Impa / Par"
-                />
-                <Icon
-                    to="/sorteios-nao-realizados"
-                    icon={<LuProjector />}
-                    title="Sorteios nao realizados"
-                />
-                <Icon
-                    to="/dezenas-quentes"
-                    icon={<FaSortNumericUpAlt />}
-                    title="Dezenas Quentes"
                 />
                 <Icon
                     to="/meus-jogos"

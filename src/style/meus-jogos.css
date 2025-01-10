@@ -76,3 +76,17 @@
     margin-left: 0.5rem;
     font-weight: normal;
 }
+
+.numero-acertado {
+    background-color: #2ecc71 !important;
+    /* Verde mais vibrante */
+    color: white !important;
+    border: 2px solid #27ae60 !important;
+    /* Borda mais escura para destaque */
+}
+
+.acertos-info {
+    color: #2ecc71;
+    font-weight: bold;
+    margin-left: 5px;
+}

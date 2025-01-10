@@ -75,36 +75,31 @@
     display: flex;
     justify-items: flex-start;
     align-items: center;
+    margin-bottom: 1rem;
     gap: 1rem;
-    border-bottom: solid 1px #8B008B;
     color: #8B008B;
 }
 
-.local-ganhadores h2 {
-    font-size: .6rem;
-    letter-spacing: 2px;
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-.local-ganhadores p {
+.local-ganhadores span {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: .3rem;
+    font-size: .5rem;
+    letter-spacing: 2px;
     font-weight: bold;
 }
 
 .local-ganhadores-info {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     gap: 1rem;
-    width: 50%;
-    margin-left: 10rem;
 }
 
 /*Premiações */
+.box-premiacoes {
+    width: 100%;
+}
+
 .premiacoes h2 {
     color: #8B008B;
     margin-top: .4rem;
@@ -133,4 +128,14 @@
     font-size: .5rem;
     color: #8B008B;
     padding-left: 1rem;
+}
+
+.box-analise {
+    width: 100%;
+}
+
+.box-result {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }

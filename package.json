@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "apexcharts": "^4.2.0",
+    "apexcharts": "^4.3.0",
     "axios": "^1.7.9",
     "chart.js": "^4.4.7",
     "prop-types": "^15.8.1",
