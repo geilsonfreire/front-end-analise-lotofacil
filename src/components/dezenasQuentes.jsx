@@ -296,250 +296,257 @@ const DezenasQuentes = () => {
     return (
         <main className="Container-Geral">
             <section className="conteiner-section">
-                <div className="title-result-info">
-                    <h1>Dezenas e suas frequências de ocorrência</h1>
-                </div>
-                {error && <p>{error}</p>}
-                {frequencias && (
-                    <>
-                        <div className="result-info-table">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        {frequencias.map((_, index) => (
-                                            <th key={index}>Dez {index + 1}</th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        {frequencias.map((frequencia, index) => (
-                                            <td key={index}>{frequencia}</td>
-                                        ))}
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <h2>Top 5 Dezenas Mais Quentes</h2>
-                        <div className="result-info-table">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Posição</th>
-                                        <th>Dezena</th>
-                                        <th>Frequência</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {topQuentes.map((item, index) => (
-                                        <tr key={index}>
-                                            <td>{index + 1}</td> {/* Posição no ranking */}
-                                            <td>Dez {item.dezena}</td> {/* Número da dezena */}
-                                            <td>{item.frequencia}</td> {/* Frequência */}
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </>
-                )}
-            </section>
-
-            <section className="conteiner-section">
-                <div className="title-result-info">
-                    <h1>Intervalo de Atraso das Dezenas</h1>
-                </div>
-                {error && <p>{error}</p>}
-                {intervalosAtraso && intervalosAtraso.length > 0 && (
-                    <>
-                        <br />
-                        <h2>O maior intervalo de atraso entre as Dezenas</h2>
-                        <div className="result-info-table">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        {intervalosAtraso && intervalosAtraso.length > 0 ? (
-                                            intervalosAtraso.map((_, index) => (
+                <div className="box-shadown">
+                    <div className="title-result-info">
+                        <h1>Dezenas e suas frequências de ocorrência</h1>
+                    </div>
+                    {error && <p>{error}</p>}
+                    {frequencias && (
+                        <>
+                            <div className="result-info-table">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            {frequencias.map((_, index) => (
                                                 <th key={index}>Dez {index + 1}</th>
-                                            ))
-                                        ) : (
-                                            <th colSpan="25">Nenhum dado disponível</th>
-                                        )}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        {intervalosAtraso && intervalosAtraso.length > 0 ? (
-                                            intervalosAtraso.map((intervalo, index) => (
-                                                <td key={index}>{intervalo}</td>
-                                            ))
-                                        ) : (
-                                            <td colSpan="25">Nenhum dado disponível</td>
-                                        )}
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <h2>Intervalo atual de atraso entre as Dezenas</h2>
-                        <div className="result-info-table">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        {atrasoAtual.length > 0 && atrasoAtual.map((_, index) => (
-                                            <th key={index}>Dez {index + 1}</th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        {atrasoAtual.length > 0 ? (
-                                            atrasoAtual.map((atraso, index) => (
-                                                <td key={index}>{atraso}</td>
-                                            ))
-                                        ) : (
-                                            <td colSpan="25">Nenhum dado disponível</td>
-                                        )}
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <h2>As 5 com Maior Atraso Entre as Dezenas</h2>
-                        <div className="result-info-table">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Dezena</th>
-                                        <th>Intervalo de Atraso</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {intervalosAtraso
-                                        .map((intervalo, index) => ({ dezena: index + 1, intervalo }))
-                                        .sort((a, b) => b.intervalo - a.intervalo) // Ordena pelo maior intervalo
-                                        .slice(0, 5) // Pega as 5 maiores
-                                        .map((item, index) => {
-                                            // A cada iteração, vamos atualizar o maior intervalo
-                                            if (item.intervalo > maiorAtraso.intervaloAtraso) {
-                                                setMaiorAtraso({ dezena: item.dezena, intervaloAtraso: item.intervalo });
-                                            }
-
-                                            return (
-                                                <tr key={index}>
-                                                    <td>Dez {item.dezena}</td> {/* Dezena */}
-                                                    <td>{item.intervalo} sorteios</td> {/* Intervalo de atraso */}
-                                                </tr>
-                                            );
-                                        })}
-                                </tbody>
-                            </table>
-                        </div>
-                    </>
-                )}
-            </section>
-
-            <section className="conteiner-section">
-                <div className="title-result-info">
-                    <h1>Dezenas Sequenciadas</h1>
-                </div>
-
-                {loading ? (
-                    <div>Carregando...</div>
-                ) : (
-                    <>
-                        <div className="result-info-table">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Tamanho da Sequência</th>
-                                        <th>Ocorrência em Concursos</th>
-                                        <th>% dos Concursos</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {Object.entries(sequencias)
-                                        .sort((a, b) => b[0] - a[0]) // Ordena por tamanho decrescente
-                                        .map(([tamanho, estat]) => {
-                                            const percentual = ((estat.maximo / totalConcursos) * 100).toFixed(1);
-                                            return (
-                                                <tr key={tamanho}>
-                                                    <td>{tamanho} números</td>
-                                                    <td>{estat.maximo} concursos</td>
-                                                    <td>{percentual}%</td>
-                                                </tr>
-                                            );
-                                        })}
-                                </tbody>
-                            </table>
-                        </div>
-                    </>
-                )}
-            </section>
-
-            <section className="conteiner-section">
-                <div className="title-result-info">
-                    <h1>Dezenas que se repetem em relação ao concurso anterior</h1>
-                </div>
-
-                {loading ? (
-                    <div>Carregando...</div>
-                ) : (
-                    <>
-                        <div className="result-info-table repet-conatiner">
-
-                            <div className="flex-container">
-                                <h2>Repetições no último concurso</h2>
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Quant. por repetição</th>
-                                            <th>Dezenas</th>
-                                            <th>% das ocorrências</th>
+                                            ))}
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {estatisticasRepeticoes?.atual && (
+                                        <tr>
+                                            {frequencias.map((frequencia, index) => (
+                                                <td key={index}>{frequencia}</td>
+                                            ))}
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <h2>Top 5 Dezenas Mais Quentes</h2>
+                            <div className="result-info-table">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Posição</th>
+                                            <th>Dezena</th>
+                                            <th>Frequência</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {topQuentes.map((item, index) => (
+                                            <tr key={index}>
+                                                <td>{index + 1}</td> {/* Posição no ranking */}
+                                                <td>Dez {item.dezena}</td> {/* Número da dezena */}
+                                                <td>{item.frequencia}</td> {/* Frequência */}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </section>
+
+            <section className="conteiner-section">
+                <div className="box-shadown">
+                    <div className="title-result-info">
+                        <h1>Intervalo de Atraso das Dezenas</h1>
+                    </div>
+                    {error && <p>{error}</p>}
+                    {intervalosAtraso && intervalosAtraso.length > 0 && (
+                        <>
+                            <br />
+                            <h2>O maior intervalo de atraso entre as Dezenas</h2>
+                            <div className="result-info-table">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            {intervalosAtraso && intervalosAtraso.length > 0 ? (
+                                                intervalosAtraso.map((_, index) => (
+                                                    <th key={index}>Dez {index + 1}</th>
+                                                ))
+                                            ) : (
+                                                <th colSpan="25">Nenhum dado disponível</th>
+                                            )}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            {intervalosAtraso && intervalosAtraso.length > 0 ? (
+                                                intervalosAtraso.map((intervalo, index) => (
+                                                    <td key={index}>{intervalo}</td>
+                                                ))
+                                            ) : (
+                                                <td colSpan="25">Nenhum dado disponível</td>
+                                            )}
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <h2>Intervalo atual de atraso entre as Dezenas</h2>
+                            <div className="result-info-table">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            {atrasoAtual.length > 0 && atrasoAtual.map((_, index) => (
+                                                <th key={index}>Dez {index + 1}</th>
+                                            ))}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            {atrasoAtual.length > 0 ? (
+                                                atrasoAtual.map((atraso, index) => (
+                                                    <td key={index}>{atraso}</td>
+                                                ))
+                                            ) : (
+                                                <td colSpan="25">Nenhum dado disponível</td>
+                                            )}
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <h2>As 5 com Maior Atraso Entre as Dezenas</h2>
+                            <div className="result-info-table">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Dezena</th>
+                                            <th>Intervalo de Atraso</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {intervalosAtraso
+                                            .map((intervalo, index) => ({ dezena: index + 1, intervalo }))
+                                            .sort((a, b) => b.intervalo - a.intervalo) // Ordena pelo maior intervalo
+                                            .slice(0, 5) // Pega as 5 maiores
+                                            .map((item, index) => {
+                                                // A cada iteração, vamos atualizar o maior intervalo
+                                                if (item.intervalo > maiorAtraso.intervaloAtraso) {
+                                                    setMaiorAtraso({ dezena: item.dezena, intervaloAtraso: item.intervalo });
+                                                }
+
+                                                return (
+                                                    <tr key={index}>
+                                                        <td>Dez {item.dezena}</td> {/* Dezena */}
+                                                        <td>{item.intervalo} sorteios</td> {/* Intervalo de atraso */}
+                                                    </tr>
+                                                );
+                                            })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </>
+                    )}
+
+                </div>
+            </section>
+
+            <section className="conteiner-section">
+                <div className="box-shadown">
+                    <div className="title-result-info">
+                        <h1>Dezenas Sequenciadas</h1>
+                    </div>
+
+                    {loading ? (
+                        <div>Carregando...</div>
+                    ) : (
+                        <>
+                            <div className="result-info-table">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Tamanho da Sequência</th>
+                                            <th>Ocorrência em Concursos</th>
+                                            <th>% dos Concursos</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {Object.entries(sequencias)
+                                            .sort((a, b) => b[0] - a[0]) // Ordena por tamanho decrescente
+                                            .map(([tamanho, estat]) => {
+                                                const percentual = ((estat.maximo / totalConcursos) * 100).toFixed(1);
+                                                return (
+                                                    <tr key={tamanho}>
+                                                        <td>{tamanho} números</td>
+                                                        <td>{estat.maximo} concursos</td>
+                                                        <td>{percentual}%</td>
+                                                    </tr>
+                                                );
+                                            })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </>
+                    )}
+
+                </div>
+            </section>
+
+            <section className="conteiner-section">
+                <div className="box-shadown">
+                    <div className="title-result-info">
+                        <h1>Dezenas que se repetem em relação ao concurso anterior</h1>
+                    </div>
+
+                    {loading ? (
+                        <div>Carregando...</div>
+                    ) : (
+                        <>
+                            <div className="result-info-table repet-conatiner">
+
+                                <div className="flex-container">
+                                    <h2>Repetições no último concurso</h2>
+                                    <table>
+                                        <thead>
                                             <tr>
-                                                <td>{estatisticasRepeticoes.atual.quantidade}</td>
-                                                <td>{estatisticasRepeticoes.atual.dezenas.join(', ')}</td>
-                                                <td>{estatisticasRepeticoes.atual.percentual}%</td>
+                                                <th>Quant. por repetição</th>
+                                                <th>Dezenas</th>
+                                                <th>% das ocorrências</th>
                                             </tr>
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
+                                        </thead>
+                                        <tbody>
+                                            {estatisticasRepeticoes?.atual && (
+                                                <tr>
+                                                    <td>{estatisticasRepeticoes.atual.quantidade}</td>
+                                                    <td>{estatisticasRepeticoes.atual.dezenas.join(', ')}</td>
+                                                    <td>{estatisticasRepeticoes.atual.percentual}%</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
 
-                            <div className="flex-container">
-                                <h3>Histórico de repetições</h3>
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Quantidade de repetições</th>
-                                            <th>Ocorrências</th>
-                                            <th>% dos concursos</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {estatisticasRepeticoes?.historico.map(item => (
-                                            <tr key={item.quantidade}
-                                                className={item.quantidade === estatisticasRepeticoes.maisFrequente.quantidade ? 'destaque' : ''}>
-                                                <td>{item.quantidade} dezenas</td>
-                                                <td>{item.ocorrencias} vezes</td>
-                                                <td>{item.percentual}%</td>
+                                <div className="flex-container">
+                                    <h2>Histórico de repetições</h2>
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Quantidade de repetições</th>
+                                                <th>Ocorrências</th>
+                                                <th>% dos concursos</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            {estatisticasRepeticoes?.historico.map(item => (
+                                                <tr key={item.quantidade}
+                                                    className={item.quantidade === estatisticasRepeticoes.maisFrequente.quantidade ? 'destaque' : ''}>
+                                                    <td>{item.quantidade} dezenas</td>
+                                                    <td>{item.ocorrencias} vezes</td>
+                                                    <td>{item.percentual}%</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                        </div>
-                    </>
-                )}
+                        </>
+                    )}
+                </div>
             </section>
-
-
-
         </main>
     );
 };

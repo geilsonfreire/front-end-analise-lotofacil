@@ -38,7 +38,7 @@ const MeusJogos = () => {
         buscarUltimoResultado();
     }, []); // Execute apenas uma vez ao montar
 
-    const verificarJogoUnico = (novoJogo, jogosAnteriores, resultadosAnteriores) => {
+    const verificarJogoUnico = (novoJogo, jogosAnteriores, resultados) => {
         // Ordena o novo jogo uma vez
         const novoJogoOrdenado = [...novoJogo].sort((a, b) => a - b);
 
@@ -48,9 +48,16 @@ const MeusJogos = () => {
         );
 
         // Verifica se o jogo já saiu em resultados anteriores
-        const jogoExisteResultados = resultadosAnteriores.some(resultado => {
+        const jogoExisteResultados = resultados.some(resultado => {
             const numerosDoResultado = resultado.dezenas.map(Number).sort((a, b) => a - b);
             return JSON.stringify(numerosDoResultado) === JSON.stringify(novoJogoOrdenado);
+        });
+
+        // Log para debug
+        console.log('Verificando jogo:', {
+            novoJogo: novoJogoOrdenado,
+            existeGerados: jogoExisteGerados,
+            existeResultados: jogoExisteResultados
         });
 
         return !jogoExisteGerados && !jogoExisteResultados;
@@ -61,67 +68,74 @@ const MeusJogos = () => {
             setLoading(true);
             const resultados = await ApiServices.getAllResults();
             let jogos = [];
-            const numerosSorteados = new Set(resultados.flatMap(resultado => resultado.dezenas.map(Number)));
 
-            // Critério 2: Selecionar 3 dezenas quentes
-            const dezenasQuentes = []; // Adicione lógica para determinar as 3 dezenas quentes
+            // Pegar o último resultado
+            const ultimoResultado = resultados[0];
+            console.log("Último resultado:", ultimoResultado); // Debug
 
-            // Critério 3: Selecionar a dezena com o menor intervalo de atraso
-            const menorAtraso = 11; // Adicione lógica para determinar a dezena com menor intervalo de atraso
+            // Critério 2: Pegar 9 dezenas do último concurso
+            const dezenasUltimoConcurso = ultimoResultado.dezenas.map(Number);
+            const noveDezenasConcursoAnterior = dezenasUltimoConcurso.slice(0, 9);
+            console.log("9 dezenas do último concurso:", noveDezenasConcursoAnterior); // Debug
 
-            // Critério 4: Selecionar 4 dezenas com maior número de atraso
-            const maioresAtrasos = []; // Adicione lógica para determinar as 4 dezenas com maior atraso
-
-            // Critério 5: Selecionar as 3 sequências mais comuns
-            const sequenciasComuns = []; // Adicione lógica para determinar as sequências mais comuns
-
-            // Critério 6: Selecionar 9 dezenas do concurso anterior
-            const concursoAnterior = []; // Adicione lógica para pegar as 9 dezenas do concurso anterior
+            // Critério 3: Dezena com menor intervalo de atraso (11)
+            const menorAtraso = 11;
 
             let tentativas = 0;
-            while (jogos.length < 30 && tentativas < 1000) {
+            const maxTentativas = 100;
+
+            const gerarNovoJogo = () => {
                 const novoJogo = [];
 
-                // Adicione as dezenas conforme os critérios
-                novoJogo.push(...dezenasQuentes);
+                // Adiciona a dezena com menor intervalo de atraso
                 novoJogo.push(menorAtraso);
-                novoJogo.push(...maioresAtrasos);
-                novoJogo.push(...sequenciasComuns.flat());
-                novoJogo.push(...concursoAnterior);
 
-                // Verifica se o jogo é único e não contém números já sorteados
-                const isUnique = verificarJogoUnico(novoJogo, jogos, resultados);
-                const isValidLength = novoJogo.length === 15;
-                const hasNoSorteados = !novoJogo.some(num => numerosSorteados.has(num));
+                // Adiciona as 9 dezenas do concurso anterior
+                novoJogo.push(...noveDezenasConcursoAnterior);
 
-                // Log para depuração
-                console.log(`Tentativa ${tentativas + 1}:`, {
-                    novoJogo,
-                    isUnique,
-                    isValidLength,
-                    hasNoSorteados,
-                });
+                // Completa o jogo até 15 dezenas com números que não foram sorteados
+                const numerosDisponiveis = Array.from({ length: 25 }, (_, i) => i + 1)
+                    .filter(num => !novoJogo.includes(num));
 
-                if (isUnique && isValidLength && hasNoSorteados) {
+                while (novoJogo.length < 15 && numerosDisponiveis.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * numerosDisponiveis.length);
+                    const numeroSelecionado = numerosDisponiveis[randomIndex];
+                    novoJogo.push(numeroSelecionado);
+                    numerosDisponiveis.splice(randomIndex, 1);
+                }
+
+                return novoJogo.sort((a, b) => a - b);
+            };
+
+            while (jogos.length < 30 && tentativas < maxTentativas) {
+                const novoJogo = gerarNovoJogo();
+
+                // Usa a função verificarJogoUnico para verificar se o jogo é único
+                if (verificarJogoUnico(novoJogo, jogos, resultados) && novoJogo.length === 15) {
                     jogos.push(novoJogo);
-                    console.log(`Jogo adicionado: ${novoJogo}`);
+                    console.log(`Jogo ${jogos.length} gerado:`, novoJogo);
                 }
 
                 tentativas++;
             }
 
-            if (jogos.length < 30) {
-                toast.warn("Não foi possível gerar 30 jogos únicos.");
-            } else {
-                toast.success("Jogos gerados com sucesso!");
+            if (jogos.length === 0) {
+                toast.error("Não foi possível gerar nenhum jogo!");
+                return;
             }
 
-            const jogosOrdenados = jogos.map(jogo => [...jogo].sort((a, b) => a - b));
-            setJogosGerados(jogosOrdenados);
-            localStorage.setItem('jogosLotofacil', JSON.stringify(jogosOrdenados));
+            if (jogos.length < 30) {
+                toast.warn(`Foram gerados apenas ${jogos.length} jogos únicos.`);
+            } else {
+                toast.success("30 jogos gerados com sucesso!");
+            }
+
+            setJogosGerados(jogos);
+            localStorage.setItem('jogosLotofacil', JSON.stringify(jogos));
+
         } catch (error) {
+            console.error("Erro ao gerar jogos:", error);
             toast.error("Erro ao gerar jogos!");
-            console.error(error);
         } finally {
             setLoading(false);
         }
