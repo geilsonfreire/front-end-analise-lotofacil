@@ -9,6 +9,8 @@ import "../style/meus-jogos.css";
 import ApiServices from "../services/apiServices";
 import ResultLatest from "../components/resultLotofacil"
 
+
+
 const MeusJogos = () => {
     const [jogosGerados, setJogosGerados] = useState(() => {
         const jogosLocalStorage = localStorage.getItem('jogosLotofacil');
@@ -47,7 +49,7 @@ const MeusJogos = () => {
             JSON.stringify([...jogo].sort((a, b) => a - b)) === JSON.stringify(novoJogoOrdenado)
         );
 
-        // Verifica se o jogo já saiu em resultados anteriores
+        // critério 1: Verifica se o jogo já saiu em resultados anteriores
         const jogoExisteResultados = resultados.some(resultado => {
             const numerosDoResultado = resultado.dezenas.map(Number).sort((a, b) => a - b);
             return JSON.stringify(numerosDoResultado) === JSON.stringify(novoJogoOrdenado);
@@ -61,6 +63,28 @@ const MeusJogos = () => {
         });
 
         return !jogoExisteGerados && !jogoExisteResultados;
+    };
+
+    const calcularDezenasQuentes = (resultados) => {
+        const frequencia = Array(25).fill(0); // Array para contar a frequência de cada dezena
+
+        resultados.forEach(resultado => {
+            resultado.dezenas.forEach(dezena => {
+                frequencia[dezena - 1] += 1; // Incrementa a contagem da dezena
+            });
+        });
+
+        // Cria um array de objetos com a dezena e sua frequência
+        const dezenasComFrequencia = frequencia.map((freq, idx) => ({
+            dezena: idx + 1,
+            frequencia: freq
+        }));
+
+        // Ordena as dezenas pela frequência e pega as 3 mais quentes
+        return dezenasComFrequencia
+            .sort((a, b) => b.frequencia - a.frequencia)
+            .slice(0, 3)
+            .map(item => item.dezena); // Retorna apenas as dezenas
     };
 
     const gerarJogos = async () => {
@@ -78,8 +102,20 @@ const MeusJogos = () => {
             const noveDezenasConcursoAnterior = dezenasUltimoConcurso.slice(0, 9);
             console.log("9 dezenas do último concurso:", noveDezenasConcursoAnterior); // Debug
 
+            // Critério 7: Pegar as 3 dezenas mais quentes
+            const dezenasQuentes = calcularDezenasQuentes(resultados);
+            console.log("3 dezenas mais quentes:", dezenasQuentes); // Debug
+
             // Critério 3: Dezena com menor intervalo de atraso (11)
             const menorAtraso = 11;
+
+            // Critério 5: Valores permitidos para a soma das dezenas
+            const valoresPermitidos = [
+                179, 181, 182, 183, 184, 185, 186, 187,
+                188, 189, 190, 191, 192, 193, 194, 195,
+                196, 197, 198, 199, 201, 202, 203, 204,
+                206, 207, 208, 209, 212, 213,
+            ];
 
             let tentativas = 0;
             const maxTentativas = 100;
@@ -93,6 +129,13 @@ const MeusJogos = () => {
                 // Adiciona as 9 dezenas do concurso anterior
                 novoJogo.push(...noveDezenasConcursoAnterior);
 
+                // Adiciona as 3 dezenas mais quentes, se não estiverem já incluídas
+                dezenasQuentes.forEach(dezena => {
+                    if (!novoJogo.includes(dezena)) {
+                        novoJogo.push(dezena);
+                    }
+                });
+
                 // Completa o jogo até 15 dezenas com números que não foram sorteados
                 const numerosDisponiveis = Array.from({ length: 25 }, (_, i) => i + 1)
                     .filter(num => !novoJogo.includes(num));
@@ -104,10 +147,26 @@ const MeusJogos = () => {
                     numerosDisponiveis.splice(randomIndex, 1);
                 }
 
-                return novoJogo.sort((a, b) => a - b);
+                // Verifica se a soma das dezenas está entre os valores permitidos
+                const somaDezenas = novoJogo.reduce((acc, num) => acc + num, 0);
+                if (!valoresPermitidos.includes(somaDezenas)) {
+                    return gerarNovoJogo(); // Tenta gerar um novo jogo se não atender aos critérios
+                }
+
+                // Contar pares e ímpares
+                const pares = novoJogo.filter(num => num % 2 === 0).length; // Conta quantos números são pares
+                const impares = novoJogo.length - pares; // O restante são ímpares
+
+                // Verifica se o jogo atende ao critério de pares e ímpares
+                if ((pares === 7 && impares === 8) || (pares === 8 && impares === 7)) {
+                    return novoJogo.sort((a, b) => a - b); // Retorna o jogo ordenado
+                } else {
+                    return gerarNovoJogo(); // Tenta gerar um novo jogo se não atender aos critérios de pares e ímpares
+                }
             };
 
-            while (jogos.length < 30 && tentativas < maxTentativas) {
+            // Alterar a condição para gerar apenas 7 jogos
+            while (jogos.length < 7 && tentativas < maxTentativas) {
                 const novoJogo = gerarNovoJogo();
 
                 // Usa a função verificarJogoUnico para verificar se o jogo é único
@@ -124,10 +183,10 @@ const MeusJogos = () => {
                 return;
             }
 
-            if (jogos.length < 30) {
+            if (jogos.length < 7) {
                 toast.warn(`Foram gerados apenas ${jogos.length} jogos únicos.`);
             } else {
-                toast.success("30 jogos gerados com sucesso!");
+                toast.success("7 jogos gerados com sucesso!");
             }
 
             setJogosGerados(jogos);
@@ -150,6 +209,11 @@ const MeusJogos = () => {
     // Função para contar acertos
     const contarAcertos = (jogo) => {
         return jogo.filter(numero => ultimoResultado.includes(numero)).length;
+    };
+
+    // Função para calcular a soma das dezenas
+    const calcularSoma = (jogo) => {
+        return jogo.reduce((acc, num) => acc + num, 0);
     };
 
     return (
@@ -181,14 +245,18 @@ const MeusJogos = () => {
                         {jogosGerados.map((jogo, index) => {
                             const { pares, impares } = contarParesImpares(jogo);
                             const acertos = contarAcertos(jogo);
+                            const soma = calcularSoma(jogo); // Calcula a soma das dezenas
                             return (
                                 <div key={index} className="jogo-box">
                                     <div className="jogo-titulo">
                                         Jogo {index + 1}
                                         <span className="jogo-info">
-                                            ({pares} pares, {impares} ímpares) -
+                                            ({pares} pares, {impares} ímpares)
                                             <span className="acertos-info">
                                                 {acertos} acertos
+                                            </span>
+                                            <span className="soma-info">
+                                                Soma: {soma}
                                             </span>
                                         </span>
                                     </div>

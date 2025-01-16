@@ -7,9 +7,9 @@ import '../style/AdminDashBoard.css'
 import ResultLatest from "../components/resultLotofacil"
 import DezenasQuents from "../components/dezenasQuentes"
 import { useProjectionsStats } from '../hooks/useProjectionsStats';
+import SomaSorteios from '../components/somaSorteio';
 
 // imports icons and images
-
 import { GrAnalytics } from "react-icons/gr";
 import { BsGraphUpArrow } from "react-icons/bs";
 
@@ -116,7 +116,9 @@ const AdminDashBoard = () => {
                 <section className='Apexcharts'>
                     <div className="container-charts">
                         <DezenasQuents />
+                        <SomaSorteios />
                     </div>
+
                 </section>
 
 

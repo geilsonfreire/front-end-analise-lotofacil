@@ -39,6 +39,7 @@
 }
 
 .jogo-titulo {
+   
     font-size: 0.9rem;
     color: #8B008B;
     margin-bottom: 0.5rem;
@@ -71,6 +72,9 @@
 }
 
 .jogo-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     font-size: 0.6rem;
     color: #666;
     margin-left: 0.5rem;
