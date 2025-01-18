@@ -39,11 +39,22 @@
 }
 
 .jogo-titulo {
-   
     font-size: 0.9rem;
     color: #8B008B;
     margin-bottom: 0.5rem;
     font-weight: bold;
+}
+
+.concurso-info, .dez-info {
+    font-size: .5rem;
+    margin-left: .5rem;
+}
+
+.dez-info span {
+    margin-left: .3rem;
+    padding: .1rem;
+    border-radius: 50%;
+    border: solid 1px #FF00FF;
 }
 
 .numeros-container {

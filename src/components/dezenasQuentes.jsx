@@ -33,36 +33,30 @@ const DezenasQuentes = () => {
 
     // Função para calcular a frequência das dezenas
     const calcularFrequenciaDezenas = (resultados) => {
-        const frequencia = Array(25).fill(0); // Array de 25 posições com valores iniciais 0
+        const frequencia = Array(25).fill(0);
 
-        resultados.forEach((resultado) => {
-            resultado.dezenas.forEach((dezena) => {
-                frequencia[dezena - 1] += 1; // Incrementa a posição correspondente
+        resultados.forEach(resultado => {
+            resultado.dezenas.forEach(dezena => {
+                frequencia[dezena - 1] += 1;
             });
         });
 
         return frequencia;
     };
 
-
     // Função para calcular o maior atraso e o atraso atual de cada dezena
     const calcularIntervalosAtraso = (resultados) => {
-        let ultimaOcorrencia = Array(25).fill(-1); // Armazena o último sorteio onde cada dezena apareceu
-        let maiorAtraso = Array(25).fill(0); // Maior intervalo de atraso para cada dezena
+        const ultimaOcorrencia = Array(25).fill(-1);
+        const maiorAtraso = Array(25).fill(0);
 
         resultados.forEach((resultado, idx) => {
-            resultado.dezenas.forEach((dezena) => {
+            resultado.dezenas.forEach(dezena => {
                 if (ultimaOcorrencia[dezena - 1] !== -1) {
-                    // Calcula o intervalo de atraso
-                    const intervalo = (idx - 1) - ultimaOcorrencia[dezena - 1];
-
-                    // Verifica se o intervalo calculado é maior que o maior já registrado
+                    const intervalo = idx - ultimaOcorrencia[dezena - 1];
                     if (intervalo > maiorAtraso[dezena - 1]) {
                         maiorAtraso[dezena - 1] = intervalo;
                     }
                 }
-
-                // Atualiza a última ocorrência da dezena
                 ultimaOcorrencia[dezena - 1] = idx;
             });
         });
@@ -72,31 +66,16 @@ const DezenasQuentes = () => {
 
     // Função para calcular o atraso atual de cada dezena (levando em consideração os últimos concursos)
     const calcularAtrasoAtual = (resultados) => {
-
-        const totalConcursos = resultados.length;  // Número total de sorteios
-        const atrasoAtual = Array(25).fill(0); // Array de 25 posições com valores iniciais 0
+        const totalConcursos = resultados.length;
+        const atrasoAtual = Array(25).fill(totalConcursos);
 
         resultados.forEach((resultado, idx) => {
-            resultado.dezenas.forEach((dezena) => {
-                // Atualiza o atraso de cada dezena com base no último concurso em que foi sorteada
-                if (atrasoAtual[dezena - 1] === 0) {
-                    // Se for o primeiro sorteio que a dezena aparece, atribui o atraso correto
-                    atrasoAtual[dezena - 1] = totalConcursos - idx;
-                }
+            resultado.dezenas.forEach(dezena => {
+                atrasoAtual[dezena - 1] = idx;
             });
         });
 
-        // Calcula o atraso de cada dezena
-        atrasoAtual.forEach((atraso, dezenaIdx) => {
-            // Verifica se a dezena apareceu, se não apareceu, o atraso será o total de sorteios
-            if (atraso === 0) {
-                atrasoAtual[dezenaIdx] = totalConcursos;
-            } else {
-                atrasoAtual[dezenaIdx] = totalConcursos - atraso; // Atraso é a diferença entre o total de sorteios e a última vez que a dezena apareceu
-            }
-        });
-
-        return atrasoAtual;
+        return atrasoAtual.map(atraso => totalConcursos - atraso - 1);
     };
 
 
@@ -168,32 +147,26 @@ const DezenasQuentes = () => {
     const analisarSequencias = (sorteios) => {
         const estatisticasPorTamanho = {};
 
-        // Para cada sorteio
         sorteios.forEach(sorteio => {
             const dezenas = sorteio.dezenas.map(Number).sort((a, b) => a - b);
             let sequenciaAtual = [];
-            const sequenciasNesteSorteio = new Set(); // Conjunto para rastrear tamanhos únicos neste sorteio
+            const sequenciasNesteSorteio = new Set();
 
-            // Analisa as sequências no sorteio atual
-            for (let i = 0; i < dezenas.length; i++) {
-                if (i === 0 || dezenas[i] === dezenas[i - 1] + 1) {
-                    sequenciaAtual.push(dezenas[i]);
+            dezenas.forEach((dezena, i) => {
+                if (i === 0 || dezena === dezenas[i - 1] + 1) {
+                    sequenciaAtual.push(dezena);
                 } else {
                     if (sequenciaAtual.length >= 2) {
-                        const tamanho = sequenciaAtual.length;
-                        sequenciasNesteSorteio.add(tamanho); // Marca que encontramos uma sequência deste tamanho
+                        sequenciasNesteSorteio.add(sequenciaAtual.length);
                     }
-                    sequenciaAtual = [dezenas[i]];
+                    sequenciaAtual = [dezena];
                 }
-            }
+            });
 
-            // Verifica a última sequência do sorteio
             if (sequenciaAtual.length >= 2) {
-                const tamanho = sequenciaAtual.length;
-                sequenciasNesteSorteio.add(tamanho);
+                sequenciasNesteSorteio.add(sequenciaAtual.length);
             }
 
-            // Atualiza as estatísticas para cada tamanho encontrado neste sorteio
             sequenciasNesteSorteio.forEach(tamanho => {
                 if (!estatisticasPorTamanho[tamanho]) {
                     estatisticasPorTamanho[tamanho] = {
@@ -207,10 +180,9 @@ const DezenasQuentes = () => {
             });
         });
 
-        // Calcula as estatísticas finais
         Object.values(estatisticasPorTamanho).forEach(estat => {
             const totalOcorrencias = estat.ocorrenciasPorConcurso.length;
-            estat.maximo = totalOcorrencias; // Número de concursos onde apareceu
+            estat.maximo = totalOcorrencias;
             estat.minimo = totalOcorrencias;
             estat.media = totalOcorrencias;
         });
@@ -238,28 +210,23 @@ const DezenasQuentes = () => {
     const analisarDezenasRepetidas = (resultados) => {
         if (resultados.length < 2) return null;
 
-        // Objeto para contar frequência de cada quantidade de repetições
         const frequenciaRepeticoes = {
             atual: {
                 quantidade: 0,
                 dezenas: [],
                 percentual: 0
             },
-            historico: Array(16).fill(0) // Array para contar ocorrências de 0 a 15 repetições
+            historico: Array(16).fill(0)
         };
 
-        // Analisa todos os pares de concursos consecutivos
         for (let i = 0; i < resultados.length - 1; i++) {
             const concursoAtual = resultados[i].dezenas.map(Number);
             const concursoAnterior = resultados[i + 1].dezenas.map(Number);
 
-            const repetidas = concursoAtual.filter(dezena =>
-                concursoAnterior.includes(dezena)
-            );
+            const repetidas = concursoAtual.filter(dezena => concursoAnterior.includes(dezena));
 
             frequenciaRepeticoes.historico[repetidas.length]++;
 
-            // Se for o concurso mais recente, guarda os detalhes
             if (i === 0) {
                 frequenciaRepeticoes.atual = {
                     quantidade: repetidas.length,
@@ -269,14 +236,10 @@ const DezenasQuentes = () => {
             }
         }
 
-        // Calcula a quantidade de repetições mais frequente
         const maisFrequente = frequenciaRepeticoes.historico
             .map((qtd, index) => ({ quantidade: index, ocorrencias: qtd }))
-            .reduce((max, atual) =>
-                atual.ocorrencias > max.ocorrencias ? atual : max
-            );
+            .reduce((max, atual) => (atual.ocorrencias > max.ocorrencias ? atual : max));
 
-        // Calcula percentuais para cada quantidade de repetições
         const totalConcursos = resultados.length - 1;
         const percentuais = frequenciaRepeticoes.historico.map(qtd =>
             ((qtd / totalConcursos) * 100).toFixed(1)
@@ -288,7 +251,7 @@ const DezenasQuentes = () => {
                 quantidade: index,
                 ocorrencias: qtd,
                 percentual: percentuais[index]
-            })).filter(item => item.ocorrencias > 0), // Remove quantidades que nunca ocorreram
+            })).filter(item => item.ocorrencias > 0),
             maisFrequente
         };
     };

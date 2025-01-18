@@ -22,11 +22,7 @@ const SomaSorteios = () => {
     const [somaContagens, setSomaContagens] = useState([]);
 
     // Função para calcular a soma e contagem
-    const calculateSum = (dezenas) => {
-        // Converte cada string em número e soma
-        const soma = dezenas.reduce((acc, num) => acc + Number(num), 0);
-        return soma; // Retorna a soma
-    };
+    const calculateSum = (dezenas) => dezenas.reduce((acc, num) => acc + Number(num), 0);
 
     // Função para buscar os resultados da API
     const fetchResults = async () => {
@@ -48,7 +44,7 @@ const SomaSorteios = () => {
     }, []);
 
     useEffect(() => {
-        if (sorteios && sorteios.length > 0) {
+        if (sorteios.length > 0) {
             const somaMap = {}; // Objeto para armazenar somas e suas contagens
 
             sorteios.forEach(dezenas => {
@@ -60,14 +56,9 @@ const SomaSorteios = () => {
             const somaContagem = Object.entries(somaMap).map(([soma, contagem]) => ({
                 soma: Number(soma),
                 contagem
-            }));
-
-            // Ordena as somas do menor para o maior
-            somaContagem.sort((a, b) => b.contagem - a.contagem);
+            })).sort((a, b) => b.contagem - a.contagem);
 
             setSomaContagens(somaContagem); // Atualiza o estado com as somas e contagens
-        } else {
-            console.log("Nenhum sorteio disponível para calcular."); // Log se não houver sorteios
         }
     }, [sorteios]);
 

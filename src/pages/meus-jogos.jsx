@@ -19,14 +19,13 @@ const MeusJogos = () => {
     const [loading, setLoading] = useState(false);
     const [ultimoResultado, setUltimoResultado] = useState([]);
 
-    // Função modificada para buscar último resultado
+    // Função buscar último resultado
     const buscarUltimoResultado = async () => {
         try {
             const resultados = await ApiServices.getAllResults();
             if (resultados && resultados.length > 0) {
                 // Garantir que estamos pegando o resultado mais recente
                 const ultimoSorteio = resultados[0];
-                console.log("Último resultado:", ultimoSorteio.dezenas); // Debug
                 setUltimoResultado(ultimoSorteio.dezenas.map(Number));
             }
         } catch (error) {
@@ -41,50 +40,55 @@ const MeusJogos = () => {
     }, []); // Execute apenas uma vez ao montar
 
     const verificarJogoUnico = (novoJogo, jogosAnteriores, resultados) => {
-        // Ordena o novo jogo uma vez
         const novoJogoOrdenado = [...novoJogo].sort((a, b) => a - b);
 
-        // Verifica se o jogo já existe nos jogos gerados
         const jogoExisteGerados = jogosAnteriores.some(jogo =>
             JSON.stringify([...jogo].sort((a, b) => a - b)) === JSON.stringify(novoJogoOrdenado)
         );
 
-        // critério 1: Verifica se o jogo já saiu em resultados anteriores
         const jogoExisteResultados = resultados.some(resultado => {
             const numerosDoResultado = resultado.dezenas.map(Number).sort((a, b) => a - b);
             return JSON.stringify(numerosDoResultado) === JSON.stringify(novoJogoOrdenado);
-        });
-
-        // Log para debug
-        console.log('Verificando jogo:', {
-            novoJogo: novoJogoOrdenado,
-            existeGerados: jogoExisteGerados,
-            existeResultados: jogoExisteResultados
         });
 
         return !jogoExisteGerados && !jogoExisteResultados;
     };
 
     const calcularDezenasQuentes = (resultados) => {
-        const frequencia = Array(25).fill(0); // Array para contar a frequência de cada dezena
+        const frequencia = Array(25).fill(0);
 
         resultados.forEach(resultado => {
             resultado.dezenas.forEach(dezena => {
-                frequencia[dezena - 1] += 1; // Incrementa a contagem da dezena
+                frequencia[dezena - 1] += 1;
             });
         });
 
-        // Cria um array de objetos com a dezena e sua frequência
-        const dezenasComFrequencia = frequencia.map((freq, idx) => ({
-            dezena: idx + 1,
-            frequencia: freq
-        }));
-
-        // Ordena as dezenas pela frequência e pega as 3 mais quentes
-        return dezenasComFrequencia
+        return frequencia
+            .map((freq, idx) => ({ dezena: idx + 1, frequencia: freq }))
             .sort((a, b) => b.frequencia - a.frequencia)
             .slice(0, 3)
-            .map(item => item.dezena); // Retorna apenas as dezenas
+            .map(item => item.dezena);
+    };
+
+    const calcularMaioresAtrasos = (resultados) => {
+        const totalConcursos = resultados.length;
+        const atrasoAtual = Array(25).fill(totalConcursos);
+
+        resultados.forEach((resultado, idx) => {
+            resultado.dezenas.forEach((dezena) => {
+                atrasoAtual[dezena - 1] = idx;
+            });
+        });
+
+        const dezenasComAtraso = atrasoAtual.map((ultimoIndice, idx) => ({
+            dezena: idx + 1,
+            atraso: totalConcursos - ultimoIndice - 1
+        }));
+
+        return dezenasComAtraso
+            .sort((a, b) => b.atraso - a.atraso)
+            .slice(0, 3)
+            .map(item => item.dezena);
     };
 
     const gerarJogos = async () => {
@@ -93,86 +97,55 @@ const MeusJogos = () => {
             const resultados = await ApiServices.getAllResults();
             let jogos = [];
 
-            // Pegar o último resultado
-            const ultimoResultado = resultados[0];
-            console.log("Último resultado:", ultimoResultado); // Debug
-
-            // Critério 2: Pegar 9 dezenas do último concurso
-            const dezenasUltimoConcurso = ultimoResultado.dezenas.map(Number);
-            const noveDezenasConcursoAnterior = dezenasUltimoConcurso.slice(0, 9);
-            console.log("9 dezenas do último concurso:", noveDezenasConcursoAnterior); // Debug
-
-            // Critério 7: Pegar as 3 dezenas mais quentes
             const dezenasQuentes = calcularDezenasQuentes(resultados);
-            console.log("3 dezenas mais quentes:", dezenasQuentes); // Debug
-
-            // Critério 3: Dezena com menor intervalo de atraso (11)
             const menorAtraso = 11;
-
-            // Critério 5: Valores permitidos para a soma das dezenas
             const valoresPermitidos = [
                 179, 181, 182, 183, 184, 185, 186, 187,
                 188, 189, 190, 191, 192, 193, 194, 195,
                 196, 197, 198, 199, 201, 202, 203, 204,
                 206, 207, 208, 209, 212, 213,
             ];
+            const maioresAtrasos = calcularMaioresAtrasos(resultados);
 
             let tentativas = 0;
             const maxTentativas = 100;
 
-            const gerarNovoJogo = () => {
-                const novoJogo = [];
+            const gerarNovoJogo = (tentativas = 0) => {
+                if (tentativas > 100) return null;
 
-                // Adiciona a dezena com menor intervalo de atraso
-                novoJogo.push(menorAtraso);
+                const novoJogo = [menorAtraso, ...maioresAtrasos];
 
-                // Adiciona as 9 dezenas do concurso anterior
-                novoJogo.push(...noveDezenasConcursoAnterior);
-
-                // Adiciona as 3 dezenas mais quentes, se não estiverem já incluídas
                 dezenasQuentes.forEach(dezena => {
-                    if (!novoJogo.includes(dezena)) {
-                        novoJogo.push(dezena);
-                    }
+                    if (!novoJogo.includes(dezena)) novoJogo.push(dezena);
                 });
 
-                // Completa o jogo até 15 dezenas com números que não foram sorteados
                 const numerosDisponiveis = Array.from({ length: 25 }, (_, i) => i + 1)
                     .filter(num => !novoJogo.includes(num));
 
                 while (novoJogo.length < 15 && numerosDisponiveis.length > 0) {
                     const randomIndex = Math.floor(Math.random() * numerosDisponiveis.length);
-                    const numeroSelecionado = numerosDisponiveis[randomIndex];
-                    novoJogo.push(numeroSelecionado);
+                    novoJogo.push(numerosDisponiveis[randomIndex]);
                     numerosDisponiveis.splice(randomIndex, 1);
                 }
 
-                // Verifica se a soma das dezenas está entre os valores permitidos
                 const somaDezenas = novoJogo.reduce((acc, num) => acc + num, 0);
-                if (!valoresPermitidos.includes(somaDezenas)) {
-                    return gerarNovoJogo(); // Tenta gerar um novo jogo se não atender aos critérios
-                }
+                if (!valoresPermitidos.includes(somaDezenas)) return gerarNovoJogo(tentativas + 1);
 
-                // Contar pares e ímpares
-                const pares = novoJogo.filter(num => num % 2 === 0).length; // Conta quantos números são pares
-                const impares = novoJogo.length - pares; // O restante são ímpares
+                const pares = novoJogo.filter(num => num % 2 === 0).length;
+                const impares = novoJogo.length - pares;
 
-                // Verifica se o jogo atende ao critério de pares e ímpares
                 if ((pares === 7 && impares === 8) || (pares === 8 && impares === 7)) {
-                    return novoJogo.sort((a, b) => a - b); // Retorna o jogo ordenado
+                    return novoJogo.sort((a, b) => a - b);
                 } else {
-                    return gerarNovoJogo(); // Tenta gerar um novo jogo se não atender aos critérios de pares e ímpares
+                    return gerarNovoJogo(tentativas + 1);
                 }
             };
 
-            // Alterar a condição para gerar apenas 7 jogos
             while (jogos.length < 7 && tentativas < maxTentativas) {
                 const novoJogo = gerarNovoJogo();
 
-                // Usa a função verificarJogoUnico para verificar se o jogo é único
-                if (verificarJogoUnico(novoJogo, jogos, resultados) && novoJogo.length === 15) {
+                if (novoJogo && verificarJogoUnico(novoJogo, jogos, resultados) && novoJogo.length === 15) {
                     jogos.push(novoJogo);
-                    console.log(`Jogo ${jogos.length} gerado:`, novoJogo);
                 }
 
                 tentativas++;

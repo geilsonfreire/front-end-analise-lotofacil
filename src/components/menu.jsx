@@ -19,11 +19,16 @@ const Menu = () => {
     useEffect(() => {
         const mainMenuLi = document.getElementById("mainMenu").querySelectorAll("li");
 
-        function changeActive() { /* função para mudar a classe active */
-            mainMenuLi.forEach(n => n.classList.remove("active")); /* removendo a classe active */
-            this.classList.add("active"); /* adicionando a classe active */
-        }
-        mainMenuLi.forEach((n) => n.addEventListener("click", changeActive)); /* adicionando evento de click */
+        const changeActive = (event) => {
+            mainMenuLi.forEach(n => n.classList.remove("active"));
+            event.currentTarget.classList.add("active");
+        };
+
+        mainMenuLi.forEach(n => n.addEventListener("click", changeActive));
+
+        return () => {
+            mainMenuLi.forEach(n => n.removeEventListener("click", changeActive));
+        };
     }, []);
 
 
