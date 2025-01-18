@@ -14,7 +14,7 @@ import { processResults } from "../utils/analiyzeOddEven";
 const AnaliseImpaPar = () => {
     // Estado para armazenar os resultados
     const [analysis, setAnalysis] = useState(null);
-    const [isAnalyzed, setIsAnalyzed] = useState(false); // Novo estado para controlar se a análise já foi concluída
+    const [hasFetched, setHasFetched] = useState(false); // Estado para controlar se a função já foi chamada
 
     useEffect(() => {
         const fetchAndAnalyze = async () => {
@@ -22,18 +22,18 @@ const AnaliseImpaPar = () => {
                 const allResults = await apiServices.getAllResults();
                 const analysisResult = await processResults(allResults);
                 setAnalysis(analysisResult);
-                if (!isAnalyzed) {
-                    toast.success("Análise concluída com sucesso!");
-                    setIsAnalyzed(true); // Atualiza o estado para indicar que a análise foi concluída
-                }
+                toast.success("Análise concluída com sucesso!");
             } catch (error) {
                 console.error("Erro ao buscar os sorteios:", error.message);
                 toast.error("Erro ao buscar os sorteios.");
             }
         };
 
-        fetchAndAnalyze();
-    }, [isAnalyzed]); // Adiciona isAnalyzed como dependência para garantir que a função seja chamada apenas uma vez
+        if (!hasFetched) {
+            fetchAndAnalyze();
+            setHasFetched(true); // Atualiza o estado para indicar que a função já foi chamada
+        }
+    }, [hasFetched]); // Adiciona hasFetched como dependência para garantir que a função seja chamada apenas uma vez
 
     return (
         <main className="Container-Geral">

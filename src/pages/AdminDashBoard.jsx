@@ -1,4 +1,6 @@
-// Immports Bibliotecas
+// Imports Bibliotecas
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 // Imports Css
 import '../style/AdminDashBoard.css'
@@ -16,6 +18,14 @@ import { BsGraphUpArrow } from "react-icons/bs";
 
 const AdminDashBoard = () => {
     const { stats, loading, error } = useProjectionsStats();
+    const [hasLoaded, setHasLoaded] = useState(false); // Novo estado para controlar se os dados foram carregados
+
+    useEffect(() => {
+        if (!loading && !error && !hasLoaded) {
+            toast.success("Dados carregados com sucesso!");
+            setHasLoaded(true); // Atualiza o estado para indicar que os dados foram carregados
+        }
+    }, [loading, error, hasLoaded]);
 
     // Função auxiliar para formatar números
     const formatNumber = (value) => {

@@ -2,20 +2,11 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-
-
 // Imports Css
 import "../style/dezenasQuentes.css";
 
-// Imports de Icones
-
-
-
 // Importando o componente de serviço
 import apiService from "../services/apiServices";
-
-
-
 
 const DezenasQuentes = () => {
     // Estado para armazenar os resultados
@@ -29,7 +20,7 @@ const DezenasQuentes = () => {
     const [loading, setLoading] = useState(true);
     const [totalConcursos, setTotalConcursos] = useState(0);
     const [estatisticasRepeticoes, setEstatisticasRepeticoes] = useState(null);
-
+    const [hasLoaded, setHasLoaded] = useState(false); // Novo estado para controlar se os dados foram carregados
 
     // Função para calcular a frequência das dezenas
     const calcularFrequenciaDezenas = (resultados) => {
@@ -78,71 +69,72 @@ const DezenasQuentes = () => {
         return atrasoAtual.map(atraso => totalConcursos - atraso - 1);
     };
 
-
     // Função para buscar os resultados e calcular as frequências e intervalos
     useEffect(() => {
         const fetchResults = async () => {
-            const loadingToast = toast.loading("Carregando dados...");
-            setError(null);
-            try {
-                // Busca os resultados da API
-                const resultados = await apiService.getAllResults(); // Obtém todos os resultados
-                setTotalConcursos(resultados.length);
+            if (!hasLoaded) {
+                const loadingToast = toast.loading("Carregando dados...");
+                setError(null);
+                try {
+                    // Busca os resultados da API
+                    const resultados = await apiService.getAllResults(); // Obtém todos os resultados
+                    setTotalConcursos(resultados.length);
 
-                // Calcula a frequência das dezenas
-                const frequencia = calcularFrequenciaDezenas(resultados); // Calcula a frequência
-                setFrequencias(frequencia);
+                    // Calcula a frequência das dezenas
+                    const frequencia = calcularFrequenciaDezenas(resultados); // Calcula a frequência
+                    setFrequencias(frequencia);
 
-                // Calcula o maior atraso
-                const maiorAtraso = calcularIntervalosAtraso(resultados);
-                setIntervalosAtraso(maiorAtraso); // Aqui, você está chamando setIntervalosAtraso para atualizar o estado
+                    // Calcula o maior atraso
+                    const maiorAtraso = calcularIntervalosAtraso(resultados);
+                    setIntervalosAtraso(maiorAtraso); // Aqui, você está chamando setIntervalosAtraso para atualizar o estado
 
-                // Calcula o atraso atual
-                const atrasoAtual = calcularAtrasoAtual(resultados);
-                setAtrasoAtual(atrasoAtual);
+                    // Calcula o atraso atual
+                    const atrasoAtual = calcularAtrasoAtual(resultados);
+                    setAtrasoAtual(atrasoAtual);
 
+                    // Calcula as 5 dezenas mais quentes
+                    const topQuentesCalculadas = frequencia
+                        .map((freq, idx) => ({ dezena: idx + 1, frequencia: freq }))
+                        .sort((a, b) => b.frequencia - a.frequencia)
+                        .slice(0, 5);
 
-                // Calcula as 5 dezenas mais quentes
-                const topQuentesCalculadas = frequencia
-                    .map((freq, idx) => ({ dezena: idx + 1, frequencia: freq }))
-                    .sort((a, b) => b.frequencia - a.frequencia)
-                    .slice(0, 5);
+                    setTopQuentes(topQuentesCalculadas);
 
-                setTopQuentes(topQuentesCalculadas);
+                    // Encontra a dezena com o maior intervalo de atraso
+                    const maiorAtrasoGlobal = maiorAtraso.reduce((max, atraso, idx) => {
+                        if (atraso > max.intervaloAtraso) {
+                            return { dezena: idx + 1, intervaloAtraso: atraso };
+                        }
+                        return max;
+                    }, { dezena: null, intervaloAtraso: 0 });
+                    setMaiorAtraso(maiorAtrasoGlobal);
 
-                // Encontra a dezena com o maior intervalo de atraso
-                const maiorAtrasoGlobal = maiorAtraso.reduce((max, atraso, idx) => {
-                    if (atraso > max.intervaloAtraso) {
-                        return { dezena: idx + 1, intervaloAtraso: atraso };
-                    }
-                    return max;
-                }, { dezena: null, intervaloAtraso: 0 });
-                setMaiorAtraso(maiorAtrasoGlobal);
+                    // Análise das dezenas repetidas
+                    const repetidasInfo = analisarDezenasRepetidas(resultados);
+                    setEstatisticasRepeticoes(repetidasInfo);
 
-                // Análise das dezenas repetidas
-                const repetidasInfo = analisarDezenasRepetidas(resultados);
-                setEstatisticasRepeticoes(repetidasInfo);
-
-                toast.update(loadingToast, {
-                    render: "Dados carregados com sucesso!",
-                    type: "success",
-                    isLoading: false,
-                    autoClose: 3000,
-                });
-            } catch (err) {
-                console.error(err);
-                setError("Erro ao carregar os dados.");
-                toast.update(loadingToast, {
-                    render: "Erro ao carregar os dados!",
-                    type: "error",
-                    isLoading: false,
-                    autoClose: 3000,
-                });
+                    toast.update(loadingToast, {
+                        render: "Dados carregados com sucesso!",
+                        type: "success",
+                        isLoading: false,
+                        autoClose: 3000,
+                    });
+                    setHasLoaded(true); // Atualiza o estado para indicar que os dados foram carregados
+                } catch (err) {
+                    console.error(err);
+                    setError("Erro ao carregar os dados.");
+                    toast.update(loadingToast, {
+                        render: "Erro ao carregar os dados!",
+                        type: "error",
+                        isLoading: false,
+                        autoClose: 3000,
+                    });
+                }
             }
         };
 
         fetchResults();
-    }, []);
+    }, [hasLoaded]);
 
     const analisarSequencias = (sorteios) => {
         const estatisticasPorTamanho = {};
