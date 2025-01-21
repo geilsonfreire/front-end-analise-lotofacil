@@ -1,25 +1,20 @@
 // Imports Bibliotecas
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { toast } from "react-toastify";
-
 
 // Imports Css
 import "../style/somaSorteios.css";
 
 // Imports de Icones
 
-
-
 // Importando o componente
 import apiServices from "../services/apiServices";
-
-
-
 
 const SomaSorteios = () => {
     // Estado para armazenar os resultados
     const [sorteios, setSorteios] = useState([]);
     const [somaContagens, setSomaContagens] = useState([]);
+    const [somaPossiveis, setSomaPossiveis] = useState([]);
 
     // Função para calcular a soma e contagem
     const calculateSum = (dezenas) => dezenas.reduce((acc, num) => acc + Number(num), 0);
@@ -38,6 +33,26 @@ const SomaSorteios = () => {
             toast.error("Erro ao buscar os resultados.");
         }
     };
+
+    // Função para calcular as somas possíveis
+    const calculatePossibleSums = useCallback(() => {
+        const totalGames = 3268760; // Total de jogos possíveis na Lotofácil
+        const possibleSums = {}; // Objeto para armazenar somas e suas contagens
+
+        for (let i = 0; i < totalGames; i++) {
+            const dezenas = Array.from({ length: 15 }, () => Math.floor(Math.random() * 25) + 1);
+            const soma = calculateSum(dezenas);
+            possibleSums[soma] = (possibleSums[soma] || 0) + 1;
+        }
+
+        // Converte o objeto em um array de [soma, contagem]
+        const somaPossiveisArray = Object.entries(possibleSums).map(([soma, contagem]) => ({
+            soma: Number(soma),
+            contagem
+        })).sort((a, b) => b.contagem - a.contagem);
+
+        setSomaPossiveis(somaPossiveisArray); // Atualiza o estado com as somas possíveis
+    }, []);
 
     useEffect(() => {
         fetchResults(); // Chama a função para buscar os resultados
@@ -62,6 +77,10 @@ const SomaSorteios = () => {
         }
     }, [sorteios]);
 
+    useEffect(() => {
+        calculatePossibleSums(); // Chama a função para calcular as somas possíveis
+    }, [calculatePossibleSums]);
+
     return (
         <main className="Container-Geral">
             <section className="conteiner-section">
@@ -74,23 +93,30 @@ const SomaSorteios = () => {
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Soma Total</th>
-                                        <th>Contagem da Soma</th>
-
+                                        <th>Soma Sorteio já ocorrido</th>
+                                        <th>Contagem da Soma sorteios já ocorridos</th>
+                                        <th>Contagem da Soma sorteios Possíveis</th>
+                                        <th>Contagem da Soma sorteios já ocorridos menos sorteios Possíveis</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {somaContagens.length === 0 ? (
                                         <tr>
-                                            <td colSpan="2">Nenhum resultado disponível.</td>
+                                            <td colSpan="5">Nenhum resultado disponível.</td>
                                         </tr>
                                     ) : (
-                                        somaContagens.map(({ soma, contagem }, index) => (
-                                            <tr key={index}>
-                                                <td>{soma}</td>
-                                                <td>{contagem}</td>
-                                            </tr>
-                                        ))
+                                        somaContagens.map(({ soma, contagem }, index) => {
+                                            const possivel = somaPossiveis.find(item => item.soma === soma);
+                                            const contagemPossivel = possivel ? possivel.contagem : 0;
+                                            return (
+                                                <tr key={index}>
+                                                    <td>{soma}</td>
+                                                    <td>{contagem}</td>
+                                                    <td>{contagemPossivel}</td>
+                                                    <td>{contagem - contagemPossivel}</td>
+                                                </tr>
+                                            );
+                                        })
                                     )}
                                 </tbody>
                             </table>
@@ -102,4 +128,4 @@ const SomaSorteios = () => {
     );
 };
 
-export default SomaSorteios
+export default SomaSorteios;
