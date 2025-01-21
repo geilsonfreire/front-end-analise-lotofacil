@@ -37,7 +37,7 @@ const getLatestResult = async () => {
         throw new Error("Não foi possível obter o último resultado."); // Lança exceção
     }
 };
-console.log(getLatestResult());
+
 
 // Função para obter o resultado de um concurso específico
 const getResultByContestNumber = async (contestNumber) => {

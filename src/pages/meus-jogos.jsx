@@ -10,6 +10,7 @@ import ApiServices from "../services/apiServices";
 import ResultLatest from "../components/resultLotofacil"
 
 const MeusJogos = () => {
+    // Declarando estados 
     const [jogosGerados, setJogosGerados] = useState(() => {
         const jogosLocalStorage = localStorage.getItem('jogosLotofacil');
         return jogosLocalStorage ? JSON.parse(jogosLocalStorage) : [];
@@ -21,10 +22,8 @@ const MeusJogos = () => {
     // Função buscar último resultado
     const buscarUltimoResultado = async () => {
         try {
-            const resultados = await ApiServices.getAllResults();
-            if (resultados && resultados.length > 0) {
-                // Garantir que estamos pegando o resultado mais recente
-                const ultimoSorteio = resultados[0];
+            const ultimoSorteio = await ApiServices.getLatestResult();
+            if (ultimoSorteio) {
                 setResultadoConcurso(ultimoSorteio.dezenas.map(Number));
             }
         } catch (error) {
@@ -50,7 +49,7 @@ const MeusJogos = () => {
     // Carregar o último resultado quando o componente montar
     useEffect(() => {
         buscarUltimoResultado();
-    }, []); // Execute apenas uma vez ao montar
+    }, []); 
 
     // Atualizar quando o concurso atual mudar
     useEffect(() => {
