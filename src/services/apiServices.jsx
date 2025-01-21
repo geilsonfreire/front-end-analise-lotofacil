@@ -51,6 +51,5 @@ const getResultByContestNumber = async (contestNumber) => {
     }
 };
 
-
 // Exporta as funções para serem utilizadas em outros arquivos
 export default { getAllResults, getLatestResult, getResultByContestNumber, convertDate };

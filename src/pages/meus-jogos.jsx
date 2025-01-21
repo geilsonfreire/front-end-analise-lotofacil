@@ -9,15 +9,14 @@ import "../style/meus-jogos.css";
 import ApiServices from "../services/apiServices";
 import ResultLatest from "../components/resultLotofacil"
 
-
-
 const MeusJogos = () => {
     const [jogosGerados, setJogosGerados] = useState(() => {
         const jogosLocalStorage = localStorage.getItem('jogosLotofacil');
         return jogosLocalStorage ? JSON.parse(jogosLocalStorage) : [];
     });
     const [loading, setLoading] = useState(false);
-    const [ultimoResultado, setUltimoResultado] = useState([]);
+    const [currentConcurso, setCurrentConcurso] = useState(null);
+    const [resultadoConcurso, setResultadoConcurso] = useState([]);
 
     // Função buscar último resultado
     const buscarUltimoResultado = async () => {
@@ -26,11 +25,25 @@ const MeusJogos = () => {
             if (resultados && resultados.length > 0) {
                 // Garantir que estamos pegando o resultado mais recente
                 const ultimoSorteio = resultados[0];
-                setUltimoResultado(ultimoSorteio.dezenas.map(Number));
+                setResultadoConcurso(ultimoSorteio.dezenas.map(Number));
             }
         } catch (error) {
             console.error("Erro ao buscar último resultado:", error);
             toast.error("Erro ao buscar último resultado!");
+        }
+    };
+
+    // Função para lidar com a mudança de concurso
+    const handleConcursoChange = async (concurso) => {
+        try {
+            const resultData = await ApiServices.getResultByContestNumber(concurso);
+            if (resultData) {
+                setResultadoConcurso(resultData.dezenas.map(Number));
+                setCurrentConcurso(concurso);
+            }
+        } catch (error) {
+            console.error("Erro ao buscar resultado do concurso:", error);
+            toast.error("Erro ao buscar resultado do concurso!");
         }
     };
 
@@ -39,6 +52,14 @@ const MeusJogos = () => {
         buscarUltimoResultado();
     }, []); // Execute apenas uma vez ao montar
 
+    // Atualizar quando o concurso atual mudar
+    useEffect(() => {
+        if (currentConcurso) {
+            handleConcursoChange(currentConcurso);
+        }
+    }, [currentConcurso]);
+
+    // Função para verificar se o jogo é único
     const verificarJogoUnico = (novoJogo, jogosAnteriores, resultados) => {
         const novoJogoOrdenado = [...novoJogo].sort((a, b) => a - b);
 
@@ -54,6 +75,7 @@ const MeusJogos = () => {
         return !jogoExisteGerados && !jogoExisteResultados;
     };
 
+    // Função para calcular as dezenas quentes
     const calcularDezenasQuentes = (resultados) => {
         const frequencia = Array(25).fill(0);
 
@@ -70,6 +92,7 @@ const MeusJogos = () => {
             .map(item => item.dezena);
     };
 
+    // Função para calcular os maiores atrasos
     const calcularMaioresAtrasos = (resultados) => {
         const totalConcursos = resultados.length;
         const atrasoAtual = Array(25).fill(totalConcursos);
@@ -91,6 +114,7 @@ const MeusJogos = () => {
             .map(item => item.dezena);
     };
 
+    // Função para gerar jogos
     const gerarJogos = async () => {
         try {
             setLoading(true);
@@ -173,6 +197,7 @@ const MeusJogos = () => {
         }
     };
 
+    // Função para contar pares e ímpares
     const contarParesImpares = (jogo) => {
         const pares = jogo.filter(n => n % 2 === 0).length;
         const impares = jogo.length - pares;
@@ -181,7 +206,7 @@ const MeusJogos = () => {
 
     // Função para contar acertos
     const contarAcertos = (jogo) => {
-        return jogo.filter(numero => ultimoResultado.includes(numero)).length;
+        return jogo.filter(numero => resultadoConcurso.includes(numero)).length;
     };
 
     // Função para calcular a soma das dezenas
@@ -198,7 +223,7 @@ const MeusJogos = () => {
             </section>
 
             <section className="conteiner-section">
-                < ResultLatest />
+                < ResultLatest onConcursoChange={handleConcursoChange} />
                 <div className="title-result-info">
                     <h1>Gerador de Jogos</h1>
                 </div>
@@ -235,7 +260,7 @@ const MeusJogos = () => {
                                     </div>
                                     <div className="numeros-container">
                                         {jogo.map((numero) => {
-                                            const numeroAcertado = ultimoResultado.includes(numero);
+                                            const numeroAcertado = resultadoConcurso.includes(numero);
                                             console.log(`Número ${numero} acertado: ${numeroAcertado}`); // Debug
                                             return (
                                                 <div

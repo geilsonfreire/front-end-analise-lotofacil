@@ -1,7 +1,7 @@
 // Imports Bibliotecas
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-
+import PropTypes from 'prop-types';
 
 // Imports Css
 import "../style/resultLotofacil.css";
@@ -9,16 +9,12 @@ import "../style/resultLotofacil.css";
 // Imports de Icones
 import { BsArrowRightCircle, BsArrowLeftCircle } from "react-icons/bs";
 
-
-
 // Importando o componente
 import apiServices from "../services/apiServices";
 import { calculateCombinations } from "../utils/mathPossibility";
 import { calculateOddEven } from "../utils/oddEvenAnalyzer";
 
-
-
-const ResultLotofacil = () => {
+const ResultLotofacil = ({ onConcursoChange }) => {
     // Estado para armazenar os resultados
     const [latestResult, setLatestResult] = useState(null);
     const [sorteios, setSorteios] = useState([]);
@@ -26,7 +22,6 @@ const ResultLotofacil = () => {
 
     // Calcula as combinações
     const totalCombinations = calculateCombinations(25, 15);
-
 
     // Combine os dois useEffects em um só
     useEffect(() => {
@@ -67,6 +62,7 @@ const ResultLotofacil = () => {
         }
     }, [latestResult]);
 
+    // Função para ir para o concurso anterior
     const handlePreviousConcurso = async () => {
         if (currentConcurso > 1) {
             const newConcurso = currentConcurso - 1;
@@ -74,11 +70,13 @@ const ResultLotofacil = () => {
         }
     };
 
+    // Função para ir para o próximo concurso
     const handleNextConcurso = async () => {
         const newConcurso = currentConcurso + 1;
         await updateConcursoData(newConcurso);
     };
 
+    // Função para atualizar os dados do concurso
     const updateConcursoData = async (concurso) => {
         const loadingToast = toast.info("Carregando dados...", { autoClose: false });
         try {
@@ -86,6 +84,7 @@ const ResultLotofacil = () => {
             if (resultData) {
                 setLatestResult(resultData);
                 setCurrentConcurso(concurso);
+                onConcursoChange(concurso); // Chamar a função de callback
                 toast.success("Dados carregados com sucesso!");
             } else {
                 toast.error("Erro ao carregar os dados.");
@@ -119,7 +118,6 @@ const ResultLotofacil = () => {
     };
 
     const repeatedCount = countRepeatedSequences();
-
 
     return (
         <main className="Container-Geral">
@@ -272,11 +270,12 @@ const ResultLotofacil = () => {
                     <h1>Nenhum resultado disponível.</h1>
                 )}
             </section>
-
-
-
         </main>
     );
 };
 
-export default ResultLotofacil
+ResultLotofacil.propTypes = {
+    onConcursoChange: PropTypes.func.isRequired,
+};
+
+export default ResultLotofacil;
