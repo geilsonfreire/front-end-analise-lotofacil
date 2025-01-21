@@ -10,6 +10,46 @@
     border-bottom-left-radius: 10px;
 }
 
+/*Botões Filtros */
+.concurso-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color:#fff;
+    padding: .3rem;
+    border-radius: 5px;
+    border: solid 1px #FF00FF;
+}
+
+.concurso-navigation button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #FF00FF;
+    color: #fff;
+    font-size: 1rem;
+    padding: .3rem .5rem;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+.concurso-navigation button:hover {
+    background-color: #8B008B;
+}
+
+.concurso-navigation .concurso-number  {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 0;
+    border-radius: 5px;
+}
+
+.concurso-navigation .concurso-number span {
+    font-size: 1rem;
+}
+
 .latest-result h2 {
     font-size: .6rem;
     color: black;

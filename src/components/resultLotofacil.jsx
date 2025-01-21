@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import "../style/resultLotofacil.css";
 
 // Imports de Icones
+import { BsArrowRightCircle, BsArrowLeftCircle } from "react-icons/bs";
 
 
 
@@ -21,6 +22,7 @@ const ResultLotofacil = () => {
     // Estado para armazenar os resultados
     const [latestResult, setLatestResult] = useState(null);
     const [sorteios, setSorteios] = useState([]);
+    const [currentConcurso, setCurrentConcurso] = useState(null);
 
     // Calcula as combinações
     const totalCombinations = calculateCombinations(25, 15);
@@ -42,6 +44,7 @@ const ResultLotofacil = () => {
 
                 if (latestResultData) {
                     setLatestResult(latestResultData);
+                    setCurrentConcurso(latestResultData.concurso);
                     toast.success("Dados carregados com sucesso!");
                 } else {
                     toast.error("Erro ao carregar os dados.");
@@ -57,6 +60,43 @@ const ResultLotofacil = () => {
 
         loadData();
     }, []);
+
+    useEffect(() => {
+        if (latestResult) {
+            setCurrentConcurso(latestResult.concurso);
+        }
+    }, [latestResult]);
+
+    const handlePreviousConcurso = async () => {
+        if (currentConcurso > 1) {
+            const newConcurso = currentConcurso - 1;
+            await updateConcursoData(newConcurso);
+        }
+    };
+
+    const handleNextConcurso = async () => {
+        const newConcurso = currentConcurso + 1;
+        await updateConcursoData(newConcurso);
+    };
+
+    const updateConcursoData = async (concurso) => {
+        const loadingToast = toast.info("Carregando dados...", { autoClose: false });
+        try {
+            const resultData = await apiServices.getResultByContestNumber(concurso);
+            if (resultData) {
+                setLatestResult(resultData);
+                setCurrentConcurso(concurso);
+                toast.success("Dados carregados com sucesso!");
+            } else {
+                toast.error("Erro ao carregar os dados.");
+            }
+        } catch (error) {
+            console.error("Erro na requisição:", error);
+            toast.error("Erro na comunicação com o servidor.");
+        } finally {
+            toast.dismiss(loadingToast);
+        }
+    };
 
     // Calcula o restante de possibilidades (dinâmico)
     const remainingCombinations = totalCombinations - sorteios.length;
@@ -92,6 +132,19 @@ const ResultLotofacil = () => {
                                 <h1>Ultimo Resultado</h1>
                                 <p>Data do concurso: <span>{latestResult.data || "N/A"}</span></p>
                                 <p>Data do próximo concurso: <span>{latestResult.dataProximoConcurso || "N/A"}</span></p>
+                                <div className="concurso-navigation">
+                                    <button
+                                        onClick={handlePreviousConcurso}>
+                                        <BsArrowLeftCircle />
+                                    </button>
+                                    <h2 className="concurso-number">
+                                        <span>{currentConcurso || "N/A"}</span>
+                                    </h2>
+                                    <button
+                                        onClick={handleNextConcurso}>
+                                        <BsArrowRightCircle />
+                                    </button>
+                                </div>
                             </div>
 
                             <div className="latest-result-info-body">
@@ -132,6 +185,7 @@ const ResultLotofacil = () => {
                                         {latestResult && latestResult.dezenas ? (
                                             (() => {
                                                 const { even, odd } = calculateOddEven(latestResult.dezenas);
+                                                const somaDezenas = latestResult.dezenas.reduce((acc, curr) => acc + Number(curr), 0);
                                                 return (
                                                     <>
                                                         <p>O sorteio contém:</p>
@@ -139,7 +193,10 @@ const ResultLotofacil = () => {
                                                         <p>pares e</p>
                                                         <span>{odd}</span>
                                                         <p>ímpares.</p>
+                                                        <p>Soma:</p>
+                                                        <span>{somaDezenas}</span>
                                                     </>
+
                                                 );
                                             })()
                                         ) : (
