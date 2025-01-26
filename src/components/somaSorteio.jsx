@@ -44,12 +44,6 @@ const SomaSorteios = () => {
             possibleSums[soma] = (possibleSums[soma] || 0) + 1;
         }
 
-        // Remova a linha abaixo
-        // const somaPossiveisArray = Object.entries(possibleSums).map(([soma, contagem]) => ({
-        //     soma: Number(soma),
-        //     contagem
-        // })).sort((a, b) => b.contagem - a.contagem);
-
     }, []);
 
     useEffect(() => {
