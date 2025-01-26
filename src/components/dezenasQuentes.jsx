@@ -12,9 +12,7 @@ const DezenasQuentes = () => {
     // Estado para armazenar os resultados
     const [frequencias, setFrequencias] = useState(null);
     const [error, setError] = useState(null);
-    const [topQuentes, setTopQuentes] = useState([]);
     const [intervalosAtraso, setIntervalosAtraso] = useState([]);
-    const [maiorAtraso, setMaiorAtraso] = useState(null);
     const [atrasoAtual, setAtrasoAtual] = useState([]);
     const [sequencias, setSequencias] = useState({});
     const [loading, setLoading] = useState(true);
@@ -93,22 +91,7 @@ const DezenasQuentes = () => {
                     setAtrasoAtual(atrasoAtual);
 
                     // Calcula as 5 dezenas mais quentes
-                    const topQuentesCalculadas = frequencia
-                        .map((freq, idx) => ({ dezena: idx + 1, frequencia: freq }))
-                        .sort((a, b) => b.frequencia - a.frequencia)
-                        .slice(0, 5);
-
-                    setTopQuentes(topQuentesCalculadas);
-
                     // Encontra a dezena com o maior intervalo de atraso
-                    const maiorAtrasoGlobal = maiorAtraso.reduce((max, atraso, idx) => {
-                        if (atraso > max.intervaloAtraso) {
-                            return { dezena: idx + 1, intervaloAtraso: atraso };
-                        }
-                        return max;
-                    }, { dezena: null, intervaloAtraso: 0 });
-                    setMaiorAtraso(maiorAtrasoGlobal);
-
                     // Análise das dezenas repetidas
                     const repetidasInfo = analisarDezenasRepetidas(resultados);
                     setEstatisticasRepeticoes(repetidasInfo);
@@ -276,28 +259,6 @@ const DezenasQuentes = () => {
                                     </tbody>
                                 </table>
                             </div>
-                            <h2>Top 5 Dezenas Mais Quentes</h2>
-                            <div className="result-info-table">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Posição</th>
-                                            <th>Dezena</th>
-                                            <th>Frequência</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {topQuentes.map((item, index) => (
-                                            <tr key={index}>
-                                                <td>{index + 1}</td> {/* Posição no ranking */}
-                                                <td>Dez {item.dezena}</td> {/* Número da dezena */}
-                                                <td>{item.frequencia}</td> {/* Frequência */}
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-
                         </>
                     )}
                 </div>
@@ -360,37 +321,6 @@ const DezenasQuentes = () => {
                                                 <td colSpan="25">Nenhum dado disponível</td>
                                             )}
                                         </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <h2>As 5 com Maior Atraso Entre as Dezenas</h2>
-                            <div className="result-info-table">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Dezena</th>
-                                            <th>Intervalo de Atraso</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {intervalosAtraso
-                                            .map((intervalo, index) => ({ dezena: index + 1, intervalo }))
-                                            .sort((a, b) => b.intervalo - a.intervalo) // Ordena pelo maior intervalo
-                                            .slice(0, 5) // Pega as 5 maiores
-                                            .map((item, index) => {
-                                                // A cada iteração, vamos atualizar o maior intervalo
-                                                if (item.intervalo > maiorAtraso.intervaloAtraso) {
-                                                    setMaiorAtraso({ dezena: item.dezena, intervaloAtraso: item.intervalo });
-                                                }
-
-                                                return (
-                                                    <tr key={index}>
-                                                        <td>Dez {item.dezena}</td> {/* Dezena */}
-                                                        <td>{item.intervalo} sorteios</td> {/* Intervalo de atraso */}
-                                                    </tr>
-                                                );
-                                            })}
                                     </tbody>
                                 </table>
                             </div>

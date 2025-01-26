@@ -14,7 +14,6 @@ const SomaSorteios = () => {
     // Estado para armazenar os resultados
     const [sorteios, setSorteios] = useState([]);
     const [somaContagens, setSomaContagens] = useState([]);
-    const [somaPossiveis, setSomaPossiveis] = useState([]);
 
     // Função para calcular a soma e contagem
     const calculateSum = (dezenas) => dezenas.reduce((acc, num) => acc + Number(num), 0);
@@ -45,13 +44,12 @@ const SomaSorteios = () => {
             possibleSums[soma] = (possibleSums[soma] || 0) + 1;
         }
 
-        // Converte o objeto em um array de [soma, contagem]
-        const somaPossiveisArray = Object.entries(possibleSums).map(([soma, contagem]) => ({
-            soma: Number(soma),
-            contagem
-        })).sort((a, b) => b.contagem - a.contagem);
+        // Remova a linha abaixo
+        // const somaPossiveisArray = Object.entries(possibleSums).map(([soma, contagem]) => ({
+        //     soma: Number(soma),
+        //     contagem
+        // })).sort((a, b) => b.contagem - a.contagem);
 
-        setSomaPossiveis(somaPossiveisArray); // Atualiza o estado com as somas possíveis
     }, []);
 
     useEffect(() => {
@@ -95,8 +93,7 @@ const SomaSorteios = () => {
                                     <tr>
                                         <th>Soma Sorteio já ocorrido</th>
                                         <th>Contagem da Soma sorteios já ocorridos</th>
-                                        <th>Contagem da Soma sorteios Possíveis</th>
-                                        <th>Contagem da Soma sorteios já ocorridos menos sorteios Possíveis</th>
+                                        
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -106,14 +103,10 @@ const SomaSorteios = () => {
                                         </tr>
                                     ) : (
                                         somaContagens.map(({ soma, contagem }, index) => {
-                                            const possivel = somaPossiveis.find(item => item.soma === soma);
-                                            const contagemPossivel = possivel ? possivel.contagem : 0;
                                             return (
                                                 <tr key={index}>
                                                     <td>{soma}</td>
                                                     <td>{contagem}</td>
-                                                    <td>{contagemPossivel}</td>
-                                                    <td>{contagem - contagemPossivel}</td>
                                                 </tr>
                                             );
                                         })
