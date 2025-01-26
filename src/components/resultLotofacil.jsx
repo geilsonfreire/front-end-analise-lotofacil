@@ -146,28 +146,6 @@ const ResultLotofacil = ({ onConcursoChange }) => {
                             </div>
 
                             <div className="latest-result-info-body">
-                                <div className="data-result-latest">
-                                    <h2>Concurso: - <span>{latestResult.concurso || "N/A"}</span></h2>
-                                    <h2>Local do sorteio: - <span>{latestResult.local || "N/A"}</span></h2>
-                                    <div className="local-ganhadores">
-                                        <h2>Local dos Ganhadores:</h2>
-                                        <div className="local-ganhadores-info">
-                                            {latestResult.localGanhadores && latestResult.localGanhadores.length > 0 ? (
-                                                <span>[
-                                                    {latestResult.localGanhadores.map((ganhador, index) => (
-                                                        <span key={index}>
-                                                            {ganhador.municipio}
-                                                            {index < latestResult.localGanhadores.length - 1 ? ' - ' : ''}
-                                                        </span>
-                                                    ))}
-                                                    ]</span>
-                                            ) : (
-                                                <span>Dados não informados</span>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-
                                 <div className="container-dezenas">
                                     <div className="dezenas">
                                         {latestResult.dezenas && latestResult.dezenas.length > 0 ? (
@@ -202,69 +180,68 @@ const ResultLotofacil = ({ onConcursoChange }) => {
                                         )}
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div className="box-shadown">
-                            <div className="result-info-table">
-
-                                <div className="box-analise">
-                                    <h2>Análise de concursos realizados / Não Realizados</h2>
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>Descrição</th>
-                                                <th>Quantidade</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>Total de possibilidades de jogos</td>
-                                                <td>{totalCombinations.toLocaleString()}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Total de sorteios já realizados</td>
-                                                <td>{sorteios.length.toLocaleString()}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Possibilidades restantes</td>
-                                                <td>{remainingCombinations.toLocaleString()}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Sorteios com sequências repetidas</td>
-                                                <td>{repeatedCount.toLocaleString()}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <div className="box-premiacoes">
-                                    <h2>Premiações:</h2>
-                                    {latestResult.premiacoes && latestResult.premiacoes.length > 0 ? (
-                                        <table className="premiacoes-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Descrição</th>
-                                                    <th>Ganhadores</th>
-                                                    <th>Valor do Prêmio</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {latestResult.premiacoes.map((premiacao, index) => (
-                                                    <tr key={index}>
-                                                        <td>{premiacao.descricao}</td>
-                                                        <td>{premiacao.ganhadores}</td>
-                                                        <td>R$ {premiacao.valorPremio.toFixed(2)}</td>
+                                <div className="box-shadown">
+                                    <div className="result-info-table">
+                                        <div className="box-analise">
+                                            <h2>Análise de Sorteios</h2>
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Descrição</th>
+                                                        <th>QNT</th>
                                                     </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    ) : (
-                                        <span>N/A</span>
-                                    )}
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Total de possibilidades de jogos</td>
+                                                        <td>{totalCombinations.toLocaleString()}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Total de sorteios já realizados</td>
+                                                        <td>{sorteios.length.toLocaleString()}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Possibilidades restantes</td>
+                                                        <td>{remainingCombinations.toLocaleString()}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Sorteios com sequências repetidas</td>
+                                                        <td>{repeatedCount.toLocaleString()}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div className="box-premiacoes">
+                                            <h2>Premiações:</h2>
+                                            {latestResult.premiacoes && latestResult.premiacoes.length > 0 ? (
+                                                <table className="premiacoes-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Descrição</th>
+                                                            <th>Ganhadores</th>
+                                                            <th>Valor do Prêmio</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {latestResult.premiacoes.map((premiacao, index) => (
+                                                            <tr key={index}>
+                                                                <td>{premiacao.descricao}</td>
+                                                                <td>{premiacao.ganhadores}</td>
+                                                                <td>R$ {premiacao.valorPremio.toFixed(2)}</td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            ) : (
+                                                <span>N/A</span>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                            </div>  
                         </div>
+
                     </>
                 ) : (
                     <h1>Nenhum resultado disponível.</h1>

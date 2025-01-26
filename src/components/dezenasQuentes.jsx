@@ -276,7 +276,6 @@ const DezenasQuentes = () => {
                                     </tbody>
                                 </table>
                             </div>
-
                             <h2>Top 5 Dezenas Mais Quentes</h2>
                             <div className="result-info-table">
                                 <table>
@@ -298,6 +297,7 @@ const DezenasQuentes = () => {
                                     </tbody>
                                 </table>
                             </div>
+
                         </>
                     )}
                 </div>

@@ -278,6 +278,7 @@ section {
 
 /*Tabela de analise de Possibilidades */
 .result-info-table {
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -319,6 +320,7 @@ section {
 
 /*Box Shadown para divs*/
 .box-shadown {
+    width: 100%;
     background-color: #fff;
     box-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
     border-radius: 10px;

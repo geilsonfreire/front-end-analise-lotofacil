@@ -109,31 +109,6 @@
     border-radius: 5px;
 }
 
-/*Local doas ganhadores */
-.local-ganhadores {
-    width: 100%;
-    display: flex;
-    justify-items: flex-start;
-    align-items: center;
-    margin-bottom: 1rem;
-    gap: 1rem;
-    color: #8B008B;
-}
-
-.local-ganhadores span {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: .5rem;
-    letter-spacing: 2px;
-    font-weight: bold;
-}
-
-.local-ganhadores-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
 
 /*Premiações */
 .box-premiacoes {
