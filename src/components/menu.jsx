@@ -14,6 +14,7 @@ import { MdSpaceDashboard } from "react-icons/md";
 import { TbClover } from "react-icons/tb";
 import { GrAnalytics } from "react-icons/gr";
 
+
 const Menu = () => {
 
     useEffect(() => {
@@ -51,10 +52,26 @@ const Menu = () => {
                     title="Analise Impa / Par"
                 />
                 <Icon
+                    to="/dezenas-quentes"
+                    icon={<GrAnalytics />}
+                    title="Analise dezQuentes"
+                />
+                <Icon
+                    to="/soma-sorteios"
+                    icon={<GrAnalytics />}
+                    title="Soma Sorteios"
+                />
+                <Icon
+                    to="/analise-clusters"
+                    icon={<GrAnalytics />}
+                    title="Analise Clusters"
+                />
+               
+                <Icon
                     to="/meus-jogos"
                     icon={<TbClover />}
                     title="Meus Jogos"
-                />
+                />   
             </ul>
         </nav>
     )

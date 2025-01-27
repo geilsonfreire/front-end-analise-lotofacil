@@ -7,9 +7,9 @@ import '../style/AdminDashBoard.css'
 
 // Imports Componenets
 import ResultLatest from "../components/resultLotofacil"
-import DezenasQuents from "../components/dezenasQuentes"
 import { useProjectionsStats } from '../hooks/useProjectionsStats';
-import SomaSorteios from '../components/somaSorteio';
+import AnaliseEspelhado from "../components/analiseEspelhados";
+
 
 // imports icons and images
 import { GrAnalytics } from "react-icons/gr";
@@ -45,6 +45,7 @@ const AdminDashBoard = () => {
                 </div>
 
                 <section className='Container-dashborder'>
+                    <ResultLatest />
                     <div className='grafil-cards'>
                         <div className="grafil-card">
                             <div className="total-text">
@@ -118,21 +119,9 @@ const AdminDashBoard = () => {
                                 )}
                             </div>
                         </div>
+                        <AnaliseEspelhado />
                     </div>
-                    <ResultLatest />
                 </section>
-
-
-                <section className='Apexcharts'>
-                    <div className="container-charts">
-                        <DezenasQuents />
-                        <SomaSorteios />
-                    </div>
-
-                </section>
-
-
-
             </main>
         </>
     )
