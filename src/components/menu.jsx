@@ -66,6 +66,11 @@ const Menu = () => {
                     icon={<GrAnalytics />}
                     title="Analise Clusters"
                 />
+                <Icon
+                    to="/analise-fibonacci"
+                    icon={<GrAnalytics />}
+                    title="Análise Fibonacci"
+                />
                
                 <Icon
                     to="/meus-jogos"
