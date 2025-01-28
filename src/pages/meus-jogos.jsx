@@ -9,6 +9,8 @@ import "../style/meus-jogos.css";
 import ApiServices from "../services/apiServices";
 import ResultLatest from "../components/resultLotofacil"
 
+const fibonacciNumbers = [1, 3, 5, 13];
+
 const MeusJogos = () => {
     // Declarando estados 
     const [jogosGerados, setJogosGerados] = useState(() => {
@@ -136,7 +138,7 @@ const MeusJogos = () => {
             const gerarNovoJogo = (tentativas = 0) => {
                 if (tentativas > 100) return null;
 
-                const novoJogo = [menorAtraso, ...maioresAtrasos];
+                const novoJogo = [...fibonacciNumbers, menorAtraso, ...maioresAtrasos];
 
                 dezenasQuentes.forEach(dezena => {
                     if (!novoJogo.includes(dezena)) novoJogo.push(dezena);
