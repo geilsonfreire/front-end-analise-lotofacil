@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import { toast } from "react-toastify";
 
 // Imports Css
-import "../style/somaSorteios.css";
+
 
 // Imports de Icones
 

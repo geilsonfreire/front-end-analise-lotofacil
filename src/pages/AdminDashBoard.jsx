@@ -7,9 +7,10 @@ import '../style/AdminDashBoard.css'
 
 // Imports Componenets
 import ResultLatest from "../components/resultLotofacil"
-import { useProjectionsStats } from '../hooks/useProjectionsStats';
 import AnaliseEspelhado from "../components/analiseEspelhados";
 
+// Imports Hooks
+import { useProjectionsStats } from '../hooks/useProjectionsStats';
 
 // imports icons and images
 import { GrAnalytics } from "react-icons/gr";
@@ -121,6 +122,9 @@ const AdminDashBoard = () => {
                         </div>
                         <AnaliseEspelhado />
                     </div>
+                    <section className="Container-dashborder">
+                      
+                    </section>
                 </section>
             </main>
         </>

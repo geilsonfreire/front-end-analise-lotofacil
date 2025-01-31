@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { toast } from "react-toastify";
 import apiServices from "../services/apiServices";
-import "../style/somaSorteios.css";
+
 
 // Função para calcular a distância euclidiana
 const euclideanDistance = (a, b) => {

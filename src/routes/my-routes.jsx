@@ -11,6 +11,7 @@ import DezenasQuentes from "../pages/dezenasQuentes.jsx";
 import SomaSorteios from "../pages/somaSorteio.jsx";
 import AnaliseClusters from "../pages/analiseClusters.jsx";
 import AnaliseFibonacci from "../pages/analiseFibonacci.jsx";
+import AnalisePalindromos from "../pages/analisePalindromos.jsx";
 
 const MyRoutes = () => {
     return (
@@ -24,6 +25,7 @@ const MyRoutes = () => {
                     <Route path="/soma-sorteios" element={<SomaSorteios />} />
                     <Route path="/analise-clusters" element={<AnaliseClusters />} />
                     <Route path="/analise-fibonacci" element={<AnaliseFibonacci />} />
+                    <Route path="/analise-palindromos" element={<AnalisePalindromos />} />
                 </Route>
             </Routes>
         </StrictMode>

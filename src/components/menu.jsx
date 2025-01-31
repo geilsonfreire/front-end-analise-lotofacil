@@ -14,7 +14,6 @@ import { MdSpaceDashboard } from "react-icons/md";
 import { TbClover } from "react-icons/tb";
 import { GrAnalytics } from "react-icons/gr";
 
-
 const Menu = () => {
 
     useEffect(() => {
@@ -70,6 +69,11 @@ const Menu = () => {
                     to="/analise-fibonacci"
                     icon={<GrAnalytics />}
                     title="Análise Fibonacci"
+                />
+                <Icon
+                    to="/analise-palindromos"
+                    icon={<GrAnalytics />}
+                    title="Análise Palíndromos"
                 />
                
                 <Icon
