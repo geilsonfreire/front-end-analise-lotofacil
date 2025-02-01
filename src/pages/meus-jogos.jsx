@@ -7,7 +7,7 @@ import "../style/meus-jogos.css";
 
 // Imports Services / Coomponents
 import ApiServices from "../services/apiServices";
-import ResultLatest from "../components/resultLotofacil"
+import ResultLatest from "../components/resultLatest";
 
 const fibonacciNumbers = [1, 3, 5, 13];
 

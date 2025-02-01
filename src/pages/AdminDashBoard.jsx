@@ -6,7 +6,8 @@ import { toast } from "react-toastify";
 import '../style/AdminDashBoard.css'
 
 // Imports Componenets
-import ResultLatest from "../components/resultLotofacil"
+import ResultLatest from "../components/resultLatest";
+import AllResult from "../components/AllResult";
 import AnaliseEspelhado from "../components/analiseEspelhados";
 
 // Imports Hooks
@@ -123,7 +124,7 @@ const AdminDashBoard = () => {
                         <AnaliseEspelhado />
                     </div>
                     <section className="Container-dashborder">
-                      
+                      <AllResult />
                     </section>
                 </section>
             </main>
