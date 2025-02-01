@@ -50,11 +50,7 @@ const Menu = () => {
                     icon={<GrAnalytics />}
                     title="Analise Impa / Par"
                 />
-                <Icon
-                    to="/dezenas-quentes"
-                    icon={<GrAnalytics />}
-                    title="Analise dezQuentes"
-                />
+            
                 <Icon
                     to="/soma-sorteios"
                     icon={<GrAnalytics />}
@@ -64,16 +60,6 @@ const Menu = () => {
                     to="/analise-clusters"
                     icon={<GrAnalytics />}
                     title="Analise Clusters"
-                />
-                <Icon
-                    to="/analise-fibonacci"
-                    icon={<GrAnalytics />}
-                    title="Análise Fibonacci"
-                />
-                <Icon
-                    to="/analise-palindromos"
-                    icon={<GrAnalytics />}
-                    title="Análise Palíndromos"
                 />
                
                 <Icon

@@ -28,46 +28,44 @@ main .grafil-cards .grafil-card {
 main .grafil-cards .grafil-card .total-text {
     display: flex;
     justify-content: space-between;
-    font-size: .5rem;
+    font-size: .6rem;
     color: #1e3194;
     letter-spacing: 2px;
+    text-transform: uppercase;
 }
 
 main .grafil-cards .grafil-card .total-text i {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #FF00FF;
     font-size: 1rem;
     width: 2rem;
     height: 2rem;
     margin-right: .5rem;
     border-radius: 50%;
-    color: #fff;
+    color: #FF00FF;
 }
 
-/*Tex Numbre */
-main .grafil-cards .grafil-card .total-number {
-    margin: 0 .5rem;
-}
-
-main .grafil-cards .grafil-card .total-number h2 {
-    width: 100%;
-}
-
-main .grafil-cards .grafil-card .total-number i {
+.more-details {
     display: flex;
-    justify-content: flex-end;
-    color: #00ff26;
-    font-size: .5rem;
+    align-items: flex-end;
+    font-size: .6rem;
+    color: #0222c5;
+    letter-spacing: 2px;
+    cursor: pointer;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
 }
 
-main .grafil-cards .grafil-card .total-number i span {
-    margin-left: .3rem;
-}
-
-main .grafil-cards .grafil-card .total-number .text-update {
-    font-size: .8vw;
-    color: #00000057;
+.more-details a {
     margin-left: .5rem;
+}
+
+.more-details a:hover {
+    color: #FF00FF;
+}
+
+.more-details svg {
+    margin-right: .5rem;
 }
