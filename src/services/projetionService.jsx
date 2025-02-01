@@ -14,12 +14,20 @@ export const updateUnrealizedDraws = async () => {
         // Calcula os sorteios não realizados
         const unrealizedDraws = getUnrealizedDraws(realizedDraws.map((draw) => draw.dezenas));
 
-        console.log("Projeção de sorteios não realizados:");
-        console.table(unrealizedDraws); // Exibe os resultados no console
+        // Subtrai os sorteios realizados dos sorteios não realizados
+        const updatedUnrealizedDraws = subtractRealizedDraws(unrealizedDraws, realizedDraws);
 
-        return unrealizedDraws;
+        console.log("Projeção de sorteios não realizados:");
+        console.table(updatedUnrealizedDraws); // Exibe os resultados no console
+
+        return updatedUnrealizedDraws;
     } catch (error) {
         console.error("Erro ao atualizar os sorteios não realizados:", error.message);
         return [];
     }
+};
+
+const subtractRealizedDraws = (unrealizedDraws, realizedDraws) => {
+    const realizedDrawsSet = new Set(realizedDraws.map(draw => draw.dezenas.sort().join(',')));
+    return unrealizedDraws.filter(draw => !realizedDrawsSet.has(draw.dezenas.sort().join(',')));
 };

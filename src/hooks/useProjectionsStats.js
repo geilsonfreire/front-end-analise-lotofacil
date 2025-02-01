@@ -64,4 +64,4 @@ export const useProjectionsStats = () => {
     }, []);
 
     return { stats, loading, error };
-}; 
+};

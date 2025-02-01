@@ -14,6 +14,11 @@ const SomaSorteios = () => {
     // Estado para armazenar os resultados
     const [sorteios, setSorteios] = useState([]);
     const [somaContagens, setSomaContagens] = useState([]);
+    const [conjuntosSoma, setConjuntosSoma] = useState({
+        "7 ímpares / 8 pares": {},
+        "8 ímpares / 7 pares": {},
+        "6 pares / 9 ímpares": {}
+    });
 
     // Função para calcular a soma e contagem
     const calculateSum = (dezenas) => dezenas.reduce((acc, num) => acc + Number(num), 0);
@@ -53,10 +58,26 @@ const SomaSorteios = () => {
     useEffect(() => {
         if (sorteios.length > 0) {
             const somaMap = {}; // Objeto para armazenar somas e suas contagens
+            const conjuntos = {
+                "7 ímpares / 8 pares": {},
+                "8 ímpares / 7 pares": {},
+                "6 pares / 9 ímpares": {}
+            };
 
             sorteios.forEach(dezenas => {
                 const soma = calculateSum(dezenas); // Calcula a soma para cada sorteio
                 somaMap[soma] = (somaMap[soma] || 0) + 1; // Incrementa a contagem da soma
+
+                const pares = dezenas.filter(num => num % 2 === 0).length;
+                const impares = dezenas.length - pares;
+
+                if (pares === 8 && impares === 7) {
+                    conjuntos["7 ímpares / 8 pares"][soma] = (conjuntos["7 ímpares / 8 pares"][soma] || 0) + 1;
+                } else if (pares === 7 && impares === 8) {
+                    conjuntos["8 ímpares / 7 pares"][soma] = (conjuntos["8 ímpares / 7 pares"][soma] || 0) + 1;
+                } else if (pares === 6 && impares === 9) {
+                    conjuntos["6 pares / 9 ímpares"][soma] = (conjuntos["6 pares / 9 ímpares"][soma] || 0) + 1;
+                }
             });
 
             // Converte o objeto em um array de [soma, contagem]
@@ -66,6 +87,7 @@ const SomaSorteios = () => {
             })).sort((a, b) => b.contagem - a.contagem);
 
             setSomaContagens(somaContagem); // Atualiza o estado com as somas e contagens
+            setConjuntosSoma(conjuntos); // Atualiza o estado com as somas dos conjuntos
         }
     }, [sorteios]);
 
@@ -87,7 +109,6 @@ const SomaSorteios = () => {
                                     <tr>
                                         <th>Soma Sorteio já ocorrido</th>
                                         <th>Contagem da Soma sorteios já ocorridos</th>
-                                        
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -111,6 +132,38 @@ const SomaSorteios = () => {
                     </>
                 </div>
             </section>
+
+            {Object.entries(conjuntosSoma).map(([conjunto, somas], index) => (
+                <section className="conteiner-section" key={index}>
+                    <div className="box-shadown">
+                        <div className="title-result-info">
+                            <h1>Somas dos Sorteios - {conjunto}</h1>
+                        </div>
+                        <>
+                            <div className="result-info-table">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Soma das Dezenas</th>
+                                            <th>Contagem das Somas</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {Object.entries(somas)
+                                            .sort((a, b) => b[1] - a[1]) // Ordena pela contagem em ordem decrescente
+                                            .map(([soma, contagem], subIndex) => (
+                                                <tr key={subIndex}>
+                                                    <td>{soma}</td>
+                                                    <td>{contagem}</td>
+                                                </tr>
+                                            ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </>
+                    </div>
+                </section>
+            ))}
         </main>
     );
 };
