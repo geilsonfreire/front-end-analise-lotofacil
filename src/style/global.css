@@ -287,7 +287,6 @@ section {
     border-left: solid 2px #8B008B;
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
-
 }
 
 .result-info-table table {
@@ -298,7 +297,6 @@ section {
 }
 
 
-
 .result-info-table th {
     background-color: #FF00FF;
     border-top-left-radius: 5px;
@@ -307,6 +305,7 @@ section {
     font-weight: bold;
     text-align: center;
     color: #fff;
+    padding: 0 .5rem;
 }
 
 .result-info-table td {

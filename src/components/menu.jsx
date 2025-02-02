@@ -44,18 +44,7 @@ const Menu = () => {
                     icon={<MdSpaceDashboard />}
                     title="DashBoard"
                 />
-               
-                <Icon
-                    to="/analise-impa-par"
-                    icon={<GrAnalytics />}
-                    title="Analise Impa / Par"
-                />
             
-                <Icon
-                    to="/soma-sorteios"
-                    icon={<GrAnalytics />}
-                    title="Soma Sorteios"
-                />
                 <Icon
                     to="/analise-clusters"
                     icon={<GrAnalytics />}

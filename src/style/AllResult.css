@@ -1,0 +1,30 @@
+.info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.info a {
+    position: relative;
+    font-size: .6rem;
+    color: #0222c5;
+    letter-spacing: 2px;
+    font-weight: 700;
+    padding: .3rem;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.info a:hover::after {
+    content: 'Detalhes!';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #fff;
+    color: #000;
+    padding: .2rem .5rem;
+    border-radius: 3px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+}

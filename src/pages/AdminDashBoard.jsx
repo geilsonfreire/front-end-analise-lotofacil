@@ -17,7 +17,7 @@ import { useProjectionsStats } from '../hooks/useProjectionsStats';
 import apiService from "../services/apiServices";
 
 // imports icons and images
-import { GrAnalytics} from "react-icons/gr";
+import { GrAnalytics } from "react-icons/gr";
 import { BsInfoCircle } from "react-icons/bs";
 
 const fibonacciNumbers = [1, 2, 3, 5, 8, 13, 21];
@@ -352,7 +352,11 @@ const AdminDashBoard = () => {
 
                     </div>
                     <section className="Container-dashborder">
-                        <AllResult />
+                        <div className="grafil-cards1">
+                            <div className="grafil-card">
+                                <AllResult />
+                            </div>
+                        </div>
                     </section>
                 </section>
             </main>

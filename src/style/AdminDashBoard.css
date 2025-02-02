@@ -12,6 +12,14 @@ main .grafil-cards {
     background: transparent;
 }
 
+main .grafil-cards1 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: 1fr;
+    gap: 1rem;
+    background: transparent;
+}
+
 main .grafil-cards .grafil-card {
     display: flex;
     flex-direction: column;

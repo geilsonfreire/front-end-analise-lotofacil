@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react';
 import apiService from "../services/apiServices";
+import { Link } from 'react-router-dom';
+
+// Import Css
+import '../style/AllResult.css';
+
+import { BsInfoCircle } from "react-icons/bs";
 
 const AllResult = () => {
     const [resultados, setResultados] = useState([]);
@@ -34,6 +40,15 @@ const AllResult = () => {
                     <div className="result-info-table">
                         <table>
                             <thead>
+                                <div className="info">
+                                    <Link to="/soma-sorteios" > 
+                                        <BsInfoCircle /> SOMAS
+                                    </Link>
+                                    <Link to="/analise-impa-par" > 
+                                        <BsInfoCircle /> IMPAR / PAR
+                                    </Link>
+                                </div>
+
                                 <tr>
                                     <th>Concurso</th>
                                     <th>Dezenas</th>
