@@ -51,7 +51,7 @@ const MeusJogos = () => {
     // Carregar o último resultado quando o componente montar
     useEffect(() => {
         buscarUltimoResultado();
-    }, []); 
+    }, []);
 
     // Atualizar quando o concurso atual mudar
     useEffect(() => {

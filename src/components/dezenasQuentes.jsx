@@ -104,10 +104,10 @@ const DezenasQuentes = () => {
                     });
                     setHasLoaded(true); // Atualiza o estado para indicar que os dados foram carregados
                 } catch (err) {
-                    console.error(err);
-                    setError("Erro ao carregar os dados.");
+                    setError("Erro ao buscar os resultados. Tente novamente mais tarde.");
+                    console.error("Erro ao buscar os resultados:", err);
                     toast.update(loadingToast, {
-                        render: "Erro ao carregar os dados!",
+                        render: "Erro ao carregar os dados. Tente novamente mais tarde.",
                         type: "error",
                         isLoading: false,
                         autoClose: 3000,

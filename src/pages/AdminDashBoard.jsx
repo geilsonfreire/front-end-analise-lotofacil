@@ -10,6 +10,7 @@ import '../style/AdminDashBoard.css'
 import ResultLatest from "../components/resultLatest";
 import AllResult from "../components/AllResult";
 import AnaliseEspelhado from "../components/analiseEspelhados";
+import AnaliseCiclos from "../components/analiseCiclos";
 
 
 // Imports Hooks
@@ -355,6 +356,9 @@ const AdminDashBoard = () => {
                         <div className="grafil-cards1">
                             <div className="grafil-card">
                                 <AllResult />
+                            </div>
+                            <div className="grafil-card">
+                                <AnaliseCiclos />
                             </div>
                         </div>
                     </section>

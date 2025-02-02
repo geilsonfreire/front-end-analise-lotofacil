@@ -12,13 +12,14 @@ import SomaSorteios from "../components/somaSorteio.jsx";
 import AnaliseClusters from "../pages/analiseClusters.jsx";
 import AnaliseFibonacci from "../components/analiseFibonacci.jsx";
 import AnalisePalindromos from "../components/analisePalindromos.jsx";
+import AnaliseCiclos from "../components/analiseCiclos.jsx";
 
 const MyRoutes = () => {
     return (
         <StrictMode>
             <Routes>
                 <Route path="/" element={<Home />}>
-                    <Route index  element={<AdminDashBoard />} />
+                    <Route index element={<AdminDashBoard />} />
                     <Route path="/meus-jogos" element={<MeusJogos />} />
                     <Route path="/analise-impa-par" element={<AnaliseImpaPar />} />
                     <Route path="/dezenas-quentes" element={<DezenasQuentes />} />
@@ -26,6 +27,7 @@ const MyRoutes = () => {
                     <Route path="/analise-clusters" element={<AnaliseClusters />} />
                     <Route path="/analise-fibonacci" element={<AnaliseFibonacci />} />
                     <Route path="/analise-palindromos" element={<AnalisePalindromos />} />
+                    <Route path="/analise-ciclos" element={<AnaliseCiclos />} />
                 </Route>
             </Routes>
         </StrictMode>

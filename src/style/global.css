@@ -29,7 +29,11 @@ ol {
     list-style: none;
 }
 
-/* scrollbar.css */
+/* scroll sections especificas  */
+.scroll-y {
+    overflow-y: auto;
+    height: 60vh;
+}
 
 /* Estilo da barra de rolagem */
 ::-webkit-scrollbar {

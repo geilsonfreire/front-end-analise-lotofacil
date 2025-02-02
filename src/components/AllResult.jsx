@@ -37,7 +37,7 @@ const AllResult = () => {
                 </div>
                 {error && <p>{error}</p>}
                 {resultados.length > 0 && (
-                    <div className="result-info-table">
+                    <div className="result-info-table scroll-y">
                         <table>
                             <thead>
                                 <div className="info">
