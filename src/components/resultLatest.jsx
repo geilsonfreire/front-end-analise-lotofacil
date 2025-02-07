@@ -20,127 +20,88 @@ const ResultLotofacil = ({ onConcursoChange }) => {
     const [sorteios, setSorteios] = useState([]);
     const [currentConcurso, setCurrentConcurso] = useState(null);
     const [dezenasRestantes, setDezenasRestantes] = useState([]);
-    const [quantidadeCiclos, setQuantidadeCiclos] = useState(0);
-    const [dezenasSorteadasNoCicloAtual, setDezenasSorteadasNoCicloAtual] = useState([]);
-    const [posicaoAtualDoCiclo, setPosicaoAtualDoCiclo] = useState(0);
+    const [cicloAtual, setCicloAtual] = useState(null);
 
     // Calcula as combinações
     const totalCombinations = calculateCombinations(25, 15);
 
-    const calcularDezenasRestantes = (resultados) => {
-        const todasDezenas = new Set(Array.from({ length: 25 }, (_, i) => i + 1));
-        const dezenasSorteadas = new Set();
+    const processarCiclos = (dados) => {
+        // 1. Ordenar pelo número do concurso
+        dados.sort((a, b) => a.concurso - b.concurso);
 
-        for (let idx = resultados.length - 1; idx >= 0; idx--) {
-            resultados[idx].dezenas.forEach(dezena => {
-                dezenasSorteadas.add(dezena);
-            });
-
-            if (dezenasSorteadas.size === 25) {
-                break;
-            }
-        }
-
-        return Array.from(todasDezenas).filter(dezena => !dezenasSorteadas.has(dezena));
-    };
-
-    const calcularQuantidadeCiclos = (resultados) => {
-        let ciclos = 0;
-        let cicloAtual = new Set();
-
-        resultados.forEach((resultado) => {
-            resultado.dezenas.forEach(dezena => {
-                cicloAtual.add(dezena);
-            });
-
-            if (cicloAtual.size === 25) {
-                ciclos += 1;
-                cicloAtual.clear();
-            }
-        });
-
-        return ciclos;
-    };
-
-    const calcularDezenasNoCicloAtual = (resultados) => {
-        const todasDezenas = new Set(Array.from({ length: 25 }, (_, i) => i + 1));
-        const dezenasSorteadas = new Set();
-        let inicioCiclo = 0;
-
-        for (let idx = 0; idx < resultados.length; idx++) {
-            resultados[idx].dezenas.forEach(dezena => {
-                dezenasSorteadas.add(dezena);
-            });
-
-            if (dezenasSorteadas.size === 25) {
-                dezenasSorteadas.clear();
-                inicioCiclo = idx + 1;
-            }
-        }
-
-        const dezenasSorteadasNoCicloAtual = new Set();
-        for (let idx = inicioCiclo; idx < resultados.length; idx++) {
-            resultados[idx].dezenas.forEach(dezena => {
-                dezenasSorteadasNoCicloAtual.add(dezena);
-            });
-        }
-
-        const dezenasRestantesNoCicloAtual = Array.from(todasDezenas).filter(dezena => !dezenasSorteadasNoCicloAtual.has(dezena));
-
-        return {
-            dezenasSorteadasNoCicloAtual: Array.from(dezenasSorteadasNoCicloAtual),
-            dezenasRestantesNoCicloAtual
+        let ciclosCalculados = [];
+        let cicloAtual = {
+            numero: 1,
+            concursos: [],
+            dezenasAusentes: new Set(
+                [...Array(25).keys()].map(i => (i + 1).toString().padStart(2, '0'))
+            )
         };
-    };
 
-    const calcularPosicaoAtualDoCiclo = (resultados) => {
-        const dezenasSorteadas = new Set();
-        let inicioCiclo = 0;
+        for (let i = 0; i < dados.length; i++) {
+            const concurso = dados[i];
+            // Padroniza as dezenas
+            const dezenasConvertidas = (concurso.dezenas || []).map(d =>
+                d.toString().padStart(2, '0')
+            );
+            const dezenasSorteadas = new Set(dezenasConvertidas);
 
-        for (let idx = 0; idx < resultados.length; idx++) {
-            resultados[idx].dezenas.forEach(dezena => {
-                dezenasSorteadas.add(dezena);
+            // Remove as dezenas sorteadas da lista de ausentes
+            cicloAtual.dezenasAusentes = new Set(
+                [...cicloAtual.dezenasAusentes].filter(
+                    d => !dezenasSorteadas.has(d)
+                )
+            );
+
+            cicloAtual.concursos.push({
+                ...concurso,
+                dezenasAusentes: new Set(cicloAtual.dezenasAusentes)
             });
 
-            if (dezenasSorteadas.size === 25) {
-                dezenasSorteadas.clear();
-                inicioCiclo = idx + 1;
+            // Se não houver mais dezenas ausentes, fecha o ciclo
+            if (cicloAtual.dezenasAusentes.size === 0) {
+                cicloAtual.duracao = cicloAtual.concursos.length;
+                ciclosCalculados.push({ ...cicloAtual });
+
+                cicloAtual = {
+                    numero: cicloAtual.numero + 1,
+                    concursos: [],
+                    dezenasAusentes: new Set(
+                        [...Array(25).keys()].map(i => (i + 1).toString().padStart(2, '0'))
+                    )
+                };
             }
         }
 
-        return resultados.length - inicioCiclo;
+        // Se ainda houver um ciclo em andamento
+        if (cicloAtual.concursos.length > 0) {
+            ciclosCalculados.push({ ...cicloAtual });
+        }
+
+        return ciclosCalculados[ciclosCalculados.length - 1];
     };
 
     useEffect(() => {
         const loadData = async () => {
             const loadingToast = toast.info("Carregando dados...", { autoClose: false });
             try {
-                // Chamar apiServices diretamente ao invés de usar fetchSorteios
                 const [allResults, latestResultData] = await Promise.all([
                     apiServices.getAllResults(),
                     apiServices.getLatestResult()
                 ]);
 
-                // Atualizar os estados diretamente
                 setSorteios(allResults);
 
                 if (latestResultData) {
                     setLatestResult(latestResultData);
                     setCurrentConcurso(latestResultData.concurso);
-                    const dezenasRestantesCalculadas = calcularDezenasRestantes(allResults);
-                    setDezenasRestantes(dezenasRestantesCalculadas);
-                    const quantidadeCiclos = calcularQuantidadeCiclos(allResults);
-                    setQuantidadeCiclos(quantidadeCiclos);
-                    const posicaoAtualDoCiclo = calcularPosicaoAtualDoCiclo(allResults);
-                    setPosicaoAtualDoCiclo(posicaoAtualDoCiclo);
-                    const { dezenasSorteadasNoCicloAtual, dezenasRestantesNoCicloAtual } = calcularDezenasNoCicloAtual(allResults);
-                    setDezenasSorteadasNoCicloAtual(dezenasSorteadasNoCicloAtual);
-                    setDezenasRestantes(dezenasRestantesNoCicloAtual);
+                    const cicloProcessado = processarCiclos(allResults);
+                    setCicloAtual(cicloProcessado);
+                    setDezenasRestantes([...cicloProcessado.dezenasAusentes].sort((a, b) => Number(a) - Number(b)));
                     toast.success("Dados carregados com sucesso!");
                 } else {
                     toast.error("Erro ao carregar os dados.");
                 }
-
             } catch (error) {
                 console.error("Erro na requisição:", error);
                 toast.error("Erro na comunicação com o servidor.");
@@ -276,26 +237,17 @@ const ResultLotofacil = ({ onConcursoChange }) => {
                                         )}
                                     </div>
                                     <div className="ciclos">
-                                        <h2>Ciclos: <span>{quantidadeCiclos}</span></h2>
-                                        <h2>Posição do ciclo: <span>{posicaoAtualDoCiclo}</span></h2>
-                                        <h2>Dezenas não sorteadas no ciclo atual:</h2>
+                                        <h2>Ciclo Atual: <span>{cicloAtual?.numero || 'N/A'}</span></h2>
+                                        <h2>Dezenas ausentes no ciclo atual:</h2>
                                         <div className="dezenas">
                                             {dezenasRestantes.length > 0 ? (
-                                                dezenasRestantes.map((dezena, index) => (
-                                                    <span key={index}>{dezena}</span>
-                                                ))
+                                                dezenasRestantes
+                                                    .sort((a, b) => Number(a) - Number(b))
+                                                    .map((dezena, index) => (
+                                                        <span key={index}>{dezena}</span>
+                                                    ))
                                             ) : (
-                                                <span>Dezenas não identificadas</span>
-                                            )}
-                                        </div>
-                                        <h2>Dezenas sorteadas no ciclo atual:</h2>
-                                        <div className="dezenas">
-                                            {dezenasSorteadasNoCicloAtual.length > 0 ? (
-                                                dezenasSorteadasNoCicloAtual.map((dezena, index) => (
-                                                    <span key={index}>{dezena}</span>
-                                                ))
-                                            ) : (
-                                                <span>Dezenas não identificadas</span>
+                                                <span>Ciclo Completo</span>
                                             )}
                                         </div>
                                     </div>
