@@ -3,7 +3,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 1rem;
+    gap: .5rem;
     padding: .5rem 0;
     border-left: solid 2px #8B008B;
     border-top-left-radius: 10px;
@@ -68,6 +68,7 @@
 .container-dezenas {
     display: flex;
     flex-direction: column;
+    width: 100%;
 }
 
 .dezenas {
@@ -153,4 +154,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.ciclos {
+    width: 100%;
 }

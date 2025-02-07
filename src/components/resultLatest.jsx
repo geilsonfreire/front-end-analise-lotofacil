@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import PropTypes from 'prop-types';
 
 // Imports Css
-import "../style/resultLotofacil.css";
+import "../style/resultLatest.css";
 
 // Imports de Icones
 import { BsArrowRightCircle, BsArrowLeftCircle } from "react-icons/bs";
@@ -19,11 +19,98 @@ const ResultLotofacil = ({ onConcursoChange }) => {
     const [latestResult, setLatestResult] = useState(null);
     const [sorteios, setSorteios] = useState([]);
     const [currentConcurso, setCurrentConcurso] = useState(null);
+    const [dezenasRestantes, setDezenasRestantes] = useState([]);
+    const [quantidadeCiclos, setQuantidadeCiclos] = useState(0);
+    const [dezenasSorteadasNoCicloAtual, setDezenasSorteadasNoCicloAtual] = useState([]);
+    const [posicaoAtualDoCiclo, setPosicaoAtualDoCiclo] = useState(0);
 
     // Calcula as combinações
     const totalCombinations = calculateCombinations(25, 15);
 
-    // Combine os dois useEffects em um só
+    const calcularDezenasRestantes = (resultados) => {
+        const todasDezenas = new Set(Array.from({ length: 25 }, (_, i) => i + 1));
+        const dezenasSorteadas = new Set();
+
+        for (let idx = resultados.length - 1; idx >= 0; idx--) {
+            resultados[idx].dezenas.forEach(dezena => {
+                dezenasSorteadas.add(dezena);
+            });
+
+            if (dezenasSorteadas.size === 25) {
+                break;
+            }
+        }
+
+        return Array.from(todasDezenas).filter(dezena => !dezenasSorteadas.has(dezena));
+    };
+
+    const calcularQuantidadeCiclos = (resultados) => {
+        let ciclos = 0;
+        let cicloAtual = new Set();
+
+        resultados.forEach((resultado) => {
+            resultado.dezenas.forEach(dezena => {
+                cicloAtual.add(dezena);
+            });
+
+            if (cicloAtual.size === 25) {
+                ciclos += 1;
+                cicloAtual.clear();
+            }
+        });
+
+        return ciclos;
+    };
+
+    const calcularDezenasNoCicloAtual = (resultados) => {
+        const todasDezenas = new Set(Array.from({ length: 25 }, (_, i) => i + 1));
+        const dezenasSorteadas = new Set();
+        let inicioCiclo = 0;
+
+        for (let idx = 0; idx < resultados.length; idx++) {
+            resultados[idx].dezenas.forEach(dezena => {
+                dezenasSorteadas.add(dezena);
+            });
+
+            if (dezenasSorteadas.size === 25) {
+                dezenasSorteadas.clear();
+                inicioCiclo = idx + 1;
+            }
+        }
+
+        const dezenasSorteadasNoCicloAtual = new Set();
+        for (let idx = inicioCiclo; idx < resultados.length; idx++) {
+            resultados[idx].dezenas.forEach(dezena => {
+                dezenasSorteadasNoCicloAtual.add(dezena);
+            });
+        }
+
+        const dezenasRestantesNoCicloAtual = Array.from(todasDezenas).filter(dezena => !dezenasSorteadasNoCicloAtual.has(dezena));
+
+        return {
+            dezenasSorteadasNoCicloAtual: Array.from(dezenasSorteadasNoCicloAtual),
+            dezenasRestantesNoCicloAtual
+        };
+    };
+
+    const calcularPosicaoAtualDoCiclo = (resultados) => {
+        const dezenasSorteadas = new Set();
+        let inicioCiclo = 0;
+
+        for (let idx = 0; idx < resultados.length; idx++) {
+            resultados[idx].dezenas.forEach(dezena => {
+                dezenasSorteadas.add(dezena);
+            });
+
+            if (dezenasSorteadas.size === 25) {
+                dezenasSorteadas.clear();
+                inicioCiclo = idx + 1;
+            }
+        }
+
+        return resultados.length - inicioCiclo;
+    };
+
     useEffect(() => {
         const loadData = async () => {
             const loadingToast = toast.info("Carregando dados...", { autoClose: false });
@@ -40,6 +127,15 @@ const ResultLotofacil = ({ onConcursoChange }) => {
                 if (latestResultData) {
                     setLatestResult(latestResultData);
                     setCurrentConcurso(latestResultData.concurso);
+                    const dezenasRestantesCalculadas = calcularDezenasRestantes(allResults);
+                    setDezenasRestantes(dezenasRestantesCalculadas);
+                    const quantidadeCiclos = calcularQuantidadeCiclos(allResults);
+                    setQuantidadeCiclos(quantidadeCiclos);
+                    const posicaoAtualDoCiclo = calcularPosicaoAtualDoCiclo(allResults);
+                    setPosicaoAtualDoCiclo(posicaoAtualDoCiclo);
+                    const { dezenasSorteadasNoCicloAtual, dezenasRestantesNoCicloAtual } = calcularDezenasNoCicloAtual(allResults);
+                    setDezenasSorteadasNoCicloAtual(dezenasSorteadasNoCicloAtual);
+                    setDezenasRestantes(dezenasRestantesNoCicloAtual);
                     toast.success("Dados carregados com sucesso!");
                 } else {
                     toast.error("Erro ao carregar os dados.");
@@ -179,6 +275,30 @@ const ResultLotofacil = ({ onConcursoChange }) => {
                                             <p>Não há dados disponíveis para análise.</p>
                                         )}
                                     </div>
+                                    <div className="ciclos">
+                                        <h2>Ciclos: <span>{quantidadeCiclos}</span></h2>
+                                        <h2>Posição do ciclo: <span>{posicaoAtualDoCiclo}</span></h2>
+                                        <h2>Dezenas não sorteadas no ciclo atual:</h2>
+                                        <div className="dezenas">
+                                            {dezenasRestantes.length > 0 ? (
+                                                dezenasRestantes.map((dezena, index) => (
+                                                    <span key={index}>{dezena}</span>
+                                                ))
+                                            ) : (
+                                                <span>Dezenas não identificadas</span>
+                                            )}
+                                        </div>
+                                        <h2>Dezenas sorteadas no ciclo atual:</h2>
+                                        <div className="dezenas">
+                                            {dezenasSorteadasNoCicloAtual.length > 0 ? (
+                                                dezenasSorteadasNoCicloAtual.map((dezena, index) => (
+                                                    <span key={index}>{dezena}</span>
+                                                ))
+                                            ) : (
+                                                <span>Dezenas não identificadas</span>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="box-shadown">
                                     <div className="result-info-table">
@@ -239,7 +359,7 @@ const ResultLotofacil = ({ onConcursoChange }) => {
                                         </div>
                                     </div>
                                 </div>
-                            </div>  
+                            </div>
                         </div>
 
                     </>
