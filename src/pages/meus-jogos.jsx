@@ -115,11 +115,65 @@ const MeusJogos = () => {
             .map(item => item.dezena);
     };
 
+    const processarCiclos = (dados) => {
+        // Ordena do mais antigo para o mais recente
+        dados.sort((a, b) => a.concurso - b.concurso);
+
+        let ciclosCalculados = [];
+        let cicloAtual = {
+            numero: 1,
+            concursos: [],
+            dezenasAusentes: new Set(
+                [...Array(25).keys()].map(i => (i + 1).toString().padStart(2, '0'))
+            )
+        };
+
+        for (let i = 0; i < dados.length; i++) {
+            const concurso = dados[i];
+            const dezenasSorteadas = new Set(
+                concurso.dezenas.map(d => d.toString().padStart(2, '0'))
+            );
+
+            // Remove as dezenas sorteadas da lista de ausentes
+            cicloAtual.dezenasAusentes = new Set(
+                [...cicloAtual.dezenasAusentes].filter(d => !dezenasSorteadas.has(d))
+            );
+
+            cicloAtual.concursos.push({
+                ...concurso,
+                dezenasAusentes: new Set(cicloAtual.dezenasAusentes)
+            });
+
+            if (cicloAtual.dezenasAusentes.size === 0) {
+                cicloAtual.duracao = cicloAtual.concursos.length;
+                ciclosCalculados.push({ ...cicloAtual });
+                cicloAtual = {
+                    numero: cicloAtual.numero + 1,
+                    concursos: [],
+                    dezenasAusentes: new Set(
+                        [...Array(25).keys()].map(i => (i + 1).toString().padStart(2, '0'))
+                    )
+                };
+            }
+        }
+
+        if (cicloAtual.concursos.length > 0) {
+            cicloAtual.duracao = cicloAtual.concursos.length;
+            ciclosCalculados.push({ ...cicloAtual });
+        }
+
+        return ciclosCalculados[ciclosCalculados.length - 1];
+    };
+
     // Função para gerar jogos
     const gerarJogos = async () => {
         try {
             setLoading(true);
             const resultados = await ApiServices.getAllResults();
+            // Processa o ciclo atual para obter dezenas ausentes
+            const cicloProcessado = processarCiclos([...resultados]);
+            const dezenasAusentesCiclo = [...cicloProcessado.dezenasAusentes].map(Number);
+
             let jogos = [];
 
             const dezenasQuentes = calcularDezenasQuentes(resultados);
@@ -138,7 +192,13 @@ const MeusJogos = () => {
             const gerarNovoJogo = (tentativas = 0) => {
                 if (tentativas > 100) return null;
 
-                const novoJogo = [...fibonacciNumbers, menorAtraso, ...maioresAtrasos];
+                // Adicione as dezenas ausentes do ciclo atual junto às existentes
+                const novoJogo = [
+                    ...fibonacciNumbers,
+                    menorAtraso,
+                    ...maioresAtrasos,
+                    ...dezenasAusentesCiclo
+                ];
 
                 dezenasQuentes.forEach(dezena => {
                     if (!novoJogo.includes(dezena)) novoJogo.push(dezena);
