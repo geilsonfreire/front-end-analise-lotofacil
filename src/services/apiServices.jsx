@@ -4,6 +4,7 @@ import axios from "axios";
 // URL base da API
 const BASE_URL = "https://loteriascaixa-api.herokuapp.com/api/lotofacil";
 
+
 // Função para converter a data de 'DD/MM/YYYY' para 'YYYY-MM-DD'
 const convertDate = (dateString) => {
     try {

@@ -40,15 +40,18 @@ const AllResult = () => {
                     <div className="result-info-table scroll-y">
                         <table>
                             <thead>
-                                <div className="info">
-                                    <Link to="/soma-sorteios" > 
-                                        <BsInfoCircle /> SOMAS
-                                    </Link>
-                                    <Link to="/analise-impa-par" > 
-                                        <BsInfoCircle /> IMPAR / PAR
-                                    </Link>
-                                </div>
-
+                                <tr>
+                                    <th colSpan="5">
+                                        <div className="info">
+                                            <Link to="/soma-sorteios" >
+                                                <BsInfoCircle /> Soma
+                                            </Link>
+                                            <Link to="/analise-impa-par" >
+                                                <BsInfoCircle /> Impar / Par
+                                            </Link>
+                                        </div>
+                                    </th>
+                                </tr>
                                 <tr>
                                     <th>Concurso</th>
                                     <th>Dezenas</th>
@@ -58,6 +61,7 @@ const AllResult = () => {
                                 </tr>
                             </thead>
                             <tbody>
+                                
                                 {resultados.map((resultado, index) => (
                                     <tr key={index}>
                                         <td>{resultado.concurso}</td>

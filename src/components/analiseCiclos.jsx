@@ -10,8 +10,6 @@ const AnaliseCiclos = () => {
             try {
                 const response = await apiService.getAllResults();
 
-                console.log("Dados recebidos da API:", response);
-
                 if (Array.isArray(response)) {
                     // Ordena os concursos do mais antigo para o mais recente
                     const dadosOrdenados = response.sort((a, b) => a.concurso - b.concurso);
@@ -63,8 +61,6 @@ const AnaliseCiclos = () => {
             cicloAtual.duracao = cicloAtual.concursos.length;
             ciclosCalculados.push({ ...cicloAtual });
         }
-
-        console.log("Ciclos calculados:", ciclosCalculados);
         setCiclos(ciclosCalculados);
     };
 

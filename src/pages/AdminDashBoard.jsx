@@ -14,7 +14,7 @@ import AnaliseCiclos from "../components/analiseCiclos";
 
 
 // Imports Hooks
-import { useProjectionsStats } from '../hooks/useProjectionsStats';
+
 import apiService from "../services/apiServices";
 
 // imports icons and images
@@ -24,8 +24,8 @@ import { BsInfoCircle } from "react-icons/bs";
 const fibonacciNumbers = [1, 2, 3, 5, 8, 13, 21];
 
 const AdminDashBoard = () => {
-    const { loading, error } = useProjectionsStats();
-    const [hasLoaded, setHasLoaded] = useState(false);
+
+
     const [frequencias, setFrequencias] = useState([]);
     const [fibonacciError, setFibonacciError] = useState(null);
     const [palindromoFrequencias, setPalindromoFrequencias] = useState([]);
@@ -38,13 +38,9 @@ const AdminDashBoard = () => {
 
     const palindromoNumbers = useMemo(() => [11, 22], []);
 
-
-    useEffect(() => {
-        if (!loading && !error && !hasLoaded) {
-            toast.success("Dados carregados com sucesso!");
-            setHasLoaded(true);
-        }
-    }, [loading, error, hasLoaded]);
+    const handleConcursoChange = (newConcurso) => {
+        console.log("Concurso changed to:", newConcurso);
+    };
 
     useEffect(() => {
         const fetchFibonacciAnalysis = async () => {
@@ -181,10 +177,6 @@ const AdminDashBoard = () => {
     }, [atrasosError]);
 
 
-    // Renderiza mensagem de erro
-    if (error) {
-        return <div className="error-message">Erro ao carregar dados: {error}</div>;
-    }
 
     return (
         <>
@@ -194,7 +186,7 @@ const AdminDashBoard = () => {
                 </div>
 
                 <section className='Container-dashborder'>
-                    <ResultLatest />
+                    <ResultLatest onConcursoChange={handleConcursoChange} />
                     <div className='grafil-cards'>
 
                         {/* Card de Números Fibonacci */}
