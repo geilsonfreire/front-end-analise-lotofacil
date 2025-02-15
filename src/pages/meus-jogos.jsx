@@ -187,6 +187,7 @@ const MeusJogos = () => {
             console.log("Dezenas quentes:", dezenasQuentes); // Adicione este console.log para verificar o retorno
             // Constante para o menor atraso permitido
             const menorAtraso = 11;
+            console.log("Menor atraso:", menorAtraso); // Adicione este console.log para verificar o retorno
             // Constante para os valores permitidos da soma das dezenas
             const valoresPermitidos = [
                 179, 181, 182, 183, 184, 185, 186, 187,
@@ -227,6 +228,7 @@ const MeusJogos = () => {
                 }
                 // Verifica se a soma das dezenas está dentro dos valores permitidos
                 const somaDezenas = novoJogo.reduce((acc, num) => acc + num, 0);
+             
                 if (!valoresPermitidos.includes(somaDezenas)) return gerarNovoJogo(tentativas + 1);
                 // Verifica se o novo jogo tem 7 pares e 8 ímpares ou vice-versa
                 const pares = novoJogo.filter(num => num % 2 === 0).length;
