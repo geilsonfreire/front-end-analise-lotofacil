@@ -10,7 +10,7 @@ import ApiServices from "../services/apiServices";
 import ResultLatest from "../components/resultLatest";
 
 //Constante Fibonacci para gerar os jogos 
-const fibonacciNumbers = [1, 3, 5, 13];
+const fibonacciNumbers = [3, 5, 13];
 
 const MeusJogos = () => {
     // Constante que armazena os jogos gerados e os armazena no localStorage
