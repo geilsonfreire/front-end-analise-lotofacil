@@ -9,9 +9,6 @@ import "../style/meus-jogos.css";
 import ApiServices from "../services/apiServices";
 import ResultLatest from "../components/resultLatest";
 
-//Constante Fibonacci para gerar os jogos 
-const fibonacciNumbers = [3, 5, 13];
-
 const MeusJogos = () => {
     // Constante que armazena os jogos gerados e os armazena no localStorage
     const [jogosGerados, setJogosGerados] = useState(() => {
@@ -171,6 +168,11 @@ const MeusJogos = () => {
         return ciclosCalculados[ciclosCalculados.length - 1];
     };
 
+    // Função para remover duplicatas
+    const removerDuplicatas = (array) => {
+        return Array.from(new Set(array));
+    };
+
     // Função para gerar jogos
     const gerarJogos = async () => {
         try {
@@ -206,17 +208,15 @@ const MeusJogos = () => {
             const gerarNovoJogo = (tentativas = 0) => {
                 if (tentativas > 100) return null;
 
-                // Adicione as dezenas ausentes do ciclo atual junto às existentes no jogo
-                const novoJogo = [
-                    ...fibonacciNumbers,
+                // Combina todas as dezenas e remove duplicatas
+                let novoJogo = [
                     menorAtraso,
                     ...maioresAtrasos,
-                    ...dezenasAusentesCiclo
+                    ...dezenasAusentesCiclo,
+                    ...dezenasQuentes
                 ];
-                // Adiciona as dezenas quentes ao novo jogo
-                dezenasQuentes.forEach(dezena => {
-                    if (!novoJogo.includes(dezena)) novoJogo.push(dezena);
-                });
+                novoJogo = removerDuplicatas(novoJogo);
+
                 // Adiciona dezenas aleatórias ao novo jogo
                 const numerosDisponiveis = Array.from({ length: 25 }, (_, i) => i + 1)
                     .filter(num => !novoJogo.includes(num));
@@ -228,7 +228,7 @@ const MeusJogos = () => {
                 }
                 // Verifica se a soma das dezenas está dentro dos valores permitidos
                 const somaDezenas = novoJogo.reduce((acc, num) => acc + num, 0);
-             
+
                 if (!valoresPermitidos.includes(somaDezenas)) return gerarNovoJogo(tentativas + 1);
                 // Verifica se o novo jogo tem 7 pares e 8 ímpares ou vice-versa
                 const pares = novoJogo.filter(num => num % 2 === 0).length;
@@ -335,11 +335,11 @@ const MeusJogos = () => {
                                         </span>
                                     </div>
                                     <div className="numeros-container">
-                                        {jogo.map((numero) => {
+                                        {jogo.map((numero, numIndex) => { // Adicione numIndex para garantir chaves únicas
                                             const numeroAcertado = resultadoConcurso.includes(numero);
                                             return (
                                                 <div
-                                                    key={numero}
+                                                    key={`${index}-${numero}-${numIndex}`} // Use index, numero e numIndex para garantir chaves únicas
                                                     className={`numero-bolinha ${numeroAcertado ? 'numero-acertado' : ''}`}
                                                 >
                                                     {numero}
