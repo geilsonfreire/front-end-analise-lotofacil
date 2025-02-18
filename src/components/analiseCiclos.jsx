@@ -73,13 +73,62 @@ const AnaliseCiclos = () => {
         setCiclos(ciclosCalculados);
     };
 
+    // Função para calcular as durações mais relevantes
+    const calcularDuracoesRelevantes = (ciclos) => {
+        const duracoes = ciclos.map(ciclo => ciclo.duracao);
+        const frequenciaDuracoes = duracoes.reduce((acc, duracao) => {
+            acc[duracao] = (acc[duracao] || 0) + 1;
+            return acc;
+        }, {});
+        const duracoesRelevantes = Object.entries(frequenciaDuracoes)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5);
+        return duracoesRelevantes;
+    };
+
+    // Função para calcular a frequência das dezenas ausentes por posição no ciclo
+    const calcularFrequenciaDezenasAusentes = (ciclos) => {
+        const frequencia = {};
+        ciclos.forEach(ciclo => {
+            ciclo.concursos.forEach((concurso, idx) => {
+                if (!frequencia[idx + 1]) {
+                    frequencia[idx + 1] = {};
+                }
+                concurso.dezenasAusentes.forEach(dezena => {
+                    frequencia[idx + 1][dezena] = (frequencia[idx + 1][dezena] || 0) + 1;
+                });
+            });
+        });
+        return frequencia;
+    };
+
+    // Função para calcular a frequência das dezenas ausentes em relação à posição no ciclo
+    const calcularFrequenciaDezenasPorPosicao = (ciclos) => {
+        const frequencia = {};
+        ciclos.forEach(ciclo => {
+            ciclo.concursos.forEach((concurso, idx) => {
+                concurso.dezenasAusentes.forEach(dezena => {
+                    if (!frequencia[dezena]) {
+                        frequencia[dezena] = {};
+                    }
+                    frequencia[dezena][idx + 1] = (frequencia[dezena][idx + 1] || 0) + 1;
+                });
+            });
+        });
+        return frequencia;
+    };
+
+    const duracoesRelevantes = calcularDuracoesRelevantes(ciclos);
+    const frequenciaDezenasAusentes = calcularFrequenciaDezenasAusentes(ciclos);
+    const frequenciaDezenasPorPosicao = calcularFrequenciaDezenasPorPosicao(ciclos);
+
     return (
         <main className="Container-Geral">
             <div className="box-shadown">
                 <div className="title-result-info">
                     <h1>Análise dos Ciclos de Dezenas</h1>
                 </div>
-
+                {/* Tabela com os resultados dos ciclos e dezenas ausentes */}
                 <div className="result-info-table scroll-y">
                     <table>
                         <thead>
@@ -114,6 +163,103 @@ const AnaliseCiclos = () => {
                                         </tr>
                                     ))
                                 )
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* Tabela com as durações mais relevantes */}
+                <div className="result-info-table scroll-y height-auto">
+                    <table>
+                        <thead>
+                            <tr>
+                                <h2>Durações mais Relevantes</h2>
+                            </tr>
+                            <tr>
+                                <th>Duração do Ciclo</th>
+                                <th>Frequência</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {duracoesRelevantes.length === 0 ? (
+                                <tr>
+                                    <td colSpan="2">Nenhum dado disponível</td>
+                                </tr>
+                            ) : (
+                                duracoesRelevantes.map(([duracao, frequencia]) => (
+                                    <tr key={duracao}>
+                                        <td>{duracao}</td>
+                                        <td>{frequencia}</td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* Tabela com a frequência das dezenas ausentes por posição no ciclo */}
+                <div className="result-info-table scroll-y">
+                    <table>
+                        <thead>
+                            <tr>
+                                <h2>Frequência das Dezenas Ausentes por Posição no Ciclo</h2>
+                            </tr>
+                            <tr>
+                                <th>Posição no Ciclo</th>
+                                <th>Dezena</th>
+                                <th>Frequência</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {Object.keys(frequenciaDezenasAusentes).length === 0 ? (
+                                <tr>
+                                    <td colSpan="3">Nenhum dado disponível</td>
+                                </tr>
+                            ) : (
+                                Object.entries(frequenciaDezenasAusentes).map(([posicao, dezenas]) =>
+                                    Object.entries(dezenas).map(([dezena, frequencia]) => (
+                                        <tr key={`${posicao}-${dezena}`}>
+                                            <td>{posicao}</td>
+                                            <td>{dezena}</td>
+                                            <td>{frequencia}</td>
+                                        </tr>
+                                    ))
+                                )
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* Tabela com a frequência das dezenas ausentes em relação à posição no ciclo */}
+                <div className="result-info-table scroll-y">
+                    <table>
+                        <thead>
+                            <tr>
+                                <h2>Frequência das Dezenas Ausentes em Relação à Posição no Ciclo</h2>
+                            </tr>
+                            <tr>
+                                <th>Dezena</th>
+                                <th>Posição no Ciclo</th>
+                                <th>Frequência</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {Object.keys(frequenciaDezenasPorPosicao).length === 0 ? (
+                                <tr>
+                                    <td colSpan="3">Nenhum dado disponível</td>
+                                </tr>
+                            ) : (
+                                Object.entries(frequenciaDezenasPorPosicao)
+                                    .sort((a, b) => a[0] - b[0])
+                                    .map(([dezena, posicoes]) =>
+                                        Object.entries(posicoes).map(([posicao, frequencia]) => (
+                                            <tr key={`${dezena}-${posicao}`}>
+                                                <td>{dezena}</td>
+                                                <td>{posicao}</td>
+                                                <td>{frequencia}</td>
+                                            </tr>
+                                        ))
+                                    )
                             )}
                         </tbody>
                     </table>

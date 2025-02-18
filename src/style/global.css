@@ -288,9 +288,14 @@ section {
     align-items: flex-start;
     gap: 1rem;
     padding: .5rem;
+    margin-bottom: 1rem;
     border-left: solid 2px #8B008B;
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
+}
+
+.height-auto {
+    height: auto;
 }
 
 .result-info-table table {
