@@ -1,8 +1,0 @@
-npm install react-router-dom
-npm install --save react-toastify
-npm install react-icons
-npm install --save prop-types
-npm install axios
-npm install react-apexcharts apexcharts
-npm install react-virtualized
-npm install react-chartjs-2 chart.js

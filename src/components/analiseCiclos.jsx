@@ -6,13 +6,16 @@ const AnaliseCiclos = () => {
     const [ciclos, setCiclos] = useState([]);
 
     useEffect(() => {
+        // Função para buscar os resultados da Lotofácil
         const fetchResults = async () => {
             try {
+                // Salva a resposta da API na variável response
                 const response = await apiService.getAllResults();
-
+                // Verifica se a resposta é um array
                 if (Array.isArray(response)) {
                     // Ordena os concursos do mais antigo para o mais recente
                     const dadosOrdenados = response.sort((a, b) => a.concurso - b.concurso);
+                    // Processa os ciclos de dezenas
                     processarCiclos(dadosOrdenados);
                 } else {
                     console.warn("Os dados recebidos não são um array:", response);
@@ -22,29 +25,34 @@ const AnaliseCiclos = () => {
                 toast.error("Erro ao carregar os resultados da Lotofácil.");
             }
         };
-
+        // Chama a função fetchResults
         fetchResults();
     }, []);
 
+    // Função para processar os ciclos de dezenas
     const processarCiclos = (dados) => {
+        // Array para armazenar os ciclos calculados inicialmente vazio
         let ciclosCalculados = [];
+        // Objeto para armazenar o ciclo atual
         let cicloAtual = {
             numero: 1,
             concursos: [],
             dezenasAusentes: new Set([...Array(25).keys()].map(i => (i + 1).toString().padStart(2, '0')))
         };
-
+        // Loop para percorrer os dados dos concursos
         for (let i = 0; i < dados.length; i++) {
+            // Salva o concurso atual na variável concurso
             const concurso = dados[i];
+            // Cria um conjunto com as dezenas sorteadas
             const dezenasSorteadas = new Set(concurso.dezenas || []);
-
+            // Adiciona o concurso atual ao ciclo atual
             cicloAtual.concursos.push({
                 ...concurso,
                 dezenasAusentes: new Set([...cicloAtual.dezenasAusentes].filter(d => !dezenasSorteadas.has(d)))
             });
-
+            // Atualiza o conjunto de dezenas ausentes
             cicloAtual.dezenasAusentes = new Set([...cicloAtual.dezenasAusentes].filter(d => !dezenasSorteadas.has(d)));
-
+            // Verifica se o ciclo atual não tem dezenas ausentes
             if (cicloAtual.dezenasAusentes.size === 0) {
                 cicloAtual.duracao = cicloAtual.concursos.length;
                 ciclosCalculados.push({ ...cicloAtual });
@@ -56,11 +64,12 @@ const AnaliseCiclos = () => {
                 };
             }
         }
-
+        // Verifica se o ciclo atual tem concursos
         if (cicloAtual.concursos.length > 0) {
             cicloAtual.duracao = cicloAtual.concursos.length;
             ciclosCalculados.push({ ...cicloAtual });
         }
+        // Atualiza o estado ciclos com os ciclos calculados
         setCiclos(ciclosCalculados);
     };
 

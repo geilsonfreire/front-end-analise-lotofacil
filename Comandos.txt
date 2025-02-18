@@ -1,0 +1,4 @@
+#updates tdas as dependencias 
+- npm run check-updates
+
+
