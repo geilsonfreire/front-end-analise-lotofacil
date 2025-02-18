@@ -122,6 +122,9 @@ const AnaliseCiclos = () => {
     const frequenciaDezenasAusentes = calcularFrequenciaDezenasAusentes(ciclos);
     const frequenciaDezenasPorPosicao = calcularFrequenciaDezenasPorPosicao(ciclos);
 
+    // Verificar a quantidade máxima de posições identificadas
+    const maxPosicoes = Math.max(...Object.values(frequenciaDezenasPorPosicao).map(posicoes => Math.max(...Object.keys(posicoes).map(Number))));
+
     return (
         <main className="Container-Geral">
             <div className="box-shadown">
@@ -262,6 +265,39 @@ const AnaliseCiclos = () => {
                                     )
                             )}
                         </tbody>
+                    </table>
+                </div>
+
+                {/* Tabela de analise por posição no formato solicitado */}
+                <div className="title-result-info">
+                    <h1>Analise das dezenas ausentes por Posição</h1>
+                </div>
+                <div className="result-info-table scroll-y">
+                    <table>
+                        <thead>
+                            {Array.from({ length: maxPosicoes }, (_, i) => (
+                                <>
+                                    <tr key={`posicao-${i + 1}`}>
+                                        <th>{i + 1}ª</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Dez:</th>
+                                        {Array.from({ length: 25 }, (_, j) => (
+                                            <td key={`dez-${j + 1}`}>{j + 1}</td>
+                                        ))}
+                                    </tr>
+                                    <tr>
+                                        <th>Freq:</th>
+                                        {Array.from({ length: 25 }, (_, j) => (
+                                            <td key={`freq-${i + 1}-${j + 1}`}>
+                                                {frequenciaDezenasPorPosicao[j + 1] ? frequenciaDezenasPorPosicao[j + 1][i + 1] || 0 : 0}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                    <br />
+                                </>
+                            ))}
+                        </thead>
                     </table>
                 </div>
             </div>
