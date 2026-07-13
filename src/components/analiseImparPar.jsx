@@ -14,26 +14,30 @@ import { processResults } from "../utils/analiyzeOddEven";
 const AnaliseImpaPar = () => {
     // Estado para armazenar os resultados
     const [analysis, setAnalysis] = useState(null);
-    const [hasFetched, setHasFetched] = useState(false); // Estado para controlar se a função já foi chamada
+   
 
     useEffect(() => {
-        const fetchAndAnalyze = async () => {
-            try {
-                const allResults = await apiServices.getAllResults();
-                const analysisResult = await processResults(allResults);
-                setAnalysis(analysisResult);
-                toast.success("Análise concluída com sucesso!");
-            } catch (error) {
-                console.error("Erro ao buscar os sorteios:", error.message);
-                toast.error("Erro ao buscar os sorteios.");
-            }
-        };
+    const fetchAndAnalyze = async () => {
+        try {
+            const allResults = await apiServices.getAllResults();
 
-        if (!hasFetched) {
-            fetchAndAnalyze();
-            setHasFetched(true); // Atualiza o estado para indicar que a função já foi chamada
+            const analysisResult = processResults(allResults);
+
+            setAnalysis(analysisResult);
+
+            toast.success("Análise concluída com sucesso!");
+
+        } catch (error) {
+
+            console.error("Erro ao buscar os sorteios:", error);
+
+            toast.error("Erro ao buscar os sorteios.");
+
         }
-    }, [hasFetched]); // Adiciona hasFetched como dependência para garantir que a função seja chamada apenas uma vez
+    };
+
+    fetchAndAnalyze();
+}, []);
 
     return (
         <main className="Container-Geral">

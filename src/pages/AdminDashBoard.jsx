@@ -9,7 +9,6 @@ import '../style/AdminDashBoard.css'
 // Imports Componenets
 import ResultLatest from "../components/resultLatest";
 import AllResult from "../components/AllResult";
-import AnaliseEspelhado from "../components/analiseEspelhados";
 import AnaliseCiclos from "../components/analiseCiclos";
 
 
@@ -26,9 +25,7 @@ const fibonacciNumbers = [1, 2, 3, 5, 8, 13, 21];
 const AdminDashBoard = () => {
 
 
-    const [frequencias, setFrequencias] = useState([]);
     const [fibonacciError, setFibonacciError] = useState(null);
-    const [palindromoFrequencias, setPalindromoFrequencias] = useState([]);
     const [palindromoError, setPalindromoError] = useState(null);
     const [quentes, setQuentes] = useState([]);
     const [frias, setFrias] = useState([]);
@@ -57,11 +54,6 @@ const AdminDashBoard = () => {
                         }
                     });
                 });
-
-                setFrequencias(fibonacciFrequency);
-                if (!fibonacciError) {
-                    toast.success("Análise de Fibonacci carregada com sucesso!");
-                }
             } catch (error) {
                 console.error("Erro ao buscar os dados de Fibonacci:", error);
                 setFibonacciError("Erro ao buscar os dados de Fibonacci.");
@@ -87,11 +79,6 @@ const AdminDashBoard = () => {
                         }
                     });
                 });
-
-                setPalindromoFrequencias(palindromoFrequency);
-                if (!palindromoError) {
-                    toast.success("Análise de Palíndromos carregada com sucesso!");
-                }
             } catch (error) {
                 console.error("Erro ao buscar os dados de Palíndromos:", error);
                 setPalindromoError("Erro ao buscar os dados de Palíndromos.");
@@ -189,71 +176,6 @@ const AdminDashBoard = () => {
                     <ResultLatest onConcursoChange={handleConcursoChange} />
                     <div className='grafil-cards'>
 
-                        {/* Card de Números Fibonacci */}
-                        <div className="grafil-card">
-                            <div className="total-text">
-                                <span>Nº Fibonacci</span>
-                                <i><GrAnalytics /></i>
-                            </div>
-                            <div className="result-info-table">
-                                {fibonacciError && <p>{fibonacciError}</p>}
-                                {frequencias.length > 0 && (
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                {fibonacciNumbers.map((num, index) => (
-                                                    <th key={index}>Dez {num}</th>
-                                                ))}
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                {fibonacciNumbers.map((num, index) => (
-                                                    <td key={index}>{frequencias[num - 1]}</td>
-                                                ))}
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                )}
-                            </div>
-                            <div className="more-details">
-                                <Link to="/analise-fibonacci">
-                                    <BsInfoCircle /> Mais detalhes
-                                </Link>
-                            </div>
-                        </div>
-
-                        {/* Card de Números Palíndromos */}
-                        <div className="grafil-card">
-                            <div className="total-text">
-                                <span>Nº Palíndromos</span>
-                                <i><GrAnalytics /></i>
-                            </div>
-                            <div className="result-info-table">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Dezena</th>
-                                            <th>Frequência</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {palindromoNumbers.map((num, index) => (
-                                            <tr key={index}>
-                                                <td>{num}</td>
-                                                <td>{palindromoFrequencias[num - 1]}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div className="more-details">
-                                <Link to="/analise-palindromos">
-                                    <BsInfoCircle /> Mais detalhes
-                                </Link>
-                            </div>
-                        </div>
-
                         {/* Card de Dezenas Quentes e Frias */}
                         <div className="grafil-card">
                             <div className="total-text">
@@ -334,23 +256,14 @@ const AdminDashBoard = () => {
                             </div>
                         </div>
 
-                        {/*Dezenas Espelhadas */}
-                        <div className="grafil-card">
-                            <div className="total-text">
-                                <span>Dezenas Espelhadas</span>
-                                <i><GrAnalytics /></i>
-                            </div>
-                            <AnaliseEspelhado />
-                        </div>
-
                     </div>
                     <section className="Container-dashborder">
                         <div className="grafil-cards1">
                             <div className="grafil-card">
                                 <AllResult />
+                                <AnaliseCiclos />
                             </div>
                             <div className="grafil-card">
-                                <AnaliseCiclos />
                             </div>
                         </div>
                     </section>

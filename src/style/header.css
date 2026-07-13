@@ -80,7 +80,7 @@
 .user-name {
     cursor: default;
     color: #000;
-    font-size: 12px;
+    font-size: 1rem;
     font-weight: bold;
     letter-spacing: 2px;
 }
@@ -90,7 +90,7 @@
 }
 
 .user-type {
-    font-size: 10px;
+    font-size: 1rem;
     color: #0000006c;
     letter-spacing: 2px;
     font-weight: bold;

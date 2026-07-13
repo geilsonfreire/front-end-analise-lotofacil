@@ -17,48 +17,49 @@ const MeusJogos = () => {
     });
 
     const [loading, setLoading] = useState(false);
-    const [currentConcurso, setCurrentConcurso] = useState(null);
     const [resultadoConcurso, setResultadoConcurso] = useState([]);
 
-    // Função buscar último resultado
-    const buscarUltimoResultado = async () => {
-        try {
-            const ultimoSorteio = await ApiServices.getLatestResult();
-            if (ultimoSorteio) {
-                setResultadoConcurso(ultimoSorteio.dezenas.map(Number));
-            }
-        } catch (error) {
-            console.error("Erro ao buscar último resultado:", error);
-            toast.error("Erro ao buscar último resultado!");
-        }
-    };
 
     // Função para lidar com a mudança de concurso
-    const handleConcursoChange = async (concurso) => {
+   const handleConcursoChange = async (concurso) => {
         try {
+
             const resultData = await ApiServices.getResultByContestNumber(concurso);
-            if (resultData) {
-                setResultadoConcurso(resultData.dezenas.map(Number));
-                setCurrentConcurso(concurso);
-            }
+
+            if (!resultData) return;
+
+            setResultadoConcurso(
+                resultData.dezenas.map(Number)
+            );
+
         } catch (error) {
-            console.error("Erro ao buscar resultado do concurso:", error);
-            toast.error("Erro ao buscar resultado do concurso!");
+
+            console.error("Erro ao buscar resultado:", error);
+
+            toast.error("Erro ao buscar resultado!");
+
         }
     };
 
     // Carregar o último resultado quando o componente montar
     useEffect(() => {
-        buscarUltimoResultado();
+        const carregarUltimoResultado = async () => {
+            try {
+                const ultimoSorteio = await ApiServices.getLatestResult();
+
+                if (ultimoSorteio) {
+                    setResultadoConcurso(ultimoSorteio.dezenas.map(Number));
+                }
+
+            } catch (error) {
+                console.error("Erro ao buscar último resultado:", error);
+                toast.error("Erro ao buscar último resultado!");
+            }
+        };
+
+        carregarUltimoResultado();
     }, []);
-
-    // Atualizar quando o concurso atual mudar
-    useEffect(() => {
-        if (currentConcurso) {
-            handleConcursoChange(currentConcurso);
-        }
-    }, [currentConcurso]);
-
+    
     // Função para verificar se o jogo é único
     const verificarJogoUnico = (novoJogo, jogosAnteriores, resultados) => {
         // Ordena o novo jogo para comparar
@@ -76,47 +77,7 @@ const MeusJogos = () => {
         return !jogoExisteGerados && !jogoExisteResultados;
     };
 
-    // Função para calcular as dezenas quentes
-    const calcularDezenasQuentes = (resultados) => {
-        // Cria um array com 25 posições preenchidas com 0
-        const frequencia = Array(25).fill(0);
-        // Itera sobre os resultados para calcular a frequência de cada dezena
-        resultados.forEach(resultado => {
-            resultado.dezenas.forEach(dezena => {
-                frequencia[dezena - 1] += 1;
-            });
-        });
-        // Mapeia as frequências para retornar as 3 dezenas mais frequentes
-        return frequencia
-            .map((freq, idx) => ({ dezena: idx + 1, frequencia: freq }))
-            .sort((a, b) => b.frequencia - a.frequencia)
-            .slice(0, 3)
-            .map(item => item.dezena);
-    };
 
-    // Função para calcular os maiores atrasos
-    const calcularMaioresAtrasos = (resultados) => {
-        // Cria um array com 25 posições preenchidas com o total de concursos
-        const totalConcursos = resultados.length;
-        // Cria um array com 25 posições preenchidas com o total de concursos
-        const atrasoAtual = Array(25).fill(totalConcursos);
-        // Itera sobre os resultados para calcular o atraso de cada dezena
-        resultados.forEach((resultado, idx) => {
-            resultado.dezenas.forEach((dezena) => {
-                atrasoAtual[dezena - 1] = idx;
-            });
-        });
-        // Mapeia os atrasos para retornar as 3 dezenas com maior atraso
-        const dezenasComAtraso = atrasoAtual.map((ultimoIndice, idx) => ({
-            dezena: idx + 1,
-            atraso: totalConcursos - ultimoIndice - 1
-        }));
-
-        return dezenasComAtraso
-            .sort((a, b) => b.atraso - a.atraso)
-            .slice(0, 3)
-            .map(item => item.dezena);
-    };
     // Função para processar os ciclos
     const processarCiclos = (dados) => {
         // Ordena do mais antigo para o mais recente
@@ -180,45 +141,27 @@ const MeusJogos = () => {
             const resultados = await ApiServices.getAllResults();
             // Processa o ciclo atual para obter dezenas ausentes
             const cicloProcessado = processarCiclos([...resultados]);
-            console.log("Ciclo processado:", cicloProcessado); // Adicione este console.log para verificar o retorno
+           
             const dezenasAusentesCiclo = [...cicloProcessado.dezenasAusentes].map(Number);
             // Inicializa o array de jogos
             let jogos = [];
-            // Calcula as dezenas quentes
-            const dezenasQuentes = calcularDezenasQuentes(resultados);
-            console.log("Dezenas quentes:", dezenasQuentes); // Adicione este console.log para verificar o retorno
-            // Constante para o menor atraso permitido
-            const menorAtraso = 11;
-            console.log("Menor atraso:", menorAtraso); // Adicione este console.log para verificar o retorno
-            // Constante para os valores permitidos da soma das dezenas
-            const valoresPermitidos = [
-                179, 181, 182, 183, 184, 185, 186, 187,
-                188, 189, 190, 191, 192, 193, 194, 195,
-                196, 197, 198, 199, 201, 202, 203, 204,
-                206, 207, 208, 209, 212, 213,
-            ];
-            // Calcula os maiores atrasos
-            const maioresAtrasos = calcularMaioresAtrasos(resultados);
-            console.log("Maiores atrasos:", maioresAtrasos); // Adicione este console.log para verificar o retorno
-            // Inicializa as tentativas
+            
             let tentativas = 0;
 
             const maxTentativas = 100;
+
             // Função para gerar um novo jogo
             const gerarNovoJogo = (tentativas = 0) => {
                 if (tentativas > 100) return null;
 
                 // Combina todas as dezenas e remove duplicatas
-                let novoJogo = [
-                    menorAtraso,
-                    ...maioresAtrasos,
-                    ...dezenasAusentesCiclo,
-                    ...dezenasQuentes
-                ];
+                let novoJogo = [...dezenasAusentesCiclo];
+
                 novoJogo = removerDuplicatas(novoJogo);
 
                 // Adiciona dezenas aleatórias ao novo jogo
-                const numerosDisponiveis = Array.from({ length: 25 }, (_, i) => i + 1)
+                const numerosDisponiveis = Array.from(
+                    { length: 25 }, (_, i) => i + 1)
                     .filter(num => !novoJogo.includes(num));
 
                 while (novoJogo.length < 15 && numerosDisponiveis.length > 0) {
@@ -226,10 +169,7 @@ const MeusJogos = () => {
                     novoJogo.push(numerosDisponiveis[randomIndex]);
                     numerosDisponiveis.splice(randomIndex, 1);
                 }
-                // Verifica se a soma das dezenas está dentro dos valores permitidos
-                const somaDezenas = novoJogo.reduce((acc, num) => acc + num, 0);
-
-                if (!valoresPermitidos.includes(somaDezenas)) return gerarNovoJogo(tentativas + 1);
+                
                 // Verifica se o novo jogo tem 7 pares e 8 ímpares ou vice-versa
                 const pares = novoJogo.filter(num => num % 2 === 0).length;
                 const impares = novoJogo.length - pares;
@@ -244,7 +184,8 @@ const MeusJogos = () => {
             while (jogos.length < 7 && tentativas < maxTentativas) {
                 const novoJogo = gerarNovoJogo();
                 // Verifica se o novo jogo é único e tem 15 dezenas
-                if (novoJogo && verificarJogoUnico(novoJogo, jogos, resultados) && novoJogo.length === 15) {
+                if (
+                    novoJogo && verificarJogoUnico(novoJogo, jogos, resultados) && novoJogo.length === 15) {
                     jogos.push(novoJogo);
                 }
                 // Incrementa as tentativas
