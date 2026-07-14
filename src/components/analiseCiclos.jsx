@@ -5,32 +5,8 @@ import apiService from "../services/apiServices";
 const AnaliseCiclos = () => {
     const [ciclos, setCiclos] = useState([]);
 
-    useEffect(() => {
-        // Função para buscar os resultados da Lotofácil
-        const fetchResults = async () => {
-            try {
-                // Salva a resposta da API na variável response
-                const response = await apiService.getAllResults();
-                // Verifica se a resposta é um array
-                if (Array.isArray(response)) {
-                    // Ordena os concursos do mais antigo para o mais recente
-                    const dadosOrdenados = response.sort((a, b) => a.concurso - b.concurso);
-                    // Processa os ciclos de dezenas
-                    processarCiclos(dadosOrdenados);
-                } else {
-                    console.warn("Os dados recebidos não são um array:", response);
-                }
-            } catch (error) {
-                console.error("Erro ao buscar resultados:", error);
-                toast.error("Erro ao carregar os resultados da Lotofácil.");
-            }
-        };
-        // Chama a função fetchResults
-        fetchResults();
-    }, []);
-
     // Função para processar os ciclos de dezenas
-    const processarCiclos = (dados) => {
+    function processarCiclos(dados) {
         // Array para armazenar os ciclos calculados inicialmente vazio
         let ciclosCalculados = [];
         // Objeto para armazenar o ciclo atual
@@ -71,7 +47,31 @@ const AnaliseCiclos = () => {
         }
         // Atualiza o estado ciclos com os ciclos calculados
         setCiclos(ciclosCalculados);
-    };
+    }
+
+    useEffect(() => {
+        // Função para buscar os resultados da Lotofácil
+        const fetchResults = async () => {
+            try {
+                // Salva a resposta da API na variável response
+                const response = await apiService.getAllResults();
+                // Verifica se a resposta é um array
+                if (Array.isArray(response)) {
+                    // Ordena os concursos do mais antigo para o mais recente
+                    const dadosOrdenados = response.sort((a, b) => a.concurso - b.concurso);
+                    // Processa os ciclos de dezenas
+                    processarCiclos(dadosOrdenados);
+                } else {
+                    console.warn("Os dados recebidos não são um array:", response);
+                }
+            } catch (error) {
+                console.error("Erro ao buscar resultados:", error);
+                toast.error("Erro ao carregar os resultados da Lotofácil.");
+            }
+        };
+        // Chama a função fetchResults
+        fetchResults();
+    }, []);
 
     // Função para calcular as durações mais relevantes
     const calcularDuracoesRelevantes = (ciclos) => {
@@ -126,20 +126,21 @@ const AnaliseCiclos = () => {
     const maxPosicoes = Math.max(...Object.values(frequenciaDezenasPorPosicao).map(posicoes => Math.max(...Object.keys(posicoes).map(Number))));
 
     return (
-        <main className="mx-auto w-full max-w-[1600px]">
-            <div className="space-y-6">
-                <div className="hidden">
-                    <h1>Análise dos Ciclos de Dezenas</h1>
+        <section className="w-full">
+            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col gap-[2rem]">
+                <div className="border-b border-violet-100 bg-linear-to-r from-violet-950 to-fuchsia-700 px-5 py-4">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-fuchsia-200">Histórico</p>
+                    <h2 className="mt-1 text-lg font-bold text-white">Análise dos Ciclos de Dezenas</h2>
                 </div>
                 {/* Tabela com os resultados dos ciclos e dezenas ausentes */}
-                <div className="cycles-card max-h-[32rem] overflow-auto" data-title="Análise dos ciclos de dezenas">
-                    <table className="w-full min-w-[700px] text-sm">
-                        <thead>
+                <div className="cycles-card max-h-[60vh] p-3 overflow-auto">
+                    <table className="w-full border-separate border-spacing-0 text-sm">
+                        <thead className="sticky top-0 z-10">
                             <tr>
-                                <th>Concurso</th>
-                                <th>Ciclo</th>
-                                <th>Duração do Ciclo</th>
-                                <th>Dezenas Ausentes</th>
+                                <th className="rounded-t-xl bg-slate-50 px-3 py-2" colSpan="5">Concurso</th>
+                                <th className="rounded-t-xl bg-slate-50 px-3 py-2" colSpan="5">Ciclo</th>
+                                <th className="rounded-t-xl bg-slate-50 px-3 py-2" colSpan="5">Duração do Ciclo</th>
+                                <th className="rounded-t-xl bg-slate-50 px-3 py-2" colSpan="5">Dezenas Ausentes</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -173,7 +174,7 @@ const AnaliseCiclos = () => {
 
                 {/* Tabela com as durações mais relevantes */}
                 <div className="cycles-card overflow-auto" data-title="Durações mais relevantes">
-                    <table className="w-full min-w-[420px] text-sm">
+                    <table className="w-full min-w-\[420px\] text-sm">
                         <thead>
                             <tr>
                                 <h2>Durações mais Relevantes</h2>
@@ -201,8 +202,8 @@ const AnaliseCiclos = () => {
                 </div>
 
                 {/* Tabela com a frequência das dezenas ausentes por posição no ciclo */}
-                <div className="cycles-card max-h-[28rem] overflow-auto" data-title="Frequência das dezenas ausentes por posição no ciclo">
-                    <table className="w-full min-w-[520px] text-sm">
+                <div className="cycles-card max-h-\[28rem\] overflow-auto" data-title="Frequência das dezenas ausentes por posição no ciclo">
+                    <table className="w-full min-w-\[520px\] text-sm">
                         <thead>
                             <tr>
                                 <h2>Frequência das Dezenas Ausentes por Posição no Ciclo</h2>
@@ -234,8 +235,8 @@ const AnaliseCiclos = () => {
                 </div>
 
                 {/* Tabela com a frequência das dezenas ausentes em relação à posição no ciclo */}
-                <div className="cycles-card max-h-[28rem] overflow-auto" data-title="Frequência das dezenas ausentes em relação à posição no ciclo">
-                    <table className="w-full min-w-[520px] text-sm">
+                <div className="cycles-card max-h-\[28rem\] overflow-auto" data-title="Frequência das dezenas ausentes em relação à posição no ciclo">
+                    <table className="w-full min-w-\[520px\] text-sm">
                         <thead>
                             <tr>
                                 <h2>Frequência das Dezenas Ausentes em Relação à Posição no Ciclo</h2>
@@ -272,8 +273,8 @@ const AnaliseCiclos = () => {
                 <div className="hidden">
                     <h1>Analise das dezenas ausentes por Posição</h1>
                 </div>
-                <div className="cycles-card max-h-[28rem] overflow-auto" data-title="Análise das dezenas ausentes por posição">
-                    <table className="w-full min-w-[800px] text-sm">
+                <div className="cycles-card max-h-\[28rem\] overflow-auto" data-title="Análise das dezenas ausentes por posição">
+                    <table className="w-full min-w-\[800px\] text-sm">
                         <thead>
                             {Array.from({ length: maxPosicoes }, (_, i) => (
                                 <>
@@ -301,7 +302,7 @@ const AnaliseCiclos = () => {
                     </table>
                 </div>
             </div>
-        </main>
+        </section>
     );
 };
 
