@@ -126,14 +126,14 @@ const AnaliseCiclos = () => {
     const maxPosicoes = Math.max(...Object.values(frequenciaDezenasPorPosicao).map(posicoes => Math.max(...Object.keys(posicoes).map(Number))));
 
     return (
-        <main className="Container-Geral">
-            <div className="box-shadown">
-                <div className="title-result-info">
+        <main className="mx-auto w-full max-w-[1600px]">
+            <div className="space-y-6">
+                <div className="hidden">
                     <h1>Análise dos Ciclos de Dezenas</h1>
                 </div>
                 {/* Tabela com os resultados dos ciclos e dezenas ausentes */}
-                <div className="result-info-table scroll-y">
-                    <table>
+                <div className="cycles-card max-h-[32rem] overflow-auto" data-title="Análise dos ciclos de dezenas">
+                    <table className="w-full min-w-[700px] text-sm">
                         <thead>
                             <tr>
                                 <th>Concurso</th>
@@ -172,8 +172,8 @@ const AnaliseCiclos = () => {
                 </div>
 
                 {/* Tabela com as durações mais relevantes */}
-                <div className="result-info-table scroll-y height-auto">
-                    <table>
+                <div className="cycles-card overflow-auto" data-title="Durações mais relevantes">
+                    <table className="w-full min-w-[420px] text-sm">
                         <thead>
                             <tr>
                                 <h2>Durações mais Relevantes</h2>
@@ -201,8 +201,8 @@ const AnaliseCiclos = () => {
                 </div>
 
                 {/* Tabela com a frequência das dezenas ausentes por posição no ciclo */}
-                <div className="result-info-table scroll-y">
-                    <table>
+                <div className="cycles-card max-h-[28rem] overflow-auto" data-title="Frequência das dezenas ausentes por posição no ciclo">
+                    <table className="w-full min-w-[520px] text-sm">
                         <thead>
                             <tr>
                                 <h2>Frequência das Dezenas Ausentes por Posição no Ciclo</h2>
@@ -234,8 +234,8 @@ const AnaliseCiclos = () => {
                 </div>
 
                 {/* Tabela com a frequência das dezenas ausentes em relação à posição no ciclo */}
-                <div className="result-info-table scroll-y">
-                    <table>
+                <div className="cycles-card max-h-[28rem] overflow-auto" data-title="Frequência das dezenas ausentes em relação à posição no ciclo">
+                    <table className="w-full min-w-[520px] text-sm">
                         <thead>
                             <tr>
                                 <h2>Frequência das Dezenas Ausentes em Relação à Posição no Ciclo</h2>
@@ -269,11 +269,11 @@ const AnaliseCiclos = () => {
                 </div>
 
                 {/* Tabela de analise por posição no formato solicitado */}
-                <div className="title-result-info">
+                <div className="hidden">
                     <h1>Analise das dezenas ausentes por Posição</h1>
                 </div>
-                <div className="result-info-table scroll-y">
-                    <table>
+                <div className="cycles-card max-h-[28rem] overflow-auto" data-title="Análise das dezenas ausentes por posição">
+                    <table className="w-full min-w-[800px] text-sm">
                         <thead>
                             {Array.from({ length: maxPosicoes }, (_, i) => (
                                 <>

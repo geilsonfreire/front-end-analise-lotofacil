@@ -3,9 +3,6 @@ import { Link } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
 import { toast } from "react-toastify";
 
-// Imports Css
-import '../style/AdminDashBoard.css'
-
 // Imports Componenets
 import ResultLatest from "../components/resultLatest";
 import AllResult from "../components/AllResult";
@@ -167,24 +164,25 @@ const AdminDashBoard = () => {
 
     return (
         <>
-            <main>
-                <div className="Title">
-                    <h1>Dash<span>Board</span></h1>
+            <main className="w-full p-0">
+                <div className="mb-6">
+                    <p className="text-xs font-bold uppercase tracking-[0.2em] text-violet-600">Visão geral</p>
+                    <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">Dash<span className="text-fuchsia-600">board</span></h1>
                 </div>
 
-                <section className='Container-dashborder'>
+                <section className='space-y-6'>
                     <ResultLatest onConcursoChange={handleConcursoChange} />
-                    <div className='grafil-cards'>
+                    <div className='grid gap-5 xl:grid-cols-2'>
 
                         {/* Card de Dezenas Quentes e Frias */}
-                        <div className="grafil-card">
-                            <div className="total-text">
-                                <span>Dez Quentes e Frias</span>
-                                <i><GrAnalytics /></i>
+                        <div className="flex min-w-0 flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                            <div className="flex items-center justify-between">
+                                <span className="mt-1 text-lg font-bold text-violet-900">Dez Quentes e Frias</span>
+                                <i className="grid h-10 w-10 place-items-center rounded-xl bg-fuchsia-50 text-lg text-fuchsia-600 not-italic"><GrAnalytics /></i>
                             </div>
-                            <div className="result-info-table">
+                            <div className="mt-4 grid gap-4 sm:grid-cols-2">
                                 {quentesFriasError && <p>{quentesFriasError}</p>}
-                                <table>
+                                <table className="w-full overflow-hidden rounded-xl border border-slate-100 text-sm">
                                     <thead>
                                         <tr>
                                             <th>Quentes</th>
@@ -200,7 +198,7 @@ const AdminDashBoard = () => {
                                         ))}
                                     </tbody>
                                 </table>
-                                <table>
+                                <table className="w-full overflow-hidden rounded-xl border border-slate-100 text-sm">
                                     <thead>
                                         <tr>
                                             <th>Frias</th>
@@ -217,22 +215,22 @@ const AdminDashBoard = () => {
                                     </tbody>
                                 </table>
                             </div>
-                            <div className="more-details">
-                                <Link to="/dezenas-quentes">
+                            <div className="mt-5">
+                                <Link className="inline-flex items-center gap-2 text-sm font-semibold text-violet-700 transition hover:text-fuchsia-600" to="/dezenas-quentes">
                                     <BsInfoCircle /> Mais detalhes
                                 </Link>
                             </div>
                         </div>
 
                         {/* Card de Atrasos */}
-                        <div className="grafil-card">
-                            <div className="total-text">
-                                <span>Maiores Atrasos</span>
-                                <i><GrAnalytics /></i>
+                        <div className="flex min-w-0 flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                            <div className="flex items-center justify-between">
+                                <span className="mt-1 text-lg font-bold text-violet-900">Maiores Atrasos</span>
+                                <i className="grid h-10 w-10 place-items-center rounded-xl bg-fuchsia-50 text-lg text-fuchsia-600 not-italic"><GrAnalytics /></i>
                             </div>
-                            <div className="result-info-table">
+                            <div className="mt-4 overflow-hidden rounded-xl border border-slate-100">
                                 {atrasosError && <p>{atrasosError}</p>}
-                                <table>
+                                <table className="w-full text-sm">
                                     <thead>
                                         <tr>
                                             <th>Dezena</th>
@@ -249,23 +247,17 @@ const AdminDashBoard = () => {
                                     </tbody>
                                 </table>
                             </div>
-                            <div className="more-details">
-                                <Link href="/dezenas-quentes">
+                            <div className="mt-5">
+                                <Link className="inline-flex items-center gap-2 text-sm font-semibold text-violet-700 transition hover:text-fuchsia-600" to="/dezenas-quentes">
                                     <BsInfoCircle /> Mais detalhes
                                 </Link>
                             </div>
                         </div>
 
                     </div>
-                    <section className="Container-dashborder">
-                        <div className="grafil-cards1">
-                            <div className="grafil-card">
-                                <AllResult />
-                                <AnaliseCiclos />
-                            </div>
-                            <div className="grafil-card">
-                            </div>
-                        </div>
+                    <section className="space-y-6">
+                        <AllResult />
+                        <AnaliseCiclos />
                     </section>
                 </section>
             </main>

@@ -2,9 +2,6 @@
 import { useNavigate } from 'react-router-dom'
 import PropTypes from 'prop-types';
 
-//Import CSS
-import '../style/MenuDropDownPerfil.css'
-
 //Import icon, image
 import { MdSettings, MdLogout, MdPersonAddAlt1 } from "react-icons/md";
 import { FaUserEdit } from "react-icons/fa";
@@ -26,23 +23,23 @@ const MenuDropDownPerfil = ({ isDropdownOpen, setIsDropdownOpen }) => {
     };
 
     return (
-        <div className={`container-menu-dropdown ${isDropdownOpen ? 'Dropshow' : ''}`}>
-            <nav className='menu-dropdown-nav'>
-                <ul>
-                    <li onClick={() => handleNavigate('/admin/perfil')}>
+        <div className={`container-menu-dropdown fixed right-5 top-16 z-50 w-60 origin-top-right rounded-2xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-900/10 transition ${isDropdownOpen ? 'scale-100 opacity-100' : 'pointer-events-none scale-95 opacity-0'}`}>
+            <nav>
+                <ul className="space-y-1">
+                    <li className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-violet-50 hover:text-violet-800" onClick={() => handleNavigate('/admin/perfil')}>
                         <FaUserEdit />
                         <span>Perfil</span>
                     </li>
-                    <li onClick={() => handleNavigate('/admin/adminCadastroUsuarios')}>
+                    <li className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-violet-50 hover:text-violet-800" onClick={() => handleNavigate('/admin/adminCadastroUsuarios')}>
                         <MdPersonAddAlt1 />
                         <span>Adicionar usuario</span>
                     </li>
-                    <li onClick={() => handleNavigate('/admin/adminConfig')}>
+                    <li className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-violet-50 hover:text-violet-800" onClick={() => handleNavigate('/admin/adminConfig')}>
                         <MdSettings />
                         <span>Configurações</span>
                     </li>
-                    <hr />
-                    <li onClick={handleLogout}>
+                    <hr className="my-2 border-slate-100" />
+                    <li className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-rose-600 transition hover:bg-rose-50" onClick={handleLogout}>
                         <MdLogout />
                         <span>Sair</span>
                     </li>

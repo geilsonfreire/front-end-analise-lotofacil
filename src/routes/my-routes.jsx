@@ -10,8 +10,6 @@ import AnaliseImpaPar from '../components/analiseImparPar.jsx';
 import DezenasQuentes from "../components/dezenasQuentes.jsx";
 import SomaSorteios from "../components/somaSorteio.jsx";
 import AnaliseClusters from "../pages/analiseClusters.jsx";
-import AnaliseFibonacci from "../components/analiseFibonacci.jsx";
-import AnalisePalindromos from "../components/analisePalindromos.jsx";
 import AnaliseCiclos from "../components/analiseCiclos.jsx";
 
 const MyRoutes = () => {
@@ -25,8 +23,6 @@ const MyRoutes = () => {
                     <Route path="/dezenas-quentes" element={<DezenasQuentes />} />
                     <Route path="/soma-sorteios" element={<SomaSorteios />} />
                     <Route path="/analise-clusters" element={<AnaliseClusters />} />
-                    <Route path="/analise-fibonacci" element={<AnaliseFibonacci />} />
-                    <Route path="/analise-palindromos" element={<AnalisePalindromos />} />
                     <Route path="/analise-ciclos" element={<AnaliseCiclos />} />
                 </Route>
             </Routes>

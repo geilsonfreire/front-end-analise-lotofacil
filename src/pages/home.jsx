@@ -4,9 +4,6 @@ import { Outlet } from 'react-router-dom';
 // Import Images
 
 
-// Import CSS
-import "../style/home.css";
-
 // Import Components
 import Menu from "../components/menu";
 import Header from "../components/header";
@@ -15,13 +12,13 @@ import Header from "../components/header";
 const Home = () => {
     // Renderiza o componente jsx
     return (
-        <div className="admin-layout">
-            <div className="menu-lateral">
+        <div className="flex min-h-screen bg-slate-50 text-slate-900">
+            <div className="shrink-0">
                 <Menu />
             </div>
-            <div className="admin-main">
+            <div className="flex min-w-0 flex-1 flex-col overflow-y-auto">
                 <Header />
-                <main id='Fund'>
+                <main id='Fund' className="flex-1 p-4 sm:p-6">
                     <Outlet />
                 </main>
             </div>

@@ -3,8 +3,6 @@ import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 
 // Imports Css
-import "../style/meus-jogos.css";
-
 // Imports Services / Coomponents
 import ApiServices from "../services/apiServices";
 import ResultLatest from "../components/resultLatest";

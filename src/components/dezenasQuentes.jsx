@@ -3,8 +3,6 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 // Imports Css
-import "../style/dezenasQuentes.css";
-
 // Importando o componente de serviço
 import apiService from "../services/apiServices";
 

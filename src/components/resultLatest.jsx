@@ -3,9 +3,6 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import PropTypes from 'prop-types';
 
-// Imports Css
-import "../style/resultLatest.css";
-
 // Imports de Icones
 import { BsArrowRightCircle, BsArrowLeftCircle } from "react-icons/bs";
 
@@ -253,9 +250,9 @@ const ResultLotofacil = ({ onConcursoChange }) => {
                                     </div>
                                 </div>
                                 <div className="box-shadown">
-                                    <div className="result-info-table">
-                                        <div className="box-analise">
-                                            <h2>Análise de Sorteios</h2>
+                                    <div className="result-info-table flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+                                        <div className="box-analise flex-1 rounded-lg p-4 shadow-sm">
+                                            <h2 className="section-heading">Análise de Sorteios</h2>
                                             <table>
                                                 <thead>
                                                     <tr>
@@ -284,8 +281,8 @@ const ResultLotofacil = ({ onConcursoChange }) => {
                                             </table>
                                         </div>
 
-                                        <div className="box-premiacoes">
-                                            <h2>Premiações:</h2>
+                                        <div className="box-premiacoes flex-1 rounded-lg p-4 shadow-sm">
+                                            <h2 className="section-heading">Premiações:</h2>
                                             {latestResult.premiacoes && latestResult.premiacoes.length > 0 ? (
                                                 <table className="premiacoes-table">
                                                     <thead>

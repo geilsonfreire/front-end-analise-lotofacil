@@ -5,7 +5,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 
 // Imports CSS
 import 'react-toastify/dist/ReactToastify.css'
-import './style/customToast.css'
+import './index.css'
 
 // Import Components
 import App from './App.jsx'

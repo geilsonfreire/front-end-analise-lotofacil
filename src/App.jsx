@@ -2,9 +2,6 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-// Import CSS
-import './style/global.css'
-
 // Import Componentes
 import MyRoutes from './routes/my-routes'
 

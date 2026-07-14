@@ -6,9 +6,6 @@ import { Link } from 'react-router-dom';
 // Import icon, img assets
 import Logo from "../assets/img/logo.png";
 
-// Import CSS
-import "../style/menu.css";
-
 // Import icon
 import { MdSpaceDashboard } from "react-icons/md";
 import { TbClover } from "react-icons/tb";
@@ -33,12 +30,12 @@ const Menu = () => {
 
 
     return (
-        <nav className="Menu-lateral">
+        <nav className="group sticky top-0 flex h-screen w-20 flex-col overflow-y-auto rounded-r-3xl border-r border-fuchsia-400/20 bg-gradient-to-b from-violet-950 via-purple-900 to-fuchsia-900 py-5 shadow-2xl shadow-violet-950/25 transition-[width] duration-300 hover:w-60">
             <Link to="/">
-                <img src={Logo} alt="Logo da pagina" />
+                <img className="ml-4 w-12 rounded-full ring-1 ring-white/30 transition duration-300 hover:scale-105 hover:ring-white/80" src={Logo} alt="Logo da pagina" />
             </Link>
 
-            <ul id="mainMenu">
+            <ul id="mainMenu" className="mt-10 flex w-full flex-col gap-2 px-2">
                 <Icon
                     to="/"
                     icon={<MdSpaceDashboard />}
@@ -63,9 +60,9 @@ const Menu = () => {
 
 const Icon = ({ to, icon, title, onClick }) => ( // Icon component
     <li>
-        <Link to={to} title={title} onClick={onClick} >
+        <Link className="flex items-center gap-4 rounded-xl px-4 py-3 text-xl text-violet-100 transition hover:bg-white/15 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fuchsia-300" to={to} title={title} onClick={onClick} >
             {icon}
-            <span className="icon-text">{title}</span>
+            <span className="w-0 overflow-hidden whitespace-nowrap text-sm font-medium tracking-wide opacity-0 transition-all duration-300 group-hover:w-36 group-hover:opacity-100">{title}</span>
         </Link>
     </li>
 );

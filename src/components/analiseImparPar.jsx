@@ -2,8 +2,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-// Imports Css
-import "../style/analiseImpaPar.css";
 
 // Imports de Icones
 

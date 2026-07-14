@@ -1,9 +1,6 @@
 // Import Bibliotecas
 import { useState, useEffect } from "react";
 
-// Import CSS
-import "../style/header.css";
-
 // Import components
 import MenuDropDownPerfil from "../components/MenuDropDownPerfil";
 
@@ -43,34 +40,34 @@ const Header = () => {
 
 
     return (
-        <header className="Header-painel">
+        <header className="Header-painel sticky top-0 z-40 flex items-center justify-between border-b border-slate-200/80 bg-white/90 px-5 py-3 shadow-sm backdrop-blur-xl">
             {/* <!-- Header Left --> */}
-            <img src={Banner} alt="" />
+            <img className="h-9 w-auto object-contain sm:h-11" src={Banner} alt="Lotofácil" />
 
             {/* <!-- Header Right --> */}
-            <div className="header-right">
+            <div className="header-right flex items-center gap-3 sm:gap-5">
 
-                <div className="profile">
-                    <div className="perfill-name-img">
-                        <img src={LogoPerfil} alt="User Profile" />
-                        <span>
+                <div className="hidden sm:block">
+                    <div className="flex items-center gap-3">
+                        <img className="h-10 w-10 rounded-full object-cover ring-2 ring-violet-100" src={LogoPerfil} alt="User Profile" />
+                        <span className="text-sm font-semibold text-slate-700">
                             Geilson Freire
                         </span>
                     </div>
                 </div>
 
-                <div className="notifications">
-                    <i>
+                <div className="relative grid h-10 w-10 cursor-pointer place-items-center rounded-xl text-xl text-violet-700 transition hover:bg-violet-50 hover:text-fuchsia-600">
+                    <i className="not-italic">
                         <MdNotifications />
                     </i>
-                    <span className="notification-count">6</span>
+                    <span className="absolute right-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">6</span>
                 </div>
 
-                <div className="menu-dropdow"
+                <div className="menu-dropdow grid h-10 w-10 cursor-pointer place-items-center rounded-xl text-xl text-violet-700 transition hover:bg-violet-50 hover:text-fuchsia-600"
                     onClick={toggleDropdown}
 
                 >
-                    <i>
+                    <i className="not-italic">
                         {isDropdownOpen ? <MdArrowCircleUp /> : <MdArrowCircleDown />}
                     </i>
                 </div>
