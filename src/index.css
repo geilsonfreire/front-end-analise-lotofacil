@@ -255,13 +255,13 @@
     }
 
     .title-result-info p {
-        font-size: .6rem;
+        font-size: 1rem;
         color: #ffffff77;
         letter-spacing: 1px;
     }
 
     .title-result-info p span {
-        font-size: .7rem;
+        font-size: 1rem;
         color: #00ff00;
         font-weight: 700;
         letter-spacing: 2px;
@@ -295,7 +295,7 @@
         background-color: #FF00FF;
         border-top-left-radius: 5px;
         border-top-right-radius: 5px;
-        font-size: .6rem;
+
         font-weight: bold;
         text-align: center;
         color: #fff;
@@ -305,7 +305,6 @@
     .result-info-table td {
         border: 1px solid #ff00ff;
         text-align: left;
-        font-size: .5rem;
         color: #8B008B;
         padding-left: 1rem;
     }

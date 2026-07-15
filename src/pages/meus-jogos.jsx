@@ -274,12 +274,13 @@ const MeusJogos = () => {
                                         </span>
                                     </div>
                                     <div className="numeros-container">
-                                        {jogo.map((numero, numIndex) => { // Adicione numIndex para garantir chaves únicas
+                                        {jogo.map((numero, numIndex) => {
                                             const numeroAcertado = resultadoConcurso.includes(numero);
                                             return (
                                                 <div
-                                                    key={`${index}-${numero}-${numIndex}`} // Use index, numero e numIndex para garantir chaves únicas
+                                                    key={`${index}-${numero}-${numIndex}`}
                                                     className={`numero-bolinha ${numeroAcertado ? 'numero-acertado' : ''}`}
+                                                    style={numeroAcertado ? { borderColor: '#059669', borderWidth: '4px' } : {}}
                                                 >
                                                     {numero}
                                                 </div>

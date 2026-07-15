@@ -138,20 +138,20 @@ const AnaliseCiclos = () => {
                     <table className="w-full border-separate border-spacing-0 text-sm">
                         <thead className="sticky top-0 z-10">
                             <tr>
-                                <th className="rounded-t-xl bg-slate-50 px-3 py-2" colSpan="5">Concurso</th>
-                                <th className="rounded-t-xl bg-slate-50 px-3 py-2" colSpan="5">Ciclo</th>
-                                <th className="rounded-t-xl bg-slate-50 px-3 py-2" colSpan="5">Duração do Ciclo</th>
-                                <th className="rounded-t-xl bg-slate-50 px-3 py-2" colSpan="5">Dezenas Ausentes</th>
+                                <th className="rounded-t-xl bg-slate-50 px-3 py-2">Concurso</th>
+                                <th className="rounded-t-xl bg-slate-50 px-3 py-2">Ciclo</th>
+                                <th className="rounded-t-xl bg-slate-50 px-3 py-2">Duração do Ciclo</th>
+                                <th className="rounded-t-xl bg-slate-50 px-3 py-2">Dezenas Ausentes</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="w-full border-separate border-spacing-0 text-sm"  >
                             {ciclos.length === 0 ? (
                                 <tr>
                                     <td colSpan="4">Nenhum dado disponível</td>
                                 </tr>
                             ) : (
-                                ciclos.map((ciclo) =>
-                                    ciclo.concursos.map((concurso, idx) => (
+                                [...ciclos].reverse().map((ciclo) =>
+                                    [...ciclo.concursos].reverse().map((concurso, idx) => (
                                         <tr key={`${ciclo.numero}-${concurso.concurso}`}>
                                             <td>{concurso.concurso}</td>
                                             <td className={idx === 0 ? "ciclo-highlight" : ""}>

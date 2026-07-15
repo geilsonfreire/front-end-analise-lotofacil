@@ -252,14 +252,14 @@ const ResultLotofacil = ({ onConcursoChange }) => {
                                         <div className="box-analise flex-1 rounded-lg p-4 shadow-sm">
                                             
                                             <h2 className="section-heading text-sm">Análise de Sorteios</h2>
-                                            <table  className="w-full border-separate border-spacing-0 text-xl">
+                                            <table  className="w-full border-separate border-spacing-0 text-sm">
                                                 <thead className="sticky top-0 z-10 text-sm">
                                                     <tr>
                                                         <th className="rounded-t-xl px-3 py-2">Descrição</th>
                                                         <th className="rounded-t-xl px-3 py-2">QNT</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody className="text-xl">
+                                                <tbody className="text-sm">
                                                     <tr>
                                                         <td>Total de possibilidades de jogos</td>
                                                         <td>{totalCombinations.toLocaleString()}</td>
@@ -283,7 +283,7 @@ const ResultLotofacil = ({ onConcursoChange }) => {
                                         <div className="box-premiacoes flex-1 rounded-lg p-4 shadow-sm">
                                             <h2 className="section-heading">Premiações:</h2>
                                             {latestResult.premiacoes && latestResult.premiacoes.length > 0 ? (
-                                                <table className="premiacoes-table">
+                                                <table className="premiacoes-table text-sm">
                                                     <thead>
                                                         <tr>
                                                             <th>Descrição</th>
