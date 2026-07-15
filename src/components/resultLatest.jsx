@@ -168,16 +168,20 @@ const ResultLotofacil = ({ onConcursoChange }) => {
     const repeatedCount = countRepeatedSequences();
 
     return (
-        <main className="Container-Geral">
+        <main className="w-full overflow-hidden flex flex-col gap-8">
 
-            <section className="latest-result">
+            <section className="rounded-2xl border-violet-100 bg-linear-to-r from-violet-950 to-fuchsia-700 px-2 py-2">
                 {latestResult ? (
                     <>
-                        <div className="box-shadown">
+                        <div className="border-violet-100 px-4">
                             <div className="title-result-info">
                                 <h1>Ultimo Resultado</h1>
-                                <p>Data do concurso: <span>{latestResult.data || "N/A"}</span></p>
-                                <p>Data do próximo concurso: <span>{latestResult.dataProximoConcurso || "N/A"}</span></p>
+                                <p className="text-sm text-slate-300">
+                                    Data do concurso: <span>{latestResult.data || "N/A"}</span>
+                                </p>
+                                <p className="text-sm text-slate-300">
+                                    Data do próximo concurso: <span>{latestResult.dataProximoConcurso || "N/A"}</span>
+                                </p>
                                 <div className="concurso-navigation">
                                     <button
                                         onClick={handlePreviousConcurso}>
@@ -246,15 +250,16 @@ const ResultLotofacil = ({ onConcursoChange }) => {
                                 <div className="box-shadown">
                                     <div className="result-info-table flex flex-col md:flex-row md:items-start md:justify-between gap-6">
                                         <div className="box-analise flex-1 rounded-lg p-4 shadow-sm">
-                                            <h2 className="section-heading">Análise de Sorteios</h2>
-                                            <table>
-                                                <thead>
+                                            
+                                            <h2 className="section-heading text-sm">Análise de Sorteios</h2>
+                                            <table  className="w-full border-separate border-spacing-0 text-xl">
+                                                <thead className="sticky top-0 z-10 text-sm">
                                                     <tr>
-                                                        <th>Descrição</th>
-                                                        <th>QNT</th>
+                                                        <th className="rounded-t-xl px-3 py-2">Descrição</th>
+                                                        <th className="rounded-t-xl px-3 py-2">QNT</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody>
+                                                <tbody className="text-xl">
                                                     <tr>
                                                         <td>Total de possibilidades de jogos</td>
                                                         <td>{totalCombinations.toLocaleString()}</td>

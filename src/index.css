@@ -233,7 +233,7 @@
         display: flex;
         justify-content: space-around;
         align-items: center;
-        background-color: #FF00FF;
+      
         border-top-left-radius: 10px;
         border-top-right-radius: 10px;
     }
