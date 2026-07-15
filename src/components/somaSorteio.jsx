@@ -1,5 +1,5 @@
 // Imports Bibliotecas
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 // Imports Css
@@ -10,90 +10,81 @@ import { toast } from "react-toastify";
 // Importando o componente
 import apiServices from "../services/apiServices";
 
+const initialConjuntosSoma = {
+    "7 ímpares / 8 pares": {},
+    "8 ímpares / 7 pares": {},
+    "6 pares / 9 ímpares": {}
+};
+
 const SomaSorteios = () => {
-    // Estado para armazenar os resultados
-    const [sorteios, setSorteios] = useState([]);
-    const [somaContagens, setSomaContagens] = useState([]);
-    const [conjuntosSoma, setConjuntosSoma] = useState({
-        "7 ímpares / 8 pares": {},
-        "8 ímpares / 7 pares": {},
-        "6 pares / 9 ímpares": {}
+    const [analysis, setAnalysis] = useState({
+        somaContagens: [],
+        conjuntosSoma: initialConjuntosSoma
     });
+
+    const { somaContagens, conjuntosSoma } = analysis;
 
     // Função para calcular a soma e contagem
     const calculateSum = (dezenas) => dezenas.reduce((acc, num) => acc + Number(num), 0);
 
-    // Função para buscar os resultados da API
-    const fetchResults = async () => {
-        try {
-            const response = await apiServices.getAllResults();
-            // Filtra as dezenas de cada concurso e mantém cada sorteio em um array
-            const sorteiosArray = response.map(item => item.dezenas.map(Number)); // Extrai as dezenas de cada sorteio
-
-            setSorteios(sorteiosArray); // Define o array de sorteios
-            toast.success("Resultados carregados com sucesso!");
-        } catch (error) {
-            console.error("Erro ao buscar os resultados:", error);
-            toast.error("Erro ao buscar os resultados.");
-        }
-    };
-
-    // Função para calcular as somas possíveis
-    const calculatePossibleSums = useCallback(() => {
-        const totalGames = 3268760; // Total de jogos possíveis na Lotofácil
-        const possibleSums = {}; // Objeto para armazenar somas e suas contagens
-
-        for (let i = 0; i < totalGames; i++) {
-            const dezenas = Array.from({ length: 15 }, () => Math.floor(Math.random() * 25) + 1);
-            const soma = calculateSum(dezenas);
-            possibleSums[soma] = (possibleSums[soma] || 0) + 1;
-        }
-
-    }, []);
-
     useEffect(() => {
-        fetchResults(); // Chama a função para buscar os resultados
-    }, []);
+        let isMounted = true;
 
-    useEffect(() => {
-        if (sorteios.length > 0) {
-            const somaMap = {}; // Objeto para armazenar somas e suas contagens
-            const conjuntos = {
-                "7 ímpares / 8 pares": {},
-                "8 ímpares / 7 pares": {},
-                "6 pares / 9 ímpares": {}
-            };
+        const loadResults = async () => {
+            try {
+                const response = await apiServices.getAllResults();
+                const sorteiosArray = response.map(item => item.dezenas.map(Number));
 
-            sorteios.forEach(dezenas => {
-                const soma = calculateSum(dezenas); // Calcula a soma para cada sorteio
-                somaMap[soma] = (somaMap[soma] || 0) + 1; // Incrementa a contagem da soma
+                const somaMap = {};
+                const conjuntos = {
+                    "7 ímpares / 8 pares": {},
+                    "8 ímpares / 7 pares": {},
+                    "6 pares / 9 ímpares": {}
+                };
 
-                const pares = dezenas.filter(num => num % 2 === 0).length;
-                const impares = dezenas.length - pares;
+                sorteiosArray.forEach(dezenas => {
+                    const soma = calculateSum(dezenas);
+                    somaMap[soma] = (somaMap[soma] || 0) + 1;
 
-                if (pares === 8 && impares === 7) {
-                    conjuntos["7 ímpares / 8 pares"][soma] = (conjuntos["7 ímpares / 8 pares"][soma] || 0) + 1;
-                } else if (pares === 7 && impares === 8) {
-                    conjuntos["8 ímpares / 7 pares"][soma] = (conjuntos["8 ímpares / 7 pares"][soma] || 0) + 1;
-                } else if (pares === 6 && impares === 9) {
-                    conjuntos["6 pares / 9 ímpares"][soma] = (conjuntos["6 pares / 9 ímpares"][soma] || 0) + 1;
+                    const pares = dezenas.filter(num => num % 2 === 0).length;
+                    const impares = dezenas.length - pares;
+
+                    if (pares === 8 && impares === 7) {
+                        conjuntos["7 ímpares / 8 pares"][soma] = (conjuntos["7 ímpares / 8 pares"][soma] || 0) + 1;
+                    } else if (pares === 7 && impares === 8) {
+                        conjuntos["8 ímpares / 7 pares"][soma] = (conjuntos["8 ímpares / 7 pares"][soma] || 0) + 1;
+                    } else if (pares === 6 && impares === 9) {
+                        conjuntos["6 pares / 9 ímpares"][soma] = (conjuntos["6 pares / 9 ímpares"][soma] || 0) + 1;
+                    }
+                });
+
+                const somaContagem = Object.entries(somaMap)
+                    .map(([soma, contagem]) => ({
+                        soma: Number(soma),
+                        contagem
+                    }))
+                    .sort((a, b) => b.contagem - a.contagem);
+
+                if (isMounted) {
+                    setAnalysis({
+                        somaContagens: somaContagem,
+                        conjuntosSoma: conjuntos
+                    });
                 }
-            });
 
-            // Converte o objeto em um array de [soma, contagem]
-            const somaContagem = Object.entries(somaMap).map(([soma, contagem]) => ({
-                soma: Number(soma),
-                contagem
-            })).sort((a, b) => b.contagem - a.contagem);
+                toast.success("Resultados carregados com sucesso!");
+            } catch (error) {
+                console.error("Erro ao buscar os resultados:", error);
+                toast.error("Erro ao buscar os resultados.");
+            }
+        };
 
-            setSomaContagens(somaContagem); // Atualiza o estado com as somas e contagens
-            setConjuntosSoma(conjuntos); // Atualiza o estado com as somas dos conjuntos
-        }
-    }, [sorteios]);
+        void loadResults();
 
-    useEffect(() => {
-        calculatePossibleSums(); // Chama a função para calcular as somas possíveis
-    }, [calculatePossibleSums]);
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     return (
         <main className="Container-Geral">

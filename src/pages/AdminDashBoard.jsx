@@ -14,7 +14,6 @@ import AnaliseCiclos from "../components/analiseCiclos";
 import apiService from "../services/apiServices";
 
 // imports icons and images
-import { GrAnalytics } from "react-icons/gr";
 import { BsInfoCircle } from "react-icons/bs";
 
 const fibonacciNumbers = [1, 2, 3, 5, 8, 13, 21];
@@ -170,46 +169,46 @@ const AdminDashBoard = () => {
                     <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">Dash<span className="text-fuchsia-600">board</span></h1>
                 </div>
 
-                <section className='space-y-6'>
+                <section className='w-full overflow-hidden flex flex-col gap-8'>
                     <ResultLatest onConcursoChange={handleConcursoChange} />
-                    <div className='grid gap-5 xl:grid-cols-2'>
+                    <div className="flex w-full gap-5 rounded-2xl border-violet-100 bg-linear-to-r from-violet-950 to-fuchsia-700 px-2 py-2">
 
                         {/* Card de Dezenas Quentes e Frias */}
-                        <div className="flex min-w-0 flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                            <div className="flex items-center justify-between">
-                                <span className="mt-1 text-lg font-bold text-violet-900">Dez Quentes e Frias</span>
-                                <i className="grid h-10 w-10 place-items-center rounded-xl bg-fuchsia-50 text-lg text-fuchsia-600 not-italic"><GrAnalytics /></i>
+                        <div className="p-2 flex w-full flex-col rounded-2xl border border-slate-200 bg-white shadow-sm">
+                            <div className="border-violet-100 rounded-t-2xl bg-linear-to-r from-violet-950 to-fuchsia-700 px-4 py-2">
+                                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-fuchsia-200">Histórico</p>
+                                <h2 className="mt-1 text-lg font-bold text-white">Dez Quentes e Frias</h2>
                             </div>
-                            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                            <div className="max-h-[60vh] overflow-auto mt-4 grid gap-2 sm:grid-cols-2">
                                 {quentesFriasError && <p>{quentesFriasError}</p>}
-                                <table className="w-full overflow-hidden rounded-xl border border-slate-100 text-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Quentes</th>
-                                            <th>QNT</th>
+                                <table className="w-full border-separate border-spacing-0 text-sm border-2 border-slate-200 rounded-2xl">
+                                    <thead className="text-left sticky top-0 z-10">
+                                        <tr className="text-violet-950">
+                                            <th className="rounded-t-xl bg-slate-50 px-3 py-2">QUENTE</th>
+                                            <th className="rounded-t-xl bg-slate-50 px-3 py-2">QNT</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody className="divide-y divide-slate-100 border-t border-slate-100">
                                         {quentes.map(({ num, freq }, index) => (
                                             <tr key={index}>
-                                                <td>{num}</td>
-                                                <td>{freq}</td>
+                                                <td className="rounded-t-xl bg-slate-50 px-3 py-2">{num}</td>
+                                                <td className="rounded-t-xl bg-slate-50 px-3 py-2">{freq}</td>
                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>
-                                <table className="w-full overflow-hidden rounded-xl border border-slate-100 text-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Frias</th>
-                                            <th>QNT</th>
+                                <table className="w-full border-separate border-spacing-0 text-sm border-2 border-slate-200 rounded-2xl">
+                                    <thead className="sticky top-0 z-10">
+                                        <tr className="text-violet-950 border">
+                                            <th className="rounded-t-xl bg-slate-50 px-3 py-2">FRIAS</th>
+                                            <th className="rounded-t-xl bg-slate-50 px-3 py-2">QNT</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody className="divide-y divide-slate-100 border-t border-slate-100">
                                         {frias.map(({ num, freq }, index) => (
                                             <tr key={index}>
-                                                <td>{num}</td>
-                                                <td>{freq}</td>
+                                                <td className="rounded-t-xl bg-slate-50 px-3 py-2">{num}</td>
+                                                <td className="rounded-t-xl bg-slate-50 px-3 py-2">{freq}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -223,25 +222,25 @@ const AdminDashBoard = () => {
                         </div>
 
                         {/* Card de Atrasos */}
-                        <div className="flex min-w-0 flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                            <div className="flex items-center justify-between">
-                                <span className="mt-1 text-lg font-bold text-violet-900">Maiores Atrasos</span>
-                                <i className="grid h-10 w-10 place-items-center rounded-xl bg-fuchsia-50 text-lg text-fuchsia-600 not-italic"><GrAnalytics /></i>
+                        <div className="p-2 flex w-full flex-col rounded-2xl border border-slate-200 bg-white shadow-sm">
+                            <div className="border-violet-100 rounded-t-2xl bg-linear-to-r from-violet-950 to-fuchsia-700 px-4 py-2">
+                                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-fuchsia-200">Histórico</p>
+                                <h2 className="mt-1 text-lg font-bold text-white">Maiores Atrasos</h2>
                             </div>
-                            <div className="mt-4 overflow-hidden rounded-xl border border-slate-100">
+                            <div className="max-h-[60vh] overflow-auto mt-4">
                                 {atrasosError && <p>{atrasosError}</p>}
-                                <table className="w-full text-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Dezena</th>
-                                            <th>Atraso Atual</th>
+                                <table className="w-full border-separate border-spacing-0 text-sm border-2 border-slate-200 rounded-2xl">
+                                    <thead className="text-left sticky top-0 z-10">
+                                        <tr className="text-violet-950">
+                                            <th className="rounded-t-xl bg-slate-50 px-3 py-2">Dezena</th>
+                                            <th className="rounded-t-xl bg-slate-50 px-3 py-2">Atraso Atual</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody className="divide-y divide-slate-100 border-t border-slate-100">
                                         {atrasos.map(({ num, atraso }, index) => (
                                             <tr key={index}>
-                                                <td>{num}</td>
-                                                <td>{atraso}</td>
+                                                <td className="rounded-t-xl bg-slate-50 px-3 py-2">{num}</td>
+                                                <td className="rounded-t-xl bg-slate-50 px-3 py-2">{atraso}</td>
                                             </tr>
                                         ))}
                                     </tbody>

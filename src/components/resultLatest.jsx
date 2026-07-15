@@ -110,12 +110,6 @@ const ResultLotofacil = ({ onConcursoChange }) => {
         loadData();
     }, []);
 
-    useEffect(() => {
-        if (latestResult) {
-            setCurrentConcurso(latestResult.concurso);
-        }
-    }, [latestResult]);
-
     // Função para ir para o concurso anterior
     const handlePreviousConcurso = async () => {
         if (currentConcurso > 1) {

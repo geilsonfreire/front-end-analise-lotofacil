@@ -126,14 +126,15 @@ const AnaliseCiclos = () => {
     const maxPosicoes = Math.max(...Object.values(frequenciaDezenasPorPosicao).map(posicoes => Math.max(...Object.keys(posicoes).map(Number))));
 
     return (
-        <section className="w-full">
-            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col gap-[2rem]">
-                <div className="border-b border-violet-100 bg-linear-to-r from-violet-950 to-fuchsia-700 px-5 py-4">
+        <section className="w-full overflow-hidden flex flex-col gap-8">
+            {/* Tabela Analise dos Ciclos */}
+            <div className="rounded-2xl border-violet-100 bg-linear-to-r from-violet-950 to-fuchsia-700 px-2 py-2">
+                <div className="border-violet-100 bg-linear-to-r from-violet-950 to-fuchsia-700 px-4">
                     <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-fuchsia-200">Histórico</p>
                     <h2 className="mt-1 text-lg font-bold text-white">Análise dos Ciclos de Dezenas</h2>
                 </div>
                 {/* Tabela com os resultados dos ciclos e dezenas ausentes */}
-                <div className="cycles-card max-h-[60vh] p-3 overflow-auto">
+                <div className="cycles-card max-h-[60vh] overflow-auto">
                     <table className="w-full border-separate border-spacing-0 text-sm">
                         <thead className="sticky top-0 z-10">
                             <tr>
@@ -171,17 +172,20 @@ const AnaliseCiclos = () => {
                         </tbody>
                     </table>
                 </div>
+            </div>  
 
-                {/* Tabela com as durações mais relevantes */}
-                <div className="cycles-card overflow-auto" data-title="Durações mais relevantes">
-                    <table className="w-full min-w-\[420px\] text-sm">
-                        <thead>
+            {/* Tabela com as durações mais relevantes */}
+            <div className="rounded-2xl border-violet-100 bg-linear-to-r from-violet-950 to-fuchsia-700 px-2 py-2">
+                <div className="border-violet-100 bg-linear-to-r from-violet-950 to-fuchsia-700 px-4">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-fuchsia-200">Histórico</p>
+                    <h2 className="mt-1 text-lg font-bold text-white">Durações mais relevantes</h2>
+                </div>
+                <div className="cycles-card max-h-[60vh] overflow-auto">
+                    <table className="w-full border-separate border-spacing-0 text-sm">
+                        <thead className="sticky top-0 z-10">
                             <tr>
-                                <h2>Durações mais Relevantes</h2>
-                            </tr>
-                            <tr>
-                                <th>Duração do Ciclo</th>
-                                <th>Frequência</th>
+                                <th className="rounded-t-xl bg-slate-50 px-3 py-2" >Duração do Ciclo</th>
+                                <th className="rounded-t-xl bg-slate-50 px-3 py-2">Frequência</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -200,18 +204,21 @@ const AnaliseCiclos = () => {
                         </tbody>
                     </table>
                 </div>
+            </div> 
 
-                {/* Tabela com a frequência das dezenas ausentes por posição no ciclo */}
-                <div className="cycles-card max-h-\[28rem\] overflow-auto" data-title="Frequência das dezenas ausentes por posição no ciclo">
-                    <table className="w-full min-w-\[520px\] text-sm">
-                        <thead>
+            {/* Tabela com a frequência das dezenas ausentes por posição no ciclo */}
+            <div className="rounded-2xl border-violet-100 bg-linear-to-r from-violet-950 to-fuchsia-700 px-2 py-2">
+                <div className="border-violet-100 bg-linear-to-r from-violet-950 to-fuchsia-700 px-4">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-fuchsia-200">Histórico</p>
+                    <h2 className="mt-1 text-lg font-bold text-white">Frequência das dezenas ausentes por posição no ciclo</h2>
+                </div>
+                <div className="cycles-card max-h-[60vh] overflow-auto">
+                    <table className="w-full border-separate border-spacing-0 text-sm">
+                        <thead className="sticky top-0 z-10">
                             <tr>
-                                <h2>Frequência das Dezenas Ausentes por Posição no Ciclo</h2>
-                            </tr>
-                            <tr>
-                                <th>Posição no Ciclo</th>
-                                <th>Dezena</th>
-                                <th>Frequência</th>
+                                <th className="rounded-t-xl bg-slate-50 px-3 py-2">Posição no Ciclo</th>
+                                <th className="rounded-t-xl bg-slate-50 px-3 py-2">Dezena</th>
+                                <th className="rounded-t-xl bg-slate-50 px-3 py-2">Frequência</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -233,18 +240,21 @@ const AnaliseCiclos = () => {
                         </tbody>
                     </table>
                 </div>
+            </div>  
 
-                {/* Tabela com a frequência das dezenas ausentes em relação à posição no ciclo */}
-                <div className="cycles-card max-h-\[28rem\] overflow-auto" data-title="Frequência das dezenas ausentes em relação à posição no ciclo">
-                    <table className="w-full min-w-\[520px\] text-sm">
-                        <thead>
+            {/* Tabela com a frequência das dezenas ausentes em relação à posição no ciclo */}
+            <div className="rounded-2xl border-violet-100 bg-linear-to-r from-violet-950 to-fuchsia-700 px-2 py-2">
+                <div className="border-violet-100 bg-linear-to-r from-violet-950 to-fuchsia-700 px-4">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-fuchsia-200">Histórico</p>
+                    <h2 className="mt-1 text-lg font-bold text-white">Frequência das dezenas ausentes em relação à posição no ciclo</h2>
+                </div>
+                <div className="cycles-card max-h-[60vh] overflow-auto">
+                    <table className="w-full border-separate border-spacing-0 text-sm">
+                        <thead className="sticky top-0 z-10">
                             <tr>
-                                <h2>Frequência das Dezenas Ausentes em Relação à Posição no Ciclo</h2>
-                            </tr>
-                            <tr>
-                                <th>Dezena</th>
-                                <th>Posição no Ciclo</th>
-                                <th>Frequência</th>
+                                <th className="rounded-t-xl bg-slate-50 px-3 py-2">Dezena</th>
+                                <th className="rounded-t-xl bg-slate-50 px-3 py-2">Posição no Ciclo</th>
+                                <th className="rounded-t-xl bg-slate-50 px-3 py-2">Frequência</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -268,29 +278,35 @@ const AnaliseCiclos = () => {
                         </tbody>
                     </table>
                 </div>
+            </div>               
 
-                {/* Tabela de analise por posição no formato solicitado */}
-                <div className="hidden">
-                    <h1>Analise das dezenas ausentes por Posição</h1>
-                </div>
-                <div className="cycles-card max-h-\[28rem\] overflow-auto" data-title="Análise das dezenas ausentes por posição">
-                    <table className="w-full min-w-\[800px\] text-sm">
-                        <thead>
+            {/* Tabela de analise por posição no formato solicitado */}
+            <div className="rounded-2xl border-violet-100 bg-linear-to-r from-violet-950 to-fuchsia-700 px-2 py-2">
+                <div className="border-violet-100 bg-linear-to-r from-violet-950 to-fuchsia-700 px-4">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-fuchsia-200">Histórico</p>
+                    <h2 className="mt-1 text-lg font-bold text-white">Analise das dezenas ausentes por Posição</h2>
+                </div>                
+                
+                <div className="cycles-card max-h-[60vh] overflow-auto">
+                    <table className="w-full border-separate border-spacing-0 text-sm">
+                        <thead className="sticky top-0 z-10">
                             {Array.from({ length: maxPosicoes }, (_, i) => (
                                 <>
                                     <tr key={`posicao-${i + 1}`}>
-                                        <th>{i + 1}ª</th>
+                                        <th className=" border-violet-100 text-white bg-linear-to-r from-violet-950 to-fuchsia-700 rounded-t-xl bg-slate-50 px-3 py-2">{i + 1}ª</th>
                                     </tr>
                                     <tr>
-                                        <th>Dez:</th>
+                                        <th className="border-violet-100 text-white bg-linear-to-r from-violet-950 to-fuchsia-700 bg-slate-50 px-3 py-2">Dez:</th>
                                         {Array.from({ length: 25 }, (_, j) => (
-                                            <td key={`dez-${j + 1}`}>{j + 1}</td>
+                                            <td key={`dez-${j + 1}`} className="px-3 py-2">
+                                                {j + 1}
+                                            </td>
                                         ))}
                                     </tr>
                                     <tr>
-                                        <th>Freq:</th>
+                                        <th className="border-violet-100 text-white bg-linear-to-r from-violet-950 to-fuchsia-700 rounded-b-xl bg-slate-50 px-3 py-2">Freq:</th>
                                         {Array.from({ length: 25 }, (_, j) => (
-                                            <td key={`freq-${i + 1}-${j + 1}`}>
+                                            <td key={`freq-${i + 1}-${j + 1}`} className="px-3 py-2">
                                                 {frequenciaDezenasPorPosicao[j + 1] ? frequenciaDezenasPorPosicao[j + 1][i + 1] || 0 : 0}
                                             </td>
                                         ))}
@@ -302,6 +318,7 @@ const AnaliseCiclos = () => {
                     </table>
                 </div>
             </div>
+
         </section>
     );
 };

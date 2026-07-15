@@ -65,6 +65,55 @@ const DezenasQuentes = () => {
         return atrasoAtual.map(atraso => totalConcursos - atraso - 1);
     };
 
+    const analisarDezenasRepetidas = (resultados) => {
+        if (resultados.length < 2) return null;
+
+        const frequenciaRepeticoes = {
+            atual: {
+                quantidade: 0,
+                dezenas: [],
+                percentual: 0
+            },
+            historico: Array(16).fill(0)
+        };
+
+        for (let i = 0; i < resultados.length - 1; i++) {
+            const concursoAtual = resultados[i].dezenas.map(Number);
+            const concursoAnterior = resultados[i + 1].dezenas.map(Number);
+
+            const repetidas = concursoAtual.filter(dezena => concursoAnterior.includes(dezena));
+
+            frequenciaRepeticoes.historico[repetidas.length]++;
+
+            if (i === 0) {
+                frequenciaRepeticoes.atual = {
+                    quantidade: repetidas.length,
+                    dezenas: repetidas.sort((a, b) => a - b),
+                    percentual: ((repetidas.length / 15) * 100).toFixed(1)
+                };
+            }
+        }
+
+        const maisFrequente = frequenciaRepeticoes.historico
+            .map((qtd, index) => ({ quantidade: index, ocorrencias: qtd }))
+            .reduce((max, atual) => (atual.ocorrencias > max.ocorrencias ? atual : max));
+
+        const totalConcursos = resultados.length - 1;
+        const percentuais = frequenciaRepeticoes.historico.map(qtd =>
+            ((qtd / totalConcursos) * 100).toFixed(1)
+        );
+
+        return {
+            atual: frequenciaRepeticoes.atual,
+            historico: frequenciaRepeticoes.historico.map((qtd, index) => ({
+                quantidade: index,
+                ocorrencias: qtd,
+                percentual: percentuais[index]
+            })).filter(item => item.ocorrencias > 0),
+            maisFrequente
+        };
+    };
+
     // Função para buscar os resultados e calcular as frequências e intervalos
     useEffect(() => {
         const fetchResults = async () => {
@@ -180,58 +229,9 @@ const DezenasQuentes = () => {
         buscarSorteios();
     }, []);
 
-    const analisarDezenasRepetidas = (resultados) => {
-        if (resultados.length < 2) return null;
-
-        const frequenciaRepeticoes = {
-            atual: {
-                quantidade: 0,
-                dezenas: [],
-                percentual: 0
-            },
-            historico: Array(16).fill(0)
-        };
-
-        for (let i = 0; i < resultados.length - 1; i++) {
-            const concursoAtual = resultados[i].dezenas.map(Number);
-            const concursoAnterior = resultados[i + 1].dezenas.map(Number);
-
-            const repetidas = concursoAtual.filter(dezena => concursoAnterior.includes(dezena));
-
-            frequenciaRepeticoes.historico[repetidas.length]++;
-
-            if (i === 0) {
-                frequenciaRepeticoes.atual = {
-                    quantidade: repetidas.length,
-                    dezenas: repetidas.sort((a, b) => a - b),
-                    percentual: ((repetidas.length / 15) * 100).toFixed(1)
-                };
-            }
-        }
-
-        const maisFrequente = frequenciaRepeticoes.historico
-            .map((qtd, index) => ({ quantidade: index, ocorrencias: qtd }))
-            .reduce((max, atual) => (atual.ocorrencias > max.ocorrencias ? atual : max));
-
-        const totalConcursos = resultados.length - 1;
-        const percentuais = frequenciaRepeticoes.historico.map(qtd =>
-            ((qtd / totalConcursos) * 100).toFixed(1)
-        );
-
-        return {
-            atual: frequenciaRepeticoes.atual,
-            historico: frequenciaRepeticoes.historico.map((qtd, index) => ({
-                quantidade: index,
-                ocorrencias: qtd,
-                percentual: percentuais[index]
-            })).filter(item => item.ocorrencias > 0),
-            maisFrequente
-        };
-    };
-
     return (
-        <main className="Container-Geral">
-            <section className="conteiner-section">
+        <main className="w-full overflow-hidden flex flex-col gap-8">
+            <section className="rounded-2xl border-violet-100 bg-linear-to-r from-violet-950 to-fuchsia-700 px-2 py-2">
                 <div className="box-shadown">
                     <div className="title-result-info">
                         <h1>Dezenas e suas frequências de ocorrência</h1>

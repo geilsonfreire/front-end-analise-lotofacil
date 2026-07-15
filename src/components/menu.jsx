@@ -30,7 +30,7 @@ const Menu = () => {
 
 
     return (
-        <nav className="group sticky top-0 flex h-screen w-20 flex-col overflow-y-auto rounded-r-3xl border-r border-fuchsia-400/20 bg-gradient-to-b from-violet-950 via-purple-900 to-fuchsia-900 py-5 shadow-2xl shadow-violet-950/25 transition-[width] duration-300 hover:w-60">
+        <nav className="group sticky top-0 flex h-screen w-20 flex-col overflow-y-auto rounded-r-3xl border-r border-fuchsia-400/20 bg-linear-to-b from-violet-950 via-purple-900 to-fuchsia-900 py-5 shadow-2xl shadow-violet-950/25 transition-[width] duration-300 hover:w-60">
             <Link to="/">
                 <img className="ml-4 w-12 rounded-full ring-1 ring-white/30 transition duration-300 hover:scale-105 hover:ring-white/80" src={Logo} alt="Logo da pagina" />
             </Link>
