@@ -1,7 +1,8 @@
 // Import Biblioteas
 import { createRoot } from 'react-dom/client'
 import { ToastContainer } from 'react-toastify';
-import { BrowserRouter as Router } from 'react-router-dom';
+//import { BrowserRouter as Router } from 'react-router-dom';
+import { HashRouter as Router} from 'react-router-dom';
 
 // Imports CSS
 import 'react-toastify/dist/ReactToastify.css'
