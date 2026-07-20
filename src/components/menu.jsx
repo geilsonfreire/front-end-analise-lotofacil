@@ -10,6 +10,7 @@ import Logo from "../assets/img/logo.png";
 import { MdSpaceDashboard } from "react-icons/md";
 import { TbClover } from "react-icons/tb";
 import { GrAnalytics } from "react-icons/gr";
+import { RiBarChart2Fill } from "react-icons/ri";
 
 const Menu = () => {
 
@@ -48,6 +49,12 @@ const Menu = () => {
                     title="Analise Clusters"
                 />
                
+                <Icon
+                    to="/analise-dezenas-sorteio-anterior"
+                    icon={<RiBarChart2Fill />}
+                    title="Dezenas Repetidas"
+                />
+
                 <Icon
                     to="/meus-jogos"
                     icon={<TbClover />}

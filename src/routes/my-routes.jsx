@@ -11,6 +11,7 @@ import DezenasQuentes from "../components/dezenasQuentes.jsx";
 import SomaSorteios from "../components/somaSorteio.jsx";
 import AnaliseClusters from "../pages/analiseClusters.jsx";
 import AnaliseCiclos from "../components/analiseCiclos.jsx";
+import AnaliseDezenasSorteioAnterior from "../components/analiseDezenasSorteioAnterior.jsx";
 
 const MyRoutes = () => {
     return (
@@ -24,6 +25,7 @@ const MyRoutes = () => {
                     <Route path="/soma-sorteios" element={<SomaSorteios />} />
                     <Route path="/analise-clusters" element={<AnaliseClusters />} />
                     <Route path="/analise-ciclos" element={<AnaliseCiclos />} />
+                    <Route path="/analise-dezenas-sorteio-anterior" element={<AnaliseDezenasSorteioAnterior />} />
                 </Route>
             </Routes>
         </StrictMode>
