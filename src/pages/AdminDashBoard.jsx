@@ -171,7 +171,7 @@ const AdminDashBoard = () => {
 
                 <section className='w-full overflow-hidden flex flex-col gap-8'>
                     <ResultLatest onConcursoChange={handleConcursoChange} />
-                    <div className="flex w-full gap-5 rounded-2xl border-violet-100 bg-linear-to-r from-violet-950 to-fuchsia-700 px-2 py-2">
+                    <div className="grid w-full gap-5 rounded-2xl border-violet-100 bg-linear-to-r from-violet-950 to-fuchsia-700 px-2 py-2">
 
                         {/* Card de Dezenas Quentes e Frias */}
                         <div className="p-2 flex w-full flex-col rounded-2xl border border-slate-200 bg-white shadow-sm">

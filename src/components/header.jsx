@@ -11,10 +11,11 @@ import Banner from "../assets/img/banner.png";
 import {
     MdNotifications,
     MdArrowCircleDown,
-    MdArrowCircleUp
+    MdArrowCircleUp,
+    MdMenu
 } from "react-icons/md";
 
-const Header = () => {
+const Header = ({ onToggleMenu }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const toggleDropdown = () => {
@@ -46,6 +47,14 @@ const Header = () => {
 
             {/* <!-- Header Right --> */}
             <div className="header-right flex items-center gap-3 sm:gap-5">
+
+                <button
+                    type="button"
+                    className="grid h-10 w-10 items-center justify-center rounded-xl text-xl text-violet-700 transition hover:bg-violet-50 hover:text-fuchsia-600 sm:hidden"
+                    onClick={onToggleMenu}
+                >
+                    <MdMenu />
+                </button>
 
                 <div className="hidden sm:block">
                     <div className="flex items-center gap-3">
