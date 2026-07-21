@@ -1,7 +1,7 @@
 // Imports Bibliotecas
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import { MdFileUpload, MdFileDownload } from "react-icons/md";
+
 
 // Imports Css
 // Imports Services / Coomponents
@@ -187,43 +187,7 @@ const MeusJogos = () => {
     const removerDuplicatas = (array) => {
         return Array.from(new Set(array));
     };
-
-    // Exporta os jogos atuais para um arquivo JSON
-    const saveGamesToFile = (games) => {
-        const json = JSON.stringify(games, null, 2);
-        const blob = new Blob([json], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'jogosLotofacil.json';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    };
-
-    // Importa jogos de um arquivo JSON e atualiza o localStorage
-    const importarJogosJSON = async (event) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-
-        try {
-            const text = await file.text();
-            const parsed = JSON.parse(text);
-            if (!Array.isArray(parsed) || !parsed.every((item) => Array.isArray(item) && item.length === 15)) {
-                throw new Error('Formato de arquivo inválido');
-            }
-            setJogosGerados(parsed);
-            localStorage.setItem('jogosLotofacil', JSON.stringify(parsed));
-            toast.success('Jogos importados com sucesso!');
-        } catch (error) {
-            console.error('Erro ao importar jogos JSON:', error);
-            toast.error('Arquivo JSON inválido ou formato incorreto.');
-        } finally {
-            event.target.value = '';
-        }
-    };
-
+   
     // Seleciona as dezenas obrigatórias do ciclo atual e prioriza as top 9 do concurso anterior
     const pickMandatoryNumbers = (absentNums, prioritizedNums, maxCount = 15) => {
         const uniqueAbsent = [...new Set(absentNums)];
@@ -314,7 +278,6 @@ const MeusJogos = () => {
             // Atualiza os jogos gerados e salva no localStorage
             setJogosGerados(jogos);
             localStorage.setItem('jogosLotofacil', JSON.stringify(jogos));
-            saveGamesToFile(jogos);
 
         } catch (error) {
             console.error("Erro ao gerar jogos:", error);
@@ -364,34 +327,6 @@ const MeusJogos = () => {
                     >
                         {loading ? 'Gerando...' : 'Gerar Jogos'}
                     </button>
-                    <button
-                        className="flex  btn-gerar"
-                        type="button"
-                        onClick={() => saveGamesToFile(jogosGerados)}
-                        disabled={jogosGerados.length === 0}
-                        aria-label="Exportar jogos"
-                        style={{ marginLeft: '0.75rem', minWidth: '3rem', cursor: 'pointer' }}
-                        
-                    >
-                        <MdFileDownload size={20} />
-                        {loading ? 'Exportando...' : 'Exportar'}
-                    </button>
-                    <label
-                        className="flex btn-gerar"
-                        htmlFor="import-json"
-                        style={{ marginLeft: '0.75rem', minWidth: '3rem', cursor: 'pointer' }}
-                        aria-label="Importar jogos"
-                    >
-                        <MdFileUpload size={20} />
-                        {loading ? 'Importando...' : 'Importar'}
-                    </label>
-                    <input
-                        id="import-json"
-                        type="file"
-                        accept="application/json"
-                        onChange={importarJogosJSON}
-                        style={{ display: 'none' }}
-                    />
                 </div>
 
                 {jogosGerados.length > 0 && (
