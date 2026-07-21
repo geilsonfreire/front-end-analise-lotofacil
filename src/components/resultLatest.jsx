@@ -209,7 +209,7 @@ const ResultLotofacil = ({ onConcursoChange }) => {
 
                              {/* cards  */}
                             <div className=" w-full lg:flex sm:mt-4 lg:mt-2">
-                                <div className="rounded-3xl border border-white/10 mb-4 bg-white/10 p-4 text-white shadow-xl shadow-black/20">
+                                <div className="rounded-3xl border border-white/10 mb-4 lg:mr-4 bg-white/10 p-4 text-white shadow-xl shadow-black/20">
                                     <div className="container-dezenas ">
                                         <div className="dezenas flex flex-wrap justify-center gap-2 rounded-3xl border border-white/10 bg-slate-950/20 p-4 text-center text-lg font-semibold text-white sm:justify-start">
                                             {latestResult.dezenas && latestResult.dezenas.length > 0 ? (
