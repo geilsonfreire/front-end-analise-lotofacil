@@ -1,6 +1,7 @@
 // Imports Bibliotecas
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
+import { MdFileUpload, MdFileDownload } from "react-icons/md";
 
 // Imports Css
 // Imports Services / Coomponents
@@ -127,9 +128,116 @@ const MeusJogos = () => {
         return ciclosCalculados[ciclosCalculados.length - 1];
     };
 
+    // Função para calcular as 9 dezenas prioritárias do concurso anterior com base no histórico
+    const getTop9FromPreviousDraw = (resultados) => {
+        const historico = resultados
+            .map((item) => ({
+                concurso: Number(item?.concurso ?? 0),
+                dezenas: Array.isArray(item?.dezenas) ? item.dezenas.map(Number).sort((a, b) => a - b) : [],
+            }))
+            .filter((item) => Number.isFinite(item.concurso) && item.concurso > 0)
+            .sort((a, b) => a.concurso - b.concurso);
+
+        if (historico.length < 2) {
+            return [];
+        }
+
+        const ranking = Array.from({ length: 25 }, (_, index) => ({
+            dezena: index + 1,
+            vezesNoAnterior: 0,
+            repeticoes: 0,
+            probabilidade: 0,
+        }));
+
+        for (let index = 1; index < historico.length; index += 1) {
+            const anterior = historico[index - 1];
+            const atual = historico[index];
+
+            ranking.forEach((item) => {
+                if (anterior.dezenas.includes(item.dezena)) {
+                    item.vezesNoAnterior += 1;
+                    if (atual.dezenas.includes(item.dezena)) {
+                        item.repeticoes += 1;
+                    }
+                }
+            });
+        }
+
+        ranking.forEach((item) => {
+            item.probabilidade = item.vezesNoAnterior > 0
+                ? Number(((item.repeticoes / item.vezesNoAnterior) * 100).toFixed(1))
+                : 0;
+        });
+
+        const previousDraw = historico[historico.length - 2].dezenas;
+
+        return ranking
+            .filter((item) => previousDraw.includes(item.dezena))
+            .sort((a, b) => {
+                if (b.probabilidade !== a.probabilidade) {
+                    return b.probabilidade - a.probabilidade;
+                }
+                return b.repeticoes - a.repeticoes;
+            })
+            .slice(0, 9)
+            .map((item) => item.dezena);
+    };
+
     // Função para remover duplicatas
     const removerDuplicatas = (array) => {
         return Array.from(new Set(array));
+    };
+
+    // Exporta os jogos atuais para um arquivo JSON
+    const saveGamesToFile = (games) => {
+        const json = JSON.stringify(games, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'jogosLotofacil.json';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
+    // Importa jogos de um arquivo JSON e atualiza o localStorage
+    const importarJogosJSON = async (event) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        try {
+            const text = await file.text();
+            const parsed = JSON.parse(text);
+            if (!Array.isArray(parsed) || !parsed.every((item) => Array.isArray(item) && item.length === 15)) {
+                throw new Error('Formato de arquivo inválido');
+            }
+            setJogosGerados(parsed);
+            localStorage.setItem('jogosLotofacil', JSON.stringify(parsed));
+            toast.success('Jogos importados com sucesso!');
+        } catch (error) {
+            console.error('Erro ao importar jogos JSON:', error);
+            toast.error('Arquivo JSON inválido ou formato incorreto.');
+        } finally {
+            event.target.value = '';
+        }
+    };
+
+    // Seleciona as dezenas obrigatórias do ciclo atual e prioriza as top 9 do concurso anterior
+    const pickMandatoryNumbers = (absentNums, prioritizedNums, maxCount = 15) => {
+        const uniqueAbsent = [...new Set(absentNums)];
+        const prioritizedSet = new Set(prioritizedNums);
+
+        const prioritizedAbsent = uniqueAbsent
+            .filter((num) => prioritizedSet.has(num))
+            .sort((a, b) => prioritizedNums.indexOf(a) - prioritizedNums.indexOf(b) || a - b);
+
+        const otherAbsent = uniqueAbsent
+            .filter((num) => !prioritizedSet.has(num))
+            .sort((a, b) => a - b);
+
+        return [...prioritizedAbsent, ...otherAbsent].slice(0, maxCount);
     };
 
     // Função para gerar jogos
@@ -139,8 +247,13 @@ const MeusJogos = () => {
             const resultados = await ApiServices.getAllResults();
             // Processa o ciclo atual para obter dezenas ausentes
             const cicloProcessado = processarCiclos([...resultados]);
-           
             const dezenasAusentesCiclo = [...cicloProcessado.dezenasAusentes].map(Number);
+            const top9Prioritarias = getTop9FromPreviousDraw(resultados);
+
+            // Se houver menos de 9 dezenas no top9, use apenas as disponíveis
+            const dezenasPrioritarias = removerDuplicatas(top9Prioritarias).slice(0, 9);
+            const dezenasIniciais = pickMandatoryNumbers(dezenasAusentesCiclo, dezenasPrioritarias, 15);
+
             // Inicializa o array de jogos
             let jogos = [];
             
@@ -152,31 +265,29 @@ const MeusJogos = () => {
             const gerarNovoJogo = (tentativas = 0) => {
                 if (tentativas > 100) return null;
 
-                // Combina todas as dezenas e remove duplicatas
-                let novoJogo = [...dezenasAusentesCiclo];
-
+                // Começa com as dezenas obrigatórias do ciclo atual, priorizando as top9 do concurso anterior
+                let novoJogo = [...dezenasIniciais];
                 novoJogo = removerDuplicatas(novoJogo);
 
-                // Adiciona dezenas aleatórias ao novo jogo
-                const numerosDisponiveis = Array.from(
-                    { length: 25 }, (_, i) => i + 1)
-                    .filter(num => !novoJogo.includes(num));
+                // Se ainda não houver 15 dezenas, adiciona números aleatórios das dezenas ausentes restantes
+                const numerosDisponiveis = Array.from({ length: 25 }, (_, i) => i + 1)
+                    .filter((num) => !novoJogo.includes(num));
 
                 while (novoJogo.length < 15 && numerosDisponiveis.length > 0) {
                     const randomIndex = Math.floor(Math.random() * numerosDisponiveis.length);
                     novoJogo.push(numerosDisponiveis[randomIndex]);
                     numerosDisponiveis.splice(randomIndex, 1);
                 }
-                
+
                 // Verifica se o novo jogo tem 7 pares e 8 ímpares ou vice-versa
                 const pares = novoJogo.filter(num => num % 2 === 0).length;
                 const impares = novoJogo.length - pares;
                 // Retorna o novo jogo ordenado se atender aos critérios
                 if ((pares === 7 && impares === 8) || (pares === 8 && impares === 7)) {
                     return novoJogo.sort((a, b) => a - b);
-                } else {
-                    return gerarNovoJogo(tentativas + 1);
                 }
+
+                return gerarNovoJogo(tentativas + 1);
             };
             // Gera os 7 jogos
             while (jogos.length < 7 && tentativas < maxTentativas) {
@@ -203,6 +314,7 @@ const MeusJogos = () => {
             // Atualiza os jogos gerados e salva no localStorage
             setJogosGerados(jogos);
             localStorage.setItem('jogosLotofacil', JSON.stringify(jogos));
+            saveGamesToFile(jogos);
 
         } catch (error) {
             console.error("Erro ao gerar jogos:", error);
@@ -248,9 +360,38 @@ const MeusJogos = () => {
                         className="btn-gerar"
                         onClick={gerarJogos}
                         disabled={loading}
+                        style={{ marginLeft: '0.75rem', minWidth: '3rem', cursor: 'pointer' }}
                     >
                         {loading ? 'Gerando...' : 'Gerar Jogos'}
                     </button>
+                    <button
+                        className="flex  btn-gerar"
+                        type="button"
+                        onClick={() => saveGamesToFile(jogosGerados)}
+                        disabled={jogosGerados.length === 0}
+                        aria-label="Exportar jogos"
+                        style={{ marginLeft: '0.75rem', minWidth: '3rem', cursor: 'pointer' }}
+                        
+                    >
+                        <MdFileDownload size={20} />
+                        {loading ? 'Exportando...' : 'Exportar'}
+                    </button>
+                    <label
+                        className="flex btn-gerar"
+                        htmlFor="import-json"
+                        style={{ marginLeft: '0.75rem', minWidth: '3rem', cursor: 'pointer' }}
+                        aria-label="Importar jogos"
+                    >
+                        <MdFileUpload size={20} />
+                        {loading ? 'Importando...' : 'Importar'}
+                    </label>
+                    <input
+                        id="import-json"
+                        type="file"
+                        accept="application/json"
+                        onChange={importarJogosJSON}
+                        style={{ display: 'none' }}
+                    />
                 </div>
 
                 {jogosGerados.length > 0 && (
