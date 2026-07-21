@@ -173,11 +173,12 @@ const ResultLotofacil = ({ onConcursoChange }) => {
             <section className="w-full rounded-2xl border-violet-100 bg-linear-to-r from-violet-950 to-fuchsia-700 px-4 py-4 sm:px-6">
                 {latestResult ? (
                     <>
-                        <div className="border-violet-100 py-4 max-w-full gap-0 sm:gap-4 lg:flex lg:flex-col lg:justify-between">
-                            <div className="gap-4 lg:flex lg:justify-between">
+                        <div className="border-violet-100 py-2 max-w-full gap-0 sm:gap-4 lg:flex lg:flex-col lg:justify-between">
+                            <div className="lg:flex mb-4 lg:justify-between">
+                                 {/* Item da data */}
                                 <div className="space-y-4 text-center lg:text-left">
                                     <h1 className="text-2xl font-bold tracking-tight text-brand-success sm:text-3xl">Último Resultado</h1>
-                                    <div className="grid gap-4 sm:grid-cols-2">
+                                    <div className="grid lg:gap-4 sm:gap-2 ap- sm:grid-cols-2">
                                         <p className="text-sm text-slate-200">
                                             Data do concurso: <span className="font-semibold text-brand-success">{latestResult.data || "N/A"}</span>
                                         </p>
@@ -186,7 +187,7 @@ const ResultLotofacil = ({ onConcursoChange }) => {
                                         </p>
                                     </div>
                                 </div>
-
+                                {/* Item do button de seleçao do concurso */}
                                 <div className="mx-auto flex w-full max-w-[18rem] items-center justify-between gap-3 rounded-3xl border border-white/10 bg-white/10 px-3 py-3 text-white backdrop-blur-sm sm:px-5 lg:mx-0">
                                     <button
                                         onClick={handlePreviousConcurso}
@@ -206,8 +207,9 @@ const ResultLotofacil = ({ onConcursoChange }) => {
                                 </div>
                             </div>
 
-                            <div className=" w-full lg:flex  gap-2 sm:mt-4 lg:mt-2">
-                                <div className="rounded-3xl border border-white/10 bg-white/10 p-4 text-white shadow-xl shadow-black/20">
+                             {/* cards  */}
+                            <div className=" w-full lg:flex sm:mt-4 lg:mt-2">
+                                <div className="rounded-3xl border border-white/10 mb-4 bg-white/10 p-4 text-white shadow-xl shadow-black/20">
                                     <div className="container-dezenas ">
                                         <div className="dezenas flex flex-wrap justify-center gap-2 rounded-3xl border border-white/10 bg-slate-950/20 p-4 text-center text-lg font-semibold text-white sm:justify-start">
                                             {latestResult.dezenas && latestResult.dezenas.length > 0 ? (
