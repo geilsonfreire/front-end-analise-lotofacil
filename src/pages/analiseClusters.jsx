@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import apiServices from "../services/apiServices";
 
@@ -54,35 +54,35 @@ const AnaliseClusters = () => {
     const [clusterRelevante, setClusterRelevante] = useState([]);
     const [error, setError] = useState(null);
 
-    const fetchClusters = useCallback(async () => {
-        try {
-            const response = await apiServices.getAllResults();
-            const sorteiosArray = response.map(item => item.dezenas.map(Number));
-
-            // Converta os sorteios para um formato adequado para k-means
-            const data = sorteiosArray.map(dezenas => dezenas);
-
-            // Execute o algoritmo k-means
-            const result = kmeans(data, 5); // 5 clusters, ajuste conforme necessário
-
-            // Selecionar o cluster mais relevante (o maior cluster)
-            const clusterMaisRelevante = result.clusters.reduce((prev, current) => (prev.length > current.length ? prev : current), []);
-
-            setClusterRelevante(clusterMaisRelevante);
-
-            if (!error) {
-                toast.success("Cluster mais relevante carregado com sucesso!");
-            }
-        } catch (error) {
-            console.error("Erro ao buscar os clusters:", error);
-            setError("Erro ao buscar os clusters.");
-            toast.error("Erro ao buscar os clusters.");
-        }
-    }, [error]);
-
     useEffect(() => {
+        const fetchClusters = async () => {
+            try {
+                const response = await apiServices.getAllResults();
+                const sorteiosArray = response.map(item => item.dezenas.map(Number));
+
+                // Converta os sorteios para um formato adequado para k-means
+                const data = sorteiosArray.map(dezenas => dezenas);
+
+                // Execute o algoritmo k-means
+                const result = kmeans(data, 5); // 5 clusters, ajuste conforme necessário
+
+                // Selecionar o cluster mais relevante (o maior cluster)
+                const clusterMaisRelevante = result.clusters.reduce((prev, current) => (prev.length > current.length ? prev : current), []);
+
+                setClusterRelevante(clusterMaisRelevante);
+
+                if (!error) {
+                    toast.success("Cluster mais relevante carregado com sucesso!");
+                }
+            } catch (error) {
+                console.error("Erro ao buscar os clusters:", error);
+                setError("Erro ao buscar os clusters.");
+                toast.error("Erro ao buscar os clusters.");
+            }
+        };
+
         fetchClusters();
-    }, [fetchClusters]);
+    }, [error]);
 
     return (
         <main className="Container-Geral">

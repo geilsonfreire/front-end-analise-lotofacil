@@ -1,6 +1,6 @@
 // Imports Bibliotecas
 import { Link } from "react-router-dom";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 // Imports Componenets
@@ -16,74 +16,21 @@ import apiService from "../services/apiServices";
 // imports icons and images
 import { BsInfoCircle } from "react-icons/bs";
 
-const fibonacciNumbers = [1, 2, 3, 5, 8, 13, 21];
-
 const AdminDashBoard = () => {
 
 
-    const [fibonacciError, setFibonacciError] = useState(null);
-    const [palindromoError, setPalindromoError] = useState(null);
+    
     const [quentes, setQuentes] = useState([]);
     const [frias, setFrias] = useState([]);
     const [quentesFriasError, setQuentesFriasError] = useState(null);
     const [atrasos, setAtrasos] = useState([]);
     const [atrasosError, setAtrasosError] = useState(null);
 
-    const palindromoNumbers = useMemo(() => [11, 22], []);
+    
 
     const handleConcursoChange = (newConcurso) => {
         console.log("Concurso changed to:", newConcurso);
     };
-
-    useEffect(() => {
-        const fetchFibonacciAnalysis = async () => {
-            try {
-                const response = await apiService.getAllResults();
-                const sorteiosArray = response.map(item => item.dezenas.map(Number));
-
-                const fibonacciFrequency = Array(25).fill(0);
-
-                sorteiosArray.forEach(dezenas => {
-                    dezenas.forEach(num => {
-                        if (fibonacciNumbers.includes(num)) {
-                            fibonacciFrequency[num - 1] += 1;
-                        }
-                    });
-                });
-            } catch (error) {
-                console.error("Erro ao buscar os dados de Fibonacci:", error);
-                setFibonacciError("Erro ao buscar os dados de Fibonacci.");
-                toast.error("Erro ao buscar os dados de Fibonacci.");
-            }
-        };
-
-        fetchFibonacciAnalysis();
-    }, [fibonacciError]);
-
-    useEffect(() => {
-        const fetchPalindromoAnalysis = async () => {
-            try {
-                const response = await apiService.getAllResults();
-                const sorteiosArray = response.map(item => item.dezenas.map(Number));
-
-                const palindromoFrequency = Array(25).fill(0);
-
-                sorteiosArray.forEach(dezenas => {
-                    dezenas.forEach(num => {
-                        if (palindromoNumbers.includes(num)) {
-                            palindromoFrequency[num - 1] += 1;
-                        }
-                    });
-                });
-            } catch (error) {
-                console.error("Erro ao buscar os dados de Palíndromos:", error);
-                setPalindromoError("Erro ao buscar os dados de Palíndromos.");
-                toast.error("Erro ao buscar os dados de Palíndromos.");
-            }
-        };
-
-        fetchPalindromoAnalysis();
-    }, [palindromoError, palindromoNumbers]);
 
     useEffect(() => {
         const fetchQuentesFrias = async () => {

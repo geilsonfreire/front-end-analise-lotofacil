@@ -1,5 +1,6 @@
 // Import Bibliotecas
 import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 
 // Import components
 import MenuDropDownPerfil from "../components/MenuDropDownPerfil";
@@ -90,6 +91,10 @@ const Header = ({ onToggleMenu }) => {
             </div>
         </header>
     );
+};
+
+Header.propTypes = {
+    onToggleMenu: PropTypes.func.isRequired,
 };
 
 export default Header;
