@@ -19,6 +19,12 @@ const ResultLotofacil = ({ onConcursoChange }) => {
     const [dezenasRestantes, setDezenasRestantes] = useState([]);
     const [cicloAtual, setCicloAtual] = useState(null);
 
+    const formatCurrencyBR = (value) =>
+        new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        }).format(Number(value || 0));
+
     // Calcula as combinações
     const totalCombinations = calculateCombinations(25, 15);
 
@@ -314,7 +320,7 @@ const ResultLotofacil = ({ onConcursoChange }) => {
                                                             <tr key={index}>
                                                                 <td className="p-2">{premiacao.descricao}</td>
                                                                 <td className="p-2">{premiacao.ganhadores}</td>
-                                                                <td className="p-2">R$ {premiacao.valorPremio.toFixed(2)}</td>
+                                                                <td className="p-2">{formatCurrencyBR(premiacao.valorPremio)}</td>
                                                             </tr>
                                                         ))}
                                                     </tbody>
