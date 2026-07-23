@@ -187,21 +187,54 @@ const MeusJogos = () => {
     const removerDuplicatas = (array) => {
         return Array.from(new Set(array));
     };
-   
-    // Seleciona as dezenas obrigatórias do ciclo atual e prioriza as top 9 do concurso anterior
-    const pickMandatoryNumbers = (absentNums, prioritizedNums, maxCount = 15) => {
-        const uniqueAbsent = [...new Set(absentNums)];
-        const prioritizedSet = new Set(prioritizedNums);
 
-        const prioritizedAbsent = uniqueAbsent
-            .filter((num) => prioritizedSet.has(num))
-            .sort((a, b) => prioritizedNums.indexOf(a) - prioritizedNums.indexOf(b) || a - b);
+    // Embaralha um array mantendo a aleatoriedade do gerador
+    const shuffleArray = (array) => {
+        const shuffled = [...array];
+
+        for (let index = shuffled.length - 1; index > 0; index -= 1) {
+            const randomIndex = Math.floor(Math.random() * (index + 1));
+            [shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]];
+        }
+
+        return shuffled;
+    };
+
+    // Define quantas dezenas devem entrar no núcleo do jogo, com base em uma faixa proporcional
+    // entre 50% e 60% das dezenas ausentes do ciclo atual.
+    const getDynamicSelectionCount = (absentCount) => {
+        if (absentCount <= 0) return 0;
+
+        const minCount = Math.max(1, Math.floor(absentCount * 0.5));
+        const maxCount = Math.min(absentCount, Math.ceil(absentCount * 0.6));
+
+        if (minCount > maxCount) {
+            return minCount;
+        }
+
+        return Math.floor(Math.random() * (maxCount - minCount + 1)) + minCount;
+    };
+
+    // Seleciona as dezenas obrigatórias do ciclo atual e prioriza as top 9 do concurso anterior
+    const pickMandatoryNumbers = (absentNums, prioritizedNums) => {
+        const uniqueAbsent = removerDuplicatas(absentNums);
+
+        if (uniqueAbsent.length === 0) {
+            return [];
+        }
+
+        const prioritizedSet = new Set(prioritizedNums);
+        const selectionCount = getDynamicSelectionCount(uniqueAbsent.length);
+
+        const prioritizedAbsent = removerDuplicatas(
+            prioritizedNums.filter((num) => uniqueAbsent.includes(num))
+        ).sort((a, b) => prioritizedNums.indexOf(a) - prioritizedNums.indexOf(b) || a - b);
 
         const otherAbsent = uniqueAbsent
             .filter((num) => !prioritizedSet.has(num))
             .sort((a, b) => a - b);
 
-        return [...prioritizedAbsent, ...otherAbsent].slice(0, maxCount);
+        return [...prioritizedAbsent, ...shuffleArray(otherAbsent)].slice(0, selectionCount);
     };
 
     // Função para gerar jogos
@@ -216,7 +249,6 @@ const MeusJogos = () => {
 
             // Se houver menos de 9 dezenas no top9, use apenas as disponíveis
             const dezenasPrioritarias = removerDuplicatas(top9Prioritarias).slice(0, 9);
-            const dezenasIniciais = pickMandatoryNumbers(dezenasAusentesCiclo, dezenasPrioritarias, 15);
 
             // Inicializa o array de jogos
             let jogos = [];
@@ -226,11 +258,11 @@ const MeusJogos = () => {
             const maxTentativas = 100;
 
             // Função para gerar um novo jogo
-            const gerarNovoJogo = (tentativas = 0) => {
+            const gerarNovoJogo = (dezenasBase, tentativas = 0) => {
                 if (tentativas > 100) return null;
 
                 // Começa com as dezenas obrigatórias do ciclo atual, priorizando as top9 do concurso anterior
-                let novoJogo = [...dezenasIniciais];
+                let novoJogo = [...dezenasBase];
                 novoJogo = removerDuplicatas(novoJogo);
 
                 // Se ainda não houver 15 dezenas, adiciona números aleatórios das dezenas ausentes restantes
@@ -251,11 +283,12 @@ const MeusJogos = () => {
                     return novoJogo.sort((a, b) => a - b);
                 }
 
-                return gerarNovoJogo(tentativas + 1);
+                return gerarNovoJogo(dezenasBase, tentativas + 1);
             };
             // Gera os 7 jogos
             while (jogos.length < 7 && tentativas < maxTentativas) {
-                const novoJogo = gerarNovoJogo();
+                const dezenasIniciais = pickMandatoryNumbers(dezenasAusentesCiclo, dezenasPrioritarias);
+                const novoJogo = gerarNovoJogo(dezenasIniciais);
                 // Verifica se o novo jogo é único e tem 15 dezenas
                 if (
                     novoJogo && verificarJogoUnico(novoJogo, jogos, resultados) && novoJogo.length === 15) {
