@@ -19,6 +19,10 @@ const ResultLotofacil = ({ onConcursoChange }) => {
     const [dezenasRestantes, setDezenasRestantes] = useState([]);
     const [cicloAtual, setCicloAtual] = useState(null);
 
+    const ordemSorteioAtual = cicloAtual?.concursos?.length
+        ? `${cicloAtual.concursos.length}° sorteio`
+        : null;
+
     const formatCurrencyBR = (value) =>
         new Intl.NumberFormat('pt-BR', {
             style: 'currency',
@@ -255,7 +259,11 @@ const ResultLotofacil = ({ onConcursoChange }) => {
                                         </div>
 
                                         <div className="ciclos rounded-3xl border border-white/10 bg-slate-950/20 p-4 text-sm text-slate-200">
-                                            <h2 className="text-base font-semibold text-white">Ciclo Atual: <span className="text-fuchsia-400">{cicloAtual?.numero || 'N/A'}</span></h2>
+                                            <h2 className="text-base font-semibold text-white">Ciclo Atual: <span className="text-fuchsia-400">{cicloAtual?.numero || 'N/A'}</span>
+                                                {ordemSorteioAtual && (
+                                                    <span className="ml-2 text-sm font-normal text-slate-300">({ordemSorteioAtual})</span>
+                                                )}
+                                            </h2>
                                             <h2 className="mt-3 text-sm font-medium text-white">Dezenas ausentes no ciclo atual:</h2>
                                             <div className="dezenas mt-2 flex flex-wrap gap-2">
                                                 {dezenasRestantes.length > 0 ? (

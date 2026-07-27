@@ -59,7 +59,8 @@ const MeusJogos = () => {
         carregarUltimoResultado();
     }, []);
     
-    // Função para verificar se o jogo é único
+    // CAMADA 5: Validação de Unicidade Rígida
+    // Garante que o jogo é único entre os 7 da cartela E nunca foi sorteado no histórico da Lotofácilo
     const verificarJogoUnico = (novoJogo, jogosAnteriores, resultados) => {
         // Ordena o novo jogo para comparar
         const novoJogoOrdenado = [...novoJogo].sort((a, b) => a - b);
@@ -128,7 +129,7 @@ const MeusJogos = () => {
         return ciclosCalculados[ciclosCalculados.length - 1];
     };
 
-    // Função para calcular as 9 dezenas prioritárias do concurso anterior com base no histórico
+    // CAMADA 1: Calcula as 9 dezenas FIXAS do ÚLTIMO concurso com base no histórico estatístico
     const getTop9FromPreviousDraw = (resultados) => {
         const historico = resultados
             .map((item) => ({
@@ -169,10 +170,11 @@ const MeusJogos = () => {
                 : 0;
         });
 
-        const previousDraw = historico[historico.length - 2].dezenas;
+        // Pega as dezenas do ÚLTIMO concurso sorteado (o mais recente)
+        const ultimoConcursoSorteado = historico[historico.length - 1].dezenas;
 
         return ranking
-            .filter((item) => previousDraw.includes(item.dezena))
+            .filter((item) => ultimoConcursoSorteado.includes(item.dezena))
             .sort((a, b) => {
                 if (b.probabilidade !== a.probabilidade) {
                     return b.probabilidade - a.probabilidade;
@@ -200,7 +202,7 @@ const MeusJogos = () => {
         return shuffled;
     };
 
-    // Define quantas dezenas devem entrar no núcleo do jogo, com base em uma faixa proporcional
+    // CAMADA 2: Define quantas dezenas devem entrar no núcleo do jogo, com base em uma faixa proporcional
     // entre 50% e 60% das dezenas ausentes do ciclo atual.
     const getDynamicSelectionCount = (absentCount) => {
         if (absentCount <= 0) return 0;
@@ -242,73 +244,109 @@ const MeusJogos = () => {
         try {
             setLoading(true);
             const resultados = await ApiServices.getAllResults();
-            // Processa o ciclo atual para obter dezenas ausentes
-            const cicloProcessado = processarCiclos([...resultados]);
-            const dezenasAusentesCiclo = [...cicloProcessado.dezenasAusentes].map(Number);
-            const top9Prioritarias = getTop9FromPreviousDraw(resultados);
 
-            // Se houver menos de 9 dezenas no top9, use apenas as disponíveis
-            const dezenasPrioritarias = removerDuplicatas(top9Prioritarias).slice(0, 9);
-
-            // Inicializa o array de jogos
-            let jogos = [];
-            
-            let tentativas = 0;
-
-            const maxTentativas = 100;
-
-            // Função para gerar um novo jogo
-            const gerarNovoJogo = (dezenasBase, tentativas = 0) => {
-                if (tentativas > 100) return null;
-
-                // Começa com as dezenas obrigatórias do ciclo atual, priorizando as top9 do concurso anterior
-                let novoJogo = [...dezenasBase];
-                novoJogo = removerDuplicatas(novoJogo);
-
-                // Se ainda não houver 15 dezenas, adiciona números aleatórios das dezenas ausentes restantes
-                const numerosDisponiveis = Array.from({ length: 25 }, (_, i) => i + 1)
-                    .filter((num) => !novoJogo.includes(num));
-
-                while (novoJogo.length < 15 && numerosDisponiveis.length > 0) {
-                    const randomIndex = Math.floor(Math.random() * numerosDisponiveis.length);
-                    novoJogo.push(numerosDisponiveis[randomIndex]);
-                    numerosDisponiveis.splice(randomIndex, 1);
-                }
-
-                // Verifica se o novo jogo tem 7 pares e 8 ímpares ou vice-versa
-                const pares = novoJogo.filter(num => num % 2 === 0).length;
-                const impares = novoJogo.length - pares;
-                // Retorna o novo jogo ordenado se atender aos critérios
-                if ((pares === 7 && impares === 8) || (pares === 8 && impares === 7)) {
-                    return novoJogo.sort((a, b) => a - b);
-                }
-
-                return gerarNovoJogo(dezenasBase, tentativas + 1);
-            };
-            // Gera os 7 jogos
-            while (jogos.length < 7 && tentativas < maxTentativas) {
-                const dezenasIniciais = pickMandatoryNumbers(dezenasAusentesCiclo, dezenasPrioritarias);
-                const novoJogo = gerarNovoJogo(dezenasIniciais);
-                // Verifica se o novo jogo é único e tem 15 dezenas
-                if (
-                    novoJogo && verificarJogoUnico(novoJogo, jogos, resultados) && novoJogo.length === 15) {
-                    jogos.push(novoJogo);
-                }
-                // Incrementa as tentativas
-                tentativas++;
-            }
-            // Verifica se foram gerados jogos suficientes
-            if (jogos.length === 0) {
-                toast.error("Não foi possível gerar nenhum jogo!");
+            if (!resultados || resultados.length === 0) {
+                toast.error("Não foi possível carregar o histórico de sorteios.");
                 return;
             }
-            // Verifica se foram gerados menos de 7 jogos
+
+            // Identifica o Último Concurso
+            const historicoOrdenado = [...resultados].sort((a, b) => b.concurso - a.concurso);
+            const ultimoConcurso = historicoOrdenado[0];
+            const dezenasUltimoConcurso = ultimoConcurso.dezenas.map(Number);
+
+            // Processa o ciclo para obter as ausentes
+            const cicloProcessado = processarCiclos([...resultados]);
+            const dezenasAusentesCiclo = [...cicloProcessado.dezenasAusentes].map(Number);
+
+            // CAMADA 1: Trava as 9 Dezenas FIXAS (Estatisticamente superiores do último sorteio)
+            const top9Prioritarias = getTop9FromPreviousDraw(resultados);
+            const dezenasFixas9 = removerDuplicatas(top9Prioritarias).slice(0, 9);
+
+            // Universo de dezenas (1 a 25)
+            const todasDezenas = Array.from({ length: 25 }, (_, i) => i + 1);
+
+            // Dezenas que NÃO saíram no último concurso (10 dezenas)
+            const dezenasForaDoConcursoAtual = todasDezenas.filter(
+                (num) => !dezenasUltimoConcurso.includes(num)
+            );
+
+            let jogos = [];
+            let tentativas = 0;
+            const maxTentativas = 500;
+
+            // Função de construção unitária do cartão
+            const gerarCartaoUnitario = () => {
+                // CAMADA 1: Inicia obrigatoriamente com as 9 dezenas fixas
+                let cartao = [...dezenasFixas9];
+
+                // CAMADA 2: Seleciona dezenas ausentes do ciclo priorizando o ranking estatístico
+                const ausentesEscolhidas = pickMandatoryNumbers(dezenasAusentesCiclo, top9Prioritarias);
+
+                ausentesEscolhidas.forEach((num) => {
+                    if (!cartao.includes(num)) cartao.push(num);
+                });
+
+                // CAMADA 3: Preenche até 15 dezenas com números FORA do Concurso Atual
+                const opcoesCamada3 = dezenasForaDoConcursoAtual.filter(
+                    (num) => !cartao.includes(num)
+                );
+                const camada3Embaralhada = shuffleArray(opcoesCamada3);
+
+                for (const num of camada3Embaralhada) {
+                    if (cartao.length === 15) break;
+                    cartao.push(num);
+                }
+
+                // Fallback de segurança (Caso o universo da Camada 3 se esgoste antes de completar 15)
+                if (cartao.length < 15) {
+                    const restoDisponivel = todasDezenas.filter((num) => !cartao.includes(num));
+                    const restoEmbaralhado = shuffleArray(restoDisponivel);
+                    for (const num of restoEmbaralhado) {
+                        if (cartao.length === 15) break;
+                        cartao.push(num);
+                    }
+                }
+
+                // CAMADA 4: Filtro Estrito de Paridade (7 Pares / 8 Ímpares ou 8 Pares / 7 Ímpares)
+                const pares = cartao.filter((num) => num % 2 === 0).length;
+                const impares = 15 - pares;
+
+                if ((pares === 7 && impares === 8) || (pares === 8 && impares === 7)) {
+                    return cartao.sort((a, b) => a - b);
+                }
+
+                return null; // Cartão rejeitado pelo filtro de paridade
+            };
+
+            // Loop de geração com validação de unicidade (CAMADA 5)
+            while (jogos.length < 7 && tentativas < maxTentativas) {
+                const novoCartao = gerarCartaoUnitario();
+
+                // CAMADA 5: Validação de Unicidade
+                if (
+                    novoCartao &&
+                    novoCartao.length === 15 &&
+                    verificarJogoUnico(novoCartao, jogos, resultados)
+                ) {
+                    jogos.push(novoCartao);
+                }
+                tentativas++;
+            }
+
+            // Tratamento de Feedbacks
+            if (jogos.length === 0) {
+                toast.error("Não foi possível gerar nenhum jogo com os critérios estabelecidos!");
+                return;
+            }
+
             if (jogos.length < 7) {
                 toast.warn(`Foram gerados apenas ${jogos.length} jogos únicos.`);
             } else {
-                toast.success("7 jogos gerados com sucesso!");
+                toast.success("7 jogos gerados com sucesso respeitando as 5 camadas!");
             }
-            // Atualiza os jogos gerados e salva no localStorage
+
+            // Atualiza estado e envia para a memória do navegador
             setJogosGerados(jogos);
             localStorage.setItem('jogosLotofacil', JSON.stringify(jogos));
 
