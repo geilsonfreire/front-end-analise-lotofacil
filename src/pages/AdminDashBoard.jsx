@@ -110,7 +110,7 @@ const AdminDashBoard = () => {
 
     return (
         <>
-            <main className="w-full p-0">
+            <main className="w-full">
                 <div className="mb-6">
                     <p className="text-xs font-bold uppercase tracking-[0.2em] text-violet-600">Visão geral</p>
                     <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">Dash<span className="text-fuchsia-600">board</span></h1>

@@ -26,7 +26,7 @@ const Home = () => {
             <Menu isOpen={isMenuOpen} onClose={closeMenu} />
             <div className="flex min-w-0 flex-1 flex-col overflow-y-auto">
                 <Header onToggleMenu={handleToggleMenu} />
-                <main id='Fund' className="flex-1 p-4 sm:p-6">
+                <main id='Fund' className="flex-1 p-2">
                     <Outlet />
                 </main>
             </div>
