@@ -60,10 +60,6 @@
         height: 60vh;
     }
 
-    main {
-        padding: 0 .5rem;
-    }
-
     main .Title {
         padding: .5rem 0;
     }
@@ -327,7 +323,7 @@
 
     .cycles-card::before {
         content: attr(data-title);
-        @apply sticky top-0 z-20 block bg-linear-to-r from-violet-950 to-fuchsia-700 px-5 py-4 text-sm font-bold text-white;
+        @apply sticky top-0 z-20 block bg-linear-to-r from-violet-950 to-fuchsia-700 px-2 py-2 text-sm font-bold text-white;
     }
 
     .cycles-card h2 { @apply hidden; }
