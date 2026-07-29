@@ -130,7 +130,7 @@ const MeusJogos = () => {
     };
 
     // CAMADA 1: Calcula as 9 dezenas FIXAS do ÚLTIMO concurso com base no histórico estatístico
-    const getTop9FromPreviousDraw = (resultados) => {
+    const getRankingDezenas = (resultados) => {
         const historico = resultados
             .map((item) => ({
                 concurso: Number(item?.concurso ?? 0),
@@ -171,18 +171,13 @@ const MeusJogos = () => {
         });
 
         // Pega as dezenas do ÚLTIMO concurso sorteado (o mais recente)
-        const ultimoConcursoSorteado = historico[historico.length - 1].dezenas;
+        return ranking.sort((a, b) => {
+            if (b.probabilidade !== a.probabilidade) {
+                return b.probabilidade - a.probabilidade;
+            }
+            return b.repeticoes - a.repeticoes;
+        });
 
-        return ranking
-            .filter((item) => ultimoConcursoSorteado.includes(item.dezena))
-            .sort((a, b) => {
-                if (b.probabilidade !== a.probabilidade) {
-                    return b.probabilidade - a.probabilidade;
-                }
-                return b.repeticoes - a.repeticoes;
-            })
-            .slice(0, 9)
-            .map((item) => item.dezena);
     };
 
     // Função para remover duplicatas
@@ -259,9 +254,20 @@ const MeusJogos = () => {
             const cicloProcessado = processarCiclos([...resultados]);
             const dezenasAusentesCiclo = [...cicloProcessado.dezenasAusentes].map(Number);
 
-            // CAMADA 1: Trava as 9 Dezenas FIXAS (Estatisticamente superiores do último sorteio)
-            const top9Prioritarias = getTop9FromPreviousDraw(resultados);
-            const dezenasFixas9 = removerDuplicatas(top9Prioritarias).slice(0, 9);
+            // CAMADA 1: Trava 8 ou 9 Dezenas FIXAS (Estatisticamente superiores do último sorteio)
+            const rankingCompleto = getRankingDezenas(resultados);
+            const rankingDezenas = rankingCompleto.map(item => item.dezena);
+            const quantidadeFixas = Math.random() < 0.5 ? 8 : 9;
+
+            const dezenasFixas9 = rankingCompleto
+                .filter(item =>
+                    dezenasUltimoConcurso.includes(item.dezena)
+                )
+
+                .slice(0, quantidadeFixas)
+
+                .map(item => item.dezena);
+
 
             // Universo de dezenas (1 a 25)
             const todasDezenas = Array.from({ length: 25 }, (_, i) => i + 1);
@@ -281,23 +287,28 @@ const MeusJogos = () => {
                 let cartao = [...dezenasFixas9];
 
                 // CAMADA 2: Seleciona dezenas ausentes do ciclo priorizando o ranking estatístico
-                const ausentesEscolhidas = pickMandatoryNumbers(dezenasAusentesCiclo, top9Prioritarias);
+                const ausentesEscolhidas = pickMandatoryNumbers(dezenasAusentesCiclo, rankingDezenas);
 
                 ausentesEscolhidas.forEach((num) => {
                     if (!cartao.includes(num)) cartao.push(num);
                 });
 
                 // CAMADA 3: Preenche até 15 dezenas com números FORA do Concurso Atual
-                const opcoesCamada3 = dezenasForaDoConcursoAtual.filter(
-                    (num) => !cartao.includes(num)
-                );
-                const camada3Embaralhada = shuffleArray(opcoesCamada3);
+                const complementoRanking = rankingCompleto
+                    .filter(item =>
+                        dezenasForaDoConcursoAtual.includes(item.dezena)
+                    )
+                    .map(item => item.dezena);
 
-                for (const num of camada3Embaralhada) {
-                    if (cartao.length === 15) break;
-                    cartao.push(num);
+                for (const num of complementoRanking) {
+
+                    if (cartao.length === 15)
+                        break;
+
+                    if (!cartao.includes(num))
+                        cartao.push(num);
+                    
                 }
-
                 // Fallback de segurança (Caso o universo da Camada 3 se esgoste antes de completar 15)
                 if (cartao.length < 15) {
                     const restoDisponivel = todasDezenas.filter((num) => !cartao.includes(num));
@@ -306,7 +317,7 @@ const MeusJogos = () => {
                         if (cartao.length === 15) break;
                         cartao.push(num);
                     }
-                }
+                };
 
                 // CAMADA 4: Filtro Estrito de Paridade (7 Pares / 8 Ímpares ou 8 Pares / 7 Ímpares)
                 const pares = cartao.filter((num) => num % 2 === 0).length;
@@ -314,13 +325,13 @@ const MeusJogos = () => {
 
                 if ((pares === 7 && impares === 8) || (pares === 8 && impares === 7)) {
                     return cartao.sort((a, b) => a - b);
-                }
+                };
 
                 return null; // Cartão rejeitado pelo filtro de paridade
             };
 
             // Loop de geração com validação de unicidade (CAMADA 5)
-            while (jogos.length < 7 && tentativas < maxTentativas) {
+            while (jogos.length < 15 && tentativas < maxTentativas) {
                 const novoCartao = gerarCartaoUnitario();
 
                 // CAMADA 5: Validação de Unicidade
@@ -340,10 +351,10 @@ const MeusJogos = () => {
                 return;
             }
 
-            if (jogos.length < 7) {
+            if (jogos.length < 15) {
                 toast.warn(`Foram gerados apenas ${jogos.length} jogos únicos.`);
             } else {
-                toast.success("7 jogos gerados com sucesso respeitando as 5 camadas!");
+                toast.success("15 jogos gerados com sucesso respeitando as 5 camadas!");
             }
 
             // Atualiza estado e envia para a memória do navegador
