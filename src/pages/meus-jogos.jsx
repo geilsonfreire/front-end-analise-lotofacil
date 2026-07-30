@@ -180,11 +180,6 @@ const MeusJogos = () => {
 
     };
 
-    // Função para remover duplicatas
-    const removerDuplicatas = (array) => {
-        return Array.from(new Set(array));
-    };
-
     // Embaralha um array mantendo a aleatoriedade do gerador
     const shuffleArray = (array) => {
         const shuffled = [...array];
@@ -212,26 +207,44 @@ const MeusJogos = () => {
         return Math.floor(Math.random() * (maxCount - minCount + 1)) + minCount;
     };
 
-    // Seleciona as dezenas obrigatórias do ciclo atual e prioriza as top 9 do concurso anterior
-    const pickMandatoryNumbers = (absentNums, prioritizedNums) => {
-        const uniqueAbsent = removerDuplicatas(absentNums);
+    // Função para selecionar dezenas distribuídas com base no ranking e controle de uso
+    const selecionarDistribuido = (
+        pool,
+        ranking,
+        controleUso,
+        quantidade,
+        cartaoAtual
+    ) => {
 
-        if (uniqueAbsent.length === 0) {
-            return [];
-        }
+        const candidatos = pool
+            .filter(num => !cartaoAtual.includes(num))
+            .sort((a, b) => {
 
-        const prioritizedSet = new Set(prioritizedNums);
-        const selectionCount = getDynamicSelectionCount(uniqueAbsent.length);
+                const usoA = controleUso.get(a);
+                const usoB = controleUso.get(b);
 
-        const prioritizedAbsent = removerDuplicatas(
-            prioritizedNums.filter((num) => uniqueAbsent.includes(num))
-        ).sort((a, b) => prioritizedNums.indexOf(a) - prioritizedNums.indexOf(b) || a - b);
+                if (usoA !== usoB)
+                    return usoA - usoB;
 
-        const otherAbsent = uniqueAbsent
-            .filter((num) => !prioritizedSet.has(num))
-            .sort((a, b) => a - b);
+                return ranking.indexOf(a) - ranking.indexOf(b);
 
-        return [...prioritizedAbsent, ...shuffleArray(otherAbsent)].slice(0, selectionCount);
+            });
+
+        const escolhidas =
+            shuffleArray(candidatos)
+                .slice(0, quantidade);
+
+        escolhidas.forEach(num => {
+
+            controleUso.set(
+                num,
+                controleUso.get(num) + 1
+            );
+
+        });
+
+        return escolhidas;
+
     };
 
     // Função para gerar jogos
@@ -253,6 +266,7 @@ const MeusJogos = () => {
             // Processa o ciclo para obter as ausentes
             const cicloProcessado = processarCiclos([...resultados]);
             const dezenasAusentesCiclo = [...cicloProcessado.dezenasAusentes].map(Number);
+            const usoAusentes = new Map(dezenasAusentesCiclo.map(num => [num, 0]));
 
             // CAMADA 1: Trava 8 ou 9 Dezenas FIXAS (Estatisticamente superiores do último sorteio)
             const rankingCompleto = getRankingDezenas(resultados);
@@ -276,6 +290,15 @@ const MeusJogos = () => {
             const dezenasForaDoConcursoAtual = todasDezenas.filter(
                 (num) => !dezenasUltimoConcurso.includes(num)
             );
+            // CAMADA 3: Pool das dezenas de complemento (ranking + distribuição)
+            const poolComplemento = rankingCompleto
+                .filter(item => dezenasForaDoConcursoAtual.includes(item.dezena))
+                .map(item => item.dezena);
+
+            // Controle de utilização das dezenas do complemento
+            const usoComplemento = new Map(
+                poolComplemento.map(num => [num, 0])
+            );
 
             let jogos = [];
             let tentativas = 0;
@@ -287,28 +310,44 @@ const MeusJogos = () => {
                 let cartao = [...dezenasFixas9];
 
                 // CAMADA 2: Seleciona dezenas ausentes do ciclo priorizando o ranking estatístico
-                const ausentesEscolhidas = pickMandatoryNumbers(dezenasAusentesCiclo, rankingDezenas);
+                const quantidadeAusentes =
+                    getDynamicSelectionCount(
+                        dezenasAusentesCiclo.length
+                    );
 
-                ausentesEscolhidas.forEach((num) => {
-                    if (!cartao.includes(num)) cartao.push(num);
-                });
+                const ausentesEscolhidas =
+                    selecionarDistribuido(
+                        dezenasAusentesCiclo,
+                        rankingDezenas,
+                        usoAusentes,
+                        quantidadeAusentes,
+                        cartao
+                    );
 
-                // CAMADA 3: Preenche até 15 dezenas com números FORA do Concurso Atual
-                const complementoRanking = rankingCompleto
-                    .filter(item =>
-                        dezenasForaDoConcursoAtual.includes(item.dezena)
-                    )
-                    .map(item => item.dezena);
-
-                for (const num of complementoRanking) {
-
-                    if (cartao.length === 15)
-                        break;
-
+                ausentesEscolhidas.forEach(num => {
                     if (!cartao.includes(num))
                         cartao.push(num);
-                    
-                }
+
+                });
+
+                // CAMADA 3: Completa o cartão usando distribuição equilibrada
+                const quantidadeComplemento =
+                    15 - cartao.length;
+
+                const complemento = selecionarDistribuido(
+                    poolComplemento,
+                    rankingDezenas,
+                    usoComplemento,
+                    quantidadeComplemento,
+                    cartao
+                );
+
+                complemento.forEach(num => {
+                    if (!cartao.includes(num)) {
+                        cartao.push(num);
+                    }
+                });
+
                 // Fallback de segurança (Caso o universo da Camada 3 se esgoste antes de completar 15)
                 if (cartao.length < 15) {
                     const restoDisponivel = todasDezenas.filter((num) => !cartao.includes(num));
@@ -336,11 +375,37 @@ const MeusJogos = () => {
 
                 // CAMADA 5: Validação de Unicidade
                 if (
+
                     novoCartao &&
                     novoCartao.length === 15 &&
                     verificarJogoUnico(novoCartao, jogos, resultados)
-                ) {
+
+                ){
+
+                    novoCartao
+                        .filter(num => usoAusentes.has(num))
+                        .forEach(num => {
+
+                            usoAusentes.set(
+                                num,
+                                usoAusentes.get(num) + 1
+                            );
+
+                        });
+
+                    novoCartao
+                        .filter(num => usoComplemento.has(num))
+                        .forEach(num => {
+
+                            usoComplemento.set(
+                                num,
+                                usoComplemento.get(num) + 1
+                            );
+
+                        });
+
                     jogos.push(novoCartao);
+
                 }
                 tentativas++;
             }
