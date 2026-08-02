@@ -189,8 +189,6 @@ const ResultLotofacil = ({ onConcursoChange }) => {
                     } else {
                         setDezenasRestantes([]);
                     }
-
-                    toast.success("Dados carregados com sucesso!");
                 } else {
                     setDezenasRestantes([]);
                     toast.error("Erro ao carregar os dados.");
@@ -229,7 +227,7 @@ const ResultLotofacil = ({ onConcursoChange }) => {
                 setLatestResult(resultData);
                 setCurrentConcurso(concurso);
                 onConcursoChange(concurso); // Chamar a função de callback
-                toast.success("Dados carregados com sucesso!");
+                toast.success("Dados atualizados com sucesso!");
             } else {
                 toast.error("Erro ao carregar os dados.");
             }

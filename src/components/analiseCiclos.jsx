@@ -7,100 +7,123 @@ const AnaliseCiclos = () => {
 
     // Função para processar os ciclos de dezenas
     function processarCiclos(dados) {
-        // Array para armazenar os ciclos calculados inicialmente vazio
-        let ciclosCalculados = [];
-        // Objeto para armazenar o ciclo atual
+        const dadosOrdenados = [...dados].sort(
+            (a, b) => Number(a.concurso) - Number(b.concurso)
+        );
+
+        const todasDezenas = new Set(
+            Array.from({ length: 25 }, (_, i) =>
+                String(i + 1).padStart(2, "0")
+            )
+        );
+
+        const ciclosCalculados = [];
+
         let cicloAtual = {
             numero: 1,
             concursos: [],
-            dezenasAusentes: new Set([...Array(25).keys()].map(i => 
-                (i + 1).toString().padStart(2, '0')))
+            dezenasAusentes: new Set(todasDezenas),
         };
-        // Loop para percorrer os dados dos concursos
-        for (let i = 0; i < dados.length; i++) {
-            // Salva o concurso atual na variável concurso
-            const concurso = dados[i];
 
-            // NORMALIZA AS DEZENAS DO CONCURSO
-            // Sempre trabalharemos com "01", "02", ..., "25"
-            // Cria um conjunto com as dezenas sorteadas
+        for (const concurso of dadosOrdenados) {
             const dezenasSorteadas = new Set(
-                (concurso.dezenas || [])
-                    .map(dezena => String(dezena).padStart(2, '0'))
+                (concurso.dezenas || []).map((dezena) =>
+                    String(dezena).padStart(2, "0")
+                )
             );
 
-            // Remove do conjunto de ausentes as dezenas
-            // que foram sorteadas neste concurso
-            const novasAusentes = new Set(
-                [...cicloAtual.dezenasAusentes]
-                    .filter(dezena => !dezenasSorteadas.has(dezena))
-            );
+            // Remove as dezenas sorteadas do conjunto de ausentes
+            for (const dezena of dezenasSorteadas) {
+                cicloAtual.dezenasAusentes.delete(dezena);
+            }
 
-            // Adiciona o concurso atual ao ciclo atual
+            // Guarda o estado do ciclo DEPOIS deste concurso
             cicloAtual.concursos.push({
                 ...concurso,
-                dezenasAusentes: new Set(novasAusentes)
+                dezenasAusentes: new Set(cicloAtual.dezenasAusentes),
             });
 
-            // Atualiza o conjunto de dezenas ausentes
-            cicloAtual.dezenasAusentes = novasAusentes;
-
-
-            // Verifica se o ciclo atual não tem dezenas ausentes
+            // Se todas as 25 dezenas já apareceram,
+            // o ciclo termina neste concurso.
             if (cicloAtual.dezenasAusentes.size === 0) {
                 cicloAtual.duracao = cicloAtual.concursos.length;
 
                 ciclosCalculados.push({
                     ...cicloAtual,
                     concursos: [...cicloAtual.concursos],
-                    dezenasAusentes: new Set(cicloAtual.dezenasAusentes)
+                    dezenasAusentes: new Set(cicloAtual.dezenasAusentes),
                 });
 
-                // Reinicia o ciclo atual para o próximo ciclo
+                // Inicia o próximo ciclo
                 cicloAtual = {
                     numero: cicloAtual.numero + 1,
                     concursos: [],
-                    dezenasAusentes: new Set(
-                        [...Array(25).keys()]
-                            .map(i => (i + 1).toString().padStart(2, '0')))
+                    dezenasAusentes: new Set(todasDezenas),
                 };
             }
         }
 
-        // Verifica se o ciclo atual tem concursos
+        // Se existe um ciclo em andamento,
+        // adiciona também ao histórico.
         if (cicloAtual.concursos.length > 0) {
             cicloAtual.duracao = cicloAtual.concursos.length;
+
             ciclosCalculados.push({
                 ...cicloAtual,
                 concursos: [...cicloAtual.concursos],
-                dezenasAusentes: new Set(cicloAtual.dezenasAusentes)
+                dezenasAusentes: new Set(cicloAtual.dezenasAusentes),
             });
         }
-        // Atualiza o estado ciclos com os ciclos calculados
+
         setCiclos(ciclosCalculados);
     }
 
     useEffect(() => {
-        // Função para buscar os resultados da Lotofácil
         const fetchResults = async () => {
             try {
-                // Salva a resposta da API na variável response
                 const response = await apiService.getAllResults();
-                // Verifica se a resposta é um array
-                if (Array.isArray(response)) {
-                    // Ordena os concursos do mais antigo para o mais recente
-                    const dadosOrdenados = response.sort((a, b) => a.concurso - b.concurso);
-                    // Processa os ciclos de dezenas
-                    processarCiclos(dadosOrdenados);
-                } else {
-                    console.warn("Os dados recebidos não são um array:", response);
+
+                if (!Array.isArray(response)) {
+                    console.warn(
+                        "Os dados recebidos não são um array:",
+                        response
+                    );
+                    return;
                 }
+
+                console.log(
+                    "TOTAL DE RESULTADOS PARA ANÁLISE:",
+                    response.length
+                );
+
+                const dadosOrdenados = [...response].sort(
+                    (a, b) => Number(a.concurso) - Number(b.concurso)
+                );
+
+                console.log(
+                    "PRIMEIRO CONCURSO:",
+                    dadosOrdenados[0]?.concurso
+                );
+
+                console.log(
+                    "ÚLTIMO CONCURSO:",
+                    dadosOrdenados.at(-1)?.concurso
+                );
+
+                processarCiclos(dadosOrdenados);
+
             } catch (error) {
-                console.error("Erro ao buscar resultados:", error);
-                toast.error("Erro ao carregar os resultados da Lotofácil.");
+                console.error(
+                    "Erro ao buscar resultados:",
+                    error
+                );
+
+                toast.error(
+                    "Erro ao carregar os resultados da Lotofácil."
+                );
             }
         };
-        // Chama a função fetchResults
+
         fetchResults();
     }, []);
 

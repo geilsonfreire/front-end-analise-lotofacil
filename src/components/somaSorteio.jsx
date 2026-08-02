@@ -71,8 +71,6 @@ const SomaSorteios = () => {
                         conjuntosSoma: conjuntos
                     });
                 }
-
-                toast.success("Resultados carregados com sucesso!");
             } catch (error) {
                 console.error("Erro ao buscar os resultados:", error);
                 toast.error("Erro ao buscar os resultados.");

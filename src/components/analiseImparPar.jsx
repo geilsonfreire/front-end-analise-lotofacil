@@ -23,7 +23,7 @@ const AnaliseImpaPar = () => {
 
             setAnalysis(analysisResult);
 
-            toast.success("Análise concluída com sucesso!");
+            toast.success("Análise de paridade concluída!");
 
         } catch (error) {
 
