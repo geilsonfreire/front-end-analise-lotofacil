@@ -220,7 +220,7 @@ const ResultLotofacil = ({ onConcursoChange }) => {
 
     // Função para atualizar os dados do concurso
     const updateConcursoData = async (concurso) => {
-        const loadingToast = toast.info("Carregando dados...", { autoClose: false });
+        
         try {
             const resultData = await apiServices.getResultByContestNumber(concurso);
             if (resultData) {
@@ -234,8 +234,6 @@ const ResultLotofacil = ({ onConcursoChange }) => {
         } catch (error) {
             console.error("Erro na requisição:", error);
             toast.error("Erro na comunicação com o servidor.");
-        } finally {
-            toast.dismiss(loadingToast);
         }
     };
 
