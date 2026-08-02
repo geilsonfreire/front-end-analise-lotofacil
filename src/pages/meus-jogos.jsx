@@ -215,36 +215,21 @@ const MeusJogos = () => {
         quantidade,
         cartaoAtual
     ) => {
-
+        
         const candidatos = pool
             .filter(num => !cartaoAtual.includes(num))
             .sort((a, b) => {
 
-                const usoA = controleUso.get(a);
-                const usoB = controleUso.get(b);
+                const usoA = controleUso.get(a) ?? 0;
+                const usoB = controleUso.get(b) ?? 0;
 
-                if (usoA !== usoB)
+                if (usoA !== usoB){
                     return usoA - usoB;
-
+                }
                 return ranking.indexOf(a) - ranking.indexOf(b);
-
             });
 
-        const escolhidas =
-            shuffleArray(candidatos)
-                .slice(0, quantidade);
-
-        escolhidas.forEach(num => {
-
-            controleUso.set(
-                num,
-                controleUso.get(num) + 1
-            );
-
-        });
-
-        return escolhidas;
-
+        return shuffleArray(candidatos).slice(0, quantidade);
     };
 
     // Função para gerar jogos
@@ -267,6 +252,8 @@ const MeusJogos = () => {
             const cicloProcessado = processarCiclos([...resultados]);
             const dezenasAusentesCiclo = [...cicloProcessado.dezenasAusentes].map(Number);
             const usoAusentes = new Map(dezenasAusentesCiclo.map(num => [num, 0]));
+            // CAMADA 2: histórico das combinações já utilizadas
+            const selecoesAusentesGeradas = [];
 
             // CAMADA 1: Trava 8 ou 9 Dezenas FIXAS (Estatisticamente superiores do último sorteio)
             const rankingCompleto = getRankingDezenas(resultados);
@@ -304,6 +291,62 @@ const MeusJogos = () => {
             let tentativas = 0;
             const maxTentativas = 500;
 
+            // CAMADA 2: Seleciona uma combinação de dezenas ausentes
+            // garantindo que a mesma combinação não seja utilizada novamente.
+            const selecionarAusentesUnicos = (
+                pool,
+                ranking,
+                controleUso,
+                quantidade,
+                cartaoAtual
+            ) => {
+
+                const maxTentativasSelecao = 1000;
+
+                for (let tentativa = 0; tentativa < maxTentativasSelecao; tentativa++) {
+
+                    const selecao = selecionarDistribuido(
+                        pool,
+                        ranking,
+                        controleUso,
+                        quantidade,
+                        cartaoAtual
+                    );
+
+                    if (!selecao || selecao.length !== quantidade) {
+                        continue;
+                    }
+
+                    const chaveNova = [...selecao]
+                        .sort((a, b) => a - b)
+                        .join("-");
+
+                    const combinacaoJaExiste = selecoesAusentesGeradas
+                        .includes(chaveNova);
+
+                    if (combinacaoJaExiste) {
+                        continue;
+                    }
+                    // Registra a combinação somente depois de validada
+                    selecoesAusentesGeradas.push(chaveNova);
+
+                    // Atualiza o uso individual das dezenas
+                    selecao.forEach(num => {
+
+                        controleUso.set(
+                            num,
+                            (controleUso.get(num) ?? 0) + 1
+                        );
+
+                    });
+
+                    return selecao;
+                }
+            
+                return [];
+            };
+
+
             // Função de construção unitária do cartão
             const gerarCartaoUnitario = () => {
                 // CAMADA 1: Inicia obrigatoriamente com as 9 dezenas fixas
@@ -316,7 +359,7 @@ const MeusJogos = () => {
                     );
 
                 const ausentesEscolhidas =
-                    selecionarDistribuido(
+                    selecionarAusentesUnicos(
                         dezenasAusentesCiclo,
                         rankingDezenas,
                         usoAusentes,
@@ -345,6 +388,10 @@ const MeusJogos = () => {
                 complemento.forEach(num => {
                     if (!cartao.includes(num)) {
                         cartao.push(num);
+                        usoComplemento.set(
+                            num,
+                            (usoComplemento.get(num) ?? 0) + 1
+                        );
                     }
                 });
 
@@ -375,37 +422,13 @@ const MeusJogos = () => {
 
                 // CAMADA 5: Validação de Unicidade
                 if (
-
                     novoCartao &&
                     novoCartao.length === 15 &&
                     verificarJogoUnico(novoCartao, jogos, resultados)
 
                 ){
 
-                    novoCartao
-                        .filter(num => usoAusentes.has(num))
-                        .forEach(num => {
-
-                            usoAusentes.set(
-                                num,
-                                usoAusentes.get(num) + 1
-                            );
-
-                        });
-
-                    novoCartao
-                        .filter(num => usoComplemento.has(num))
-                        .forEach(num => {
-
-                            usoComplemento.set(
-                                num,
-                                usoComplemento.get(num) + 1
-                            );
-
-                        });
-
                     jogos.push(novoCartao);
-
                 }
                 tentativas++;
             }
