@@ -142,13 +142,6 @@ const DezenasQuentes = () => {
                     // Análise das dezenas repetidas
                     const repetidasInfo = analisarDezenasRepetidas(resultados);
                     setEstatisticasRepeticoes(repetidasInfo);
-
-                    toast.update(loadingToast, {
-                        render: "Dados carregados com sucesso!",
-                        type: "success",
-                        isLoading: false,
-                        autoClose: 3000,
-                    });
                     setHasLoaded(true); // Atualiza o estado para indicar que os dados foram carregados
                 } catch (err) {
                     setError("Erro ao buscar os resultados. Tente novamente mais tarde.");
