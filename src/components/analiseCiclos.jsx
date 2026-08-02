@@ -13,37 +13,68 @@ const AnaliseCiclos = () => {
         let cicloAtual = {
             numero: 1,
             concursos: [],
-            dezenasAusentes: new Set([...Array(25).keys()].map(i => (i + 1).toString().padStart(2, '0')))
+            dezenasAusentes: new Set([...Array(25).keys()].map(i => 
+                (i + 1).toString().padStart(2, '0')))
         };
         // Loop para percorrer os dados dos concursos
         for (let i = 0; i < dados.length; i++) {
             // Salva o concurso atual na variável concurso
             const concurso = dados[i];
+
+            // NORMALIZA AS DEZENAS DO CONCURSO
+            // Sempre trabalharemos com "01", "02", ..., "25"
             // Cria um conjunto com as dezenas sorteadas
-            const dezenasSorteadas = new Set(concurso.dezenas || []);
+            const dezenasSorteadas = new Set(
+                (concurso.dezenas || [])
+                    .map(dezena => String(dezena).padStart(2, '0'))
+            );
+
+            // Remove do conjunto de ausentes as dezenas
+            // que foram sorteadas neste concurso
+            const novasAusentes = new Set(
+                [...cicloAtual.dezenasAusentes]
+                    .filter(dezena => !dezenasSorteadas.has(dezena))
+            );
+
             // Adiciona o concurso atual ao ciclo atual
             cicloAtual.concursos.push({
                 ...concurso,
-                dezenasAusentes: new Set([...cicloAtual.dezenasAusentes].filter(d => !dezenasSorteadas.has(d)))
+                dezenasAusentes: new Set(novasAusentes)
             });
+
             // Atualiza o conjunto de dezenas ausentes
-            cicloAtual.dezenasAusentes = new Set([...cicloAtual.dezenasAusentes].filter(d => !dezenasSorteadas.has(d)));
+            cicloAtual.dezenasAusentes = novasAusentes;
+
+
             // Verifica se o ciclo atual não tem dezenas ausentes
             if (cicloAtual.dezenasAusentes.size === 0) {
                 cicloAtual.duracao = cicloAtual.concursos.length;
-                ciclosCalculados.push({ ...cicloAtual });
 
+                ciclosCalculados.push({
+                    ...cicloAtual,
+                    concursos: [...cicloAtual.concursos],
+                    dezenasAusentes: new Set(cicloAtual.dezenasAusentes)
+                });
+
+                // Reinicia o ciclo atual para o próximo ciclo
                 cicloAtual = {
                     numero: cicloAtual.numero + 1,
                     concursos: [],
-                    dezenasAusentes: new Set([...Array(25).keys()].map(i => (i + 1).toString().padStart(2, '0')))
+                    dezenasAusentes: new Set(
+                        [...Array(25).keys()]
+                            .map(i => (i + 1).toString().padStart(2, '0')))
                 };
             }
         }
+
         // Verifica se o ciclo atual tem concursos
         if (cicloAtual.concursos.length > 0) {
             cicloAtual.duracao = cicloAtual.concursos.length;
-            ciclosCalculados.push({ ...cicloAtual });
+            ciclosCalculados.push({
+                ...cicloAtual,
+                concursos: [...cicloAtual.concursos],
+                dezenasAusentes: new Set(cicloAtual.dezenasAusentes)
+            });
         }
         // Atualiza o estado ciclos com os ciclos calculados
         setCiclos(ciclosCalculados);

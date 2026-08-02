@@ -195,16 +195,30 @@ const MeusJogos = () => {
     // CAMADA 2: Define quantas dezenas devem entrar no núcleo do jogo, com base em uma faixa proporcional
     // entre 50% e 60% das dezenas ausentes do ciclo atual.
     const getDynamicSelectionCount = (absentCount) => {
-        if (absentCount <= 0) return 0;
-
-        const minCount = Math.max(1, Math.floor(absentCount * 0.5));
-        const maxCount = Math.min(absentCount, Math.ceil(absentCount * 0.6));
-
-        if (minCount > maxCount) {
-            return minCount;
+        // Nenhuma dezena ausente
+        if (absentCount === 0) {
+            return 0;
         }
 
-        return Math.floor(Math.random() * (maxCount - minCount + 1)) + minCount;
+        // Apenas uma dezena ausente
+        if (absentCount === 1) {
+            return 1;
+        }
+
+        // Duas ou mais dezenas ausentes
+        const minCount = Math.max(
+            1,
+            Math.floor(absentCount * 0.5)
+        );
+
+        const maxCount = Math.min(
+            absentCount,
+            Math.ceil(absentCount * 0.6)
+        );
+
+        return Math.floor(
+            Math.random() * (maxCount - minCount + 1)
+        ) + minCount;
     };
 
     // Função para selecionar dezenas distribuídas com base no ranking e controle de uso

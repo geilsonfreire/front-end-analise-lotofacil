@@ -9,7 +9,6 @@ import MeusJogos from '../pages/meus-jogos.jsx';
 import AnaliseImpaPar from '../components/analiseImparPar.jsx';
 import DezenasQuentes from "../components/dezenasQuentes.jsx";
 import SomaSorteios from "../components/somaSorteio.jsx";
-import AnaliseClusters from "../pages/analiseClusters.jsx";
 import AnaliseCiclos from "../components/analiseCiclos.jsx";
 import AnaliseDezenasSorteioAnterior from "../components/analiseDezenasSorteioAnterior.jsx";
 
@@ -23,7 +22,6 @@ const MyRoutes = () => {
                     <Route path="/analise-impa-par" element={<AnaliseImpaPar />} />
                     <Route path="/dezenas-quentes" element={<DezenasQuentes />} />
                     <Route path="/soma-sorteios" element={<SomaSorteios />} />
-                    <Route path="/analise-clusters" element={<AnaliseClusters />} />
                     <Route path="/analise-ciclos" element={<AnaliseCiclos />} />
                     <Route path="/analise-dezenas-sorteio-anterior" element={<AnaliseDezenasSorteioAnterior />} />
                 </Route>

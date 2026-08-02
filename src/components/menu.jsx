@@ -9,7 +9,6 @@ import Logo from "../assets/img/logo.png";
 // Import icon
 import { MdSpaceDashboard } from "react-icons/md";
 import { TbClover } from "react-icons/tb";
-import { GrAnalytics } from "react-icons/gr";
 import { RiBarChart2Fill } from "react-icons/ri";
 
 const Menu = ({ isOpen, onClose }) => {
@@ -47,13 +46,6 @@ const Menu = ({ isOpen, onClose }) => {
                         to="/"
                         icon={<MdSpaceDashboard />}
                         title="DashBoard"
-                        onClick={onClose}
-                    />
-                
-                    <Icon
-                        to="/analise-clusters"
-                        icon={<GrAnalytics />}
-                        title="Analise Clusters"
                         onClick={onClose}
                     />
                    

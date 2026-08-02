@@ -33,64 +33,87 @@ const ResultLotofacil = ({ onConcursoChange }) => {
     const totalCombinations = calculateCombinations(25, 15);
 
     const processarCiclos = (dados) => {
-        // 1. Ordenar pelo número do concurso
-        dados.sort((a, b) => a.concurso - b.concurso);
+        // Ordena do concurso mais antigo para o mais recente
+        const dadosOrdenados = [...dados].sort(
+            (a, b) => Number(a.concurso) - Number(b.concurso)
+        );
 
-        let ciclosCalculados = [];
+        const todasDezenas = new Set(
+            Array.from({ length: 25 }, (_, i) =>
+                String(i + 1).padStart(2, "0")
+            )
+        );
+
+        const ciclosCalculados = [];
+
         let cicloAtual = {
             numero: 1,
             concursos: [],
-            dezenasAusentes: new Set(
-                [...Array(25).keys()].map(i => (i + 1).toString().padStart(2, '0'))
-            )
+            dezenasAusentes: new Set(todasDezenas),
         };
 
-        for (let i = 0; i < dados.length; i++) {
-            const concurso = dados[i];
-            // Padroniza as dezenas
-            const dezenasConvertidas = (concurso.dezenas || []).map(d =>
-                d.toString().padStart(2, '0')
-            );
-            const dezenasSorteadas = new Set(dezenasConvertidas);
-
-            // Remove as dezenas sorteadas da lista de ausentes
-            cicloAtual.dezenasAusentes = new Set(
-                [...cicloAtual.dezenasAusentes].filter(
-                    d => !dezenasSorteadas.has(d)
+        for (const concurso of dadosOrdenados) {
+            const dezenasSorteadas = new Set(
+                (concurso.dezenas || []).map((dezena) =>
+                    String(dezena).padStart(2, "0")
                 )
             );
 
+            // Remove as dezenas que já foram sorteadas
+            cicloAtual.dezenasAusentes = new Set(
+                [...cicloAtual.dezenasAusentes].filter(
+                    (dezena) => !dezenasSorteadas.has(dezena)
+                )
+            );
+
+            // Guarda o estado do ciclo depois deste concurso
             cicloAtual.concursos.push({
                 ...concurso,
-                dezenasAusentes: new Set(cicloAtual.dezenasAusentes)
+                dezenasAusentes: new Set(cicloAtual.dezenasAusentes),
             });
 
-            // Se não houver mais dezenas ausentes, fecha o ciclo
+            // Se todas as 25 dezenas apareceram,
+            // o ciclo foi concluído neste concurso.
             if (cicloAtual.dezenasAusentes.size === 0) {
                 cicloAtual.duracao = cicloAtual.concursos.length;
-                ciclosCalculados.push({ ...cicloAtual });
 
+                ciclosCalculados.push({
+                    ...cicloAtual,
+                    concursos: [...cicloAtual.concursos],
+                    dezenasAusentes: new Set(cicloAtual.dezenasAusentes),
+                });
+
+                // Inicia um novo ciclo
                 cicloAtual = {
                     numero: cicloAtual.numero + 1,
                     concursos: [],
-                    dezenasAusentes: new Set(
-                        [...Array(25).keys()].map(i => (i + 1).toString().padStart(2, '0'))
-                    )
+                    dezenasAusentes: new Set(todasDezenas),
                 };
             }
         }
 
-        // Se ainda houver um ciclo em andamento
+        // Se existe um ciclo em andamento,
+        // adiciona ele sem fechá-lo.
         if (cicloAtual.concursos.length > 0) {
-            ciclosCalculados.push({ ...cicloAtual });
+            cicloAtual.duracao = cicloAtual.concursos.length;
+
+            ciclosCalculados.push({
+                ...cicloAtual,
+                concursos: [...cicloAtual.concursos],
+                dezenasAusentes: new Set(cicloAtual.dezenasAusentes),
+            });
         }
 
-        return ciclosCalculados[ciclosCalculados.length - 1];
+        // Retorna somente o ciclo atual
+        return ciclosCalculados.at(-1) || null;
     };
 
     useEffect(() => {
         const loadData = async () => {
-            const loadingToast = toast.info("Carregando dados...", { autoClose: false });
+            const loadingToast = toast.info("Carregando dados...", {
+                autoClose: false
+            });
+
             try {
                 const [allResults, latestResultData] = await Promise.all([
                     apiServices.getAllResults(),
@@ -102,11 +125,74 @@ const ResultLotofacil = ({ onConcursoChange }) => {
                 if (latestResultData) {
                     setLatestResult(latestResultData);
                     setCurrentConcurso(latestResultData.concurso);
-                    const cicloProcessado = processarCiclos(allResults);
+
+                    // ==================================================
+                    // 1. Copia todos os resultados disponíveis
+                    // ==================================================
+                    const resultadosParaCiclo = [...allResults];
+
+                    // ==================================================
+                    // 2. Verifica se o último concurso já está
+                    //    dentro de allResults
+                    // ==================================================
+                    const ultimoConcursoJaExiste = resultadosParaCiclo.some(
+                        (resultado) =>
+                            Number(resultado.concurso) ===
+                            Number(latestResultData.concurso)
+                    );
+
+                    // ==================================================
+                    // 3. Se não estiver, adiciona o último concurso
+                    // ==================================================
+                    if (!ultimoConcursoJaExiste) {
+                        resultadosParaCiclo.push(latestResultData);
+                    }
+
+                    // ==================================================
+                    // 4. Processa os ciclos incluindo o último concurso
+                    // ==================================================
+                    const cicloProcessado = processarCiclos(resultadosParaCiclo);
+
+                    console.log(
+                        "TOTAL PARA CÁLCULO DO CICLO:",
+                        resultadosParaCiclo.length
+                    );
+
+                    console.log(
+                        "ÚLTIMO CONCURSO USADO NO CÁLCULO:",
+                        resultadosParaCiclo.at(-1)?.concurso
+                    );
+
+                    console.log(
+                        "CICLO ATUAL PROCESSADO:",
+                        cicloProcessado
+                    );
+
                     setCicloAtual(cicloProcessado);
-                    setDezenasRestantes([...cicloProcessado.dezenasAusentes].sort((a, b) => Number(a) - Number(b)));
+
+                    // ==================================================
+                    // 5. Atualiza as dezenas ausentes
+                    // ==================================================
+                    if (cicloProcessado) {
+                        const ausentes = [
+                            ...cicloProcessado.dezenasAusentes
+                        ].sort(
+                            (a, b) => Number(a) - Number(b)
+                        );
+
+                        setDezenasRestantes(ausentes);
+
+                        console.log(
+                            "DEZENAS AUSENTES NO CICLO ATUAL:",
+                            ausentes
+                        );
+                    } else {
+                        setDezenasRestantes([]);
+                    }
+
                     toast.success("Dados carregados com sucesso!");
                 } else {
+                    setDezenasRestantes([]);
                     toast.error("Erro ao carregar os dados.");
                 }
             } catch (error) {
