@@ -58,23 +58,186 @@ const MeusJogos = () => {
 
         carregarUltimoResultado();
     }, []);
-    
-    // CAMADA 5: Validação de Unicidade Rígida
-    // Garante que o jogo é único entre os 7 da cartela E nunca foi sorteado no histórico da Lotofácilo
-    const verificarJogoUnico = (novoJogo, jogosAnteriores, resultados) => {
-        // Ordena o novo jogo para comparar
-        const novoJogoOrdenado = [...novoJogo].sort((a, b) => a - b);
-        // Verifica se o jogo já foi gerado anteriormente
-        const jogoExisteGerados = jogosAnteriores.some(jogo =>
-            JSON.stringify([...jogo].sort((a, b) => a - b)) === JSON.stringify(novoJogoOrdenado)
-        );
-        // Verifica se o jogo já foi sorteado dentre os resultados ja realisado da lotofacil
-        const jogoExisteResultados = resultados.some(resultado => {
-            const numerosDoResultado = resultado.dezenas.map(Number).sort((a, b) => a - b);
-            return JSON.stringify(numerosDoResultado) === JSON.stringify(novoJogoOrdenado);
+
+    // Gera todas as 16 combinações de 15 dezenas existentes dentro de um jogo de 16
+    const gerarCombinacoesDe15 = (jogo16) => {
+
+        // Validação de entrada
+        if (!Array.isArray(jogo16) || jogo16.length !== 16) {
+            return [];
+        }
+
+        // Normaliza e ordena o jogo
+        const jogoOrdenado = [...new Set(jogo16)]
+            .map(Number)
+            .sort((a, b) => a - b);
+
+        // Garante que continuamos realmente com 16 dezenas únicas
+        if (jogoOrdenado.length !== 16) {
+            return [];
+        }
+
+        // Remove uma dezena por vez.
+        // 16 dezenas → 16 combinações diferentes de 15.
+        return jogoOrdenado.map((_, indiceRemovido) => {
+            return jogoOrdenado
+                .filter((_, indice) => indice !== indiceRemovido);
         });
-        // Retorna verdadeiro se o jogo não existir em nenhum dos casos
-        return !jogoExisteGerados && !jogoExisteResultados;
+    };
+        
+    // CAMADA 5: Validação de unicidade
+    //
+    // Regras:
+    //
+    // 1. Nenhuma combinação de 15 dezenas do jogo de 16
+    //    pode ter sido sorteada no histórico.
+    //
+    // 2. Nenhuma combinação de 15 dezenas do novo jogo
+    //    pode existir dentro de outro jogo nosso.
+    //
+    // 3. O conjunto completo de 16 dezenas também não
+    //    pode ser igual a outro jogo nosso.
+
+    const verificarJogoUnico = (novoJogo, dezenaAdicional, jogosAnteriores, resultados) => {
+
+        // ==========================================================
+        // NORMALIZA O NOVO JOGO
+        // ==========================================================
+
+        const novoJogoOrdenado = [...novoJogo]
+            .map(Number)
+            .sort((a, b) => a - b);
+
+        // Monta o jogo de 16 dezenas
+        const jogo16 = [
+            ...novoJogoOrdenado,
+            Number(dezenaAdicional)
+        ].sort((a, b) => a - b);
+
+        // ==========================================================
+        // GERA AS 16 COMBINAÇÕES DE 15 DO NOVO JOGO
+        // ==========================================================
+         // Gera as 16 combinações possíveis de 15 dezenas
+        const combinacoesNovoJogo = gerarCombinacoesDe15(jogo16);
+
+        console.log("NOVO JOGO 15:", novoJogoOrdenado);
+        console.log("DEZENA ADICIONAL:", dezenaAdicional);
+        console.log("JOGO COMPLETO 16:", jogo16);
+        console.log("COMBINAÇÕES NOVO JOGO:", combinacoesNovoJogo);
+
+        // ==========================================================
+        // CHAVE PADRONIZADA PARA COMPARAÇÃO
+        // ==========================================================
+
+        const criarChave = (numeros) => {
+            return [...numeros]
+                .map(Number)
+                .sort((a, b) => a - b)
+                .join("-");
+        };
+
+
+        // ==========================================================
+        // REGRA 1
+        // COMPARAÇÃO DAS 15 DEZENAS CONTRA O HISTÓRICO
+        // ==========================================================
+
+        const historicoChaves = new Set(
+            resultados.map(resultado =>
+                criarChave(resultado.dezenas)
+            )
+        );
+
+
+        const combinacaoHistorica = combinacoesNovoJogo.some(
+            combinacao => historicoChaves.has(
+                criarChave(combinacao)
+            )
+        );
+
+
+        // Se alguma das 16 combinações de 15 já foi sorteada
+        if (combinacaoHistorica) {
+            return false;
+        }
+
+
+        // ==========================================================
+        // REGRA 2
+        // COMPARAÇÃO DAS 15 DEZENAS CONTRA NOSSOS JOGOS
+        // ==========================================================
+
+        const combinacoesJogosAnteriores = jogosAnteriores.flatMap(
+            jogo => {
+
+                // Jogos antigos de 16
+                if (jogo.length === 16) {
+                    return gerarCombinacoesDe15(
+                        jogo
+                    );
+                }
+
+                // Compatibilidade com jogos antigos de 15
+                if (jogo.length === 15) {
+                    return [[...jogo]];
+                }
+
+                return [];
+            }
+        );
+
+
+        const combinacaoJaGerada = combinacoesNovoJogo.some(
+            combinacaoNova => {
+
+                const chaveNova = criarChave(combinacaoNova);
+
+                return combinacoesJogosAnteriores.some(
+                    combinacaoAnterior =>
+                        criarChave(combinacaoAnterior) === chaveNova
+                );
+            }
+        );
+
+        // Se alguma combinação de 15 já pertence
+        // a um dos nossos jogos
+        if (combinacaoJaGerada) {
+            return false;
+        }
+
+
+        // ==========================================================
+        // REGRA 3
+        // COMPARAÇÃO DOS 16 CONTRA NOSSOS JOGOS
+        // ==========================================================
+
+        const chaveNovoJogo16 = criarChave(jogo16);
+
+
+        const jogo16JaExiste = jogosAnteriores.some(
+            jogo => {
+
+                // Só compara jogos completos de 16
+                if (jogo.length !== 16) {
+                    return false;
+                }
+
+                return criarChave(jogo) === chaveNovoJogo16;
+            }
+        );
+
+
+        // Jogo de 16 exatamente igual já existe
+        if (jogo16JaExiste) {
+            return false;
+        }
+
+
+        // ==========================================================
+        // TODAS AS VALIDAÇÕES PASSARAM
+        // ==========================================================
+
+        return true;
     };
 
 
@@ -287,6 +450,22 @@ const MeusJogos = () => {
             // Universo de dezenas (1 a 25)
             const todasDezenas = Array.from({ length: 25 }, (_, i) => i + 1);
 
+            // Seleciona a dezena adicional do jogo de 16
+            const selecionarDezenaAdicional = (jogo15) => {
+
+                const disponiveis = todasDezenas.filter(
+                    numero => !jogo15.includes(numero)
+                );
+
+                if (disponiveis.length === 0) {
+                    return null;
+                }
+
+                return disponiveis[
+                    Math.floor(Math.random() * disponiveis.length)
+                ];
+            };
+
             // Dezenas que NÃO saíram no último concurso (10 dezenas)
             const dezenasForaDoConcursoAtual = todasDezenas.filter(
                 (num) => !dezenasUltimoConcurso.includes(num)
@@ -432,18 +611,62 @@ const MeusJogos = () => {
 
             // Loop de geração com validação de unicidade (CAMADA 5)
             while (jogos.length < 15 && tentativas < maxTentativas) {
+
+                // ==========================================================
+                // GERA O JOGO BASE DE 15
+                // ==========================================================
+
                 const novoCartao = gerarCartaoUnitario();
 
-                // CAMADA 5: Validação de Unicidade
-                if (
-                    novoCartao &&
-                    novoCartao.length === 15 &&
-                    verificarJogoUnico(novoCartao, jogos, resultados)
+                if (!novoCartao || novoCartao.length !== 15) {
+                    tentativas++;
+                    continue;
+                }
 
-                ){
+
+                // ==========================================================
+                // SELECIONA A DEZENA ADICIONAL
+                // ==========================================================
+
+                const dezenaAdicional = selecionarDezenaAdicional(
+                    novoCartao
+                );
+
+                if (!dezenaAdicional) {
+                    tentativas++;
+                    continue;
+                }
+
+
+                // ==========================================================
+                // CAMADA 5: VALIDAÇÃO DE UNICIDADE
+                // ==========================================================
+
+                const jogoValido = verificarJogoUnico(
+                    novoCartao,
+                    dezenaAdicional,
+                    jogos,
+                    resultados
+                );
+
+
+                // ==========================================================
+                // ACEITA O JOGO
+                // ==========================================================
+
+                if (jogoValido) {
 
                     jogos.push(novoCartao);
+
+                    console.log(
+                        `Jogo ${jogos.length} aceito:`,
+                        novoCartao,
+                        "| Adicional:",
+                        dezenaAdicional
+                    );
                 }
+
+
                 tentativas++;
             }
 
