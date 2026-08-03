@@ -101,29 +101,35 @@ const MeusJogos = () => {
     const verificarJogoUnico = (novoJogo, dezenaAdicional, jogosAnteriores, resultados) => {
 
         // ==========================================================
-        // NORMALIZA O NOVO JOGO
+        // NORMALIZA O NOVO JOGO DE 15
         // ==========================================================
-
-        const novoJogoOrdenado = [...novoJogo]
+        const novoJogoOrdenado = [...new Set(novoJogo)]
             .map(Number)
             .sort((a, b) => a - b);
 
-        // Monta o jogo de 16 dezenas
+        // Segurança
+        if (novoJogoOrdenado.length !== 15) {
+            return false;
+        }
+
+        // ==========================================================
+        // MONTA O JOGO COMPLETO DE 16
+        // ==========================================================
+        const adicional = Number(dezenaAdicional);
+        if (
+            !Number.isInteger(adicional) ||
+            novoJogoOrdenado.includes(adicional)
+        ) {
+            return false;
+        }
         const jogo16 = [
             ...novoJogoOrdenado,
-            Number(dezenaAdicional)
+            adicional
         ].sort((a, b) => a - b);
-
-        // ==========================================================
-        // GERA AS 16 COMBINAÇÕES DE 15 DO NOVO JOGO
-        // ==========================================================
-         // Gera as 16 combinações possíveis de 15 dezenas
-        const combinacoesNovoJogo = gerarCombinacoesDe15(jogo16);
-
-        console.log("NOVO JOGO 15:", novoJogoOrdenado);
-        console.log("DEZENA ADICIONAL:", dezenaAdicional);
-        console.log("JOGO COMPLETO 16:", jogo16);
-        console.log("COMBINAÇÕES NOVO JOGO:", combinacoesNovoJogo);
+        // Segurança
+        if (jogo16.length !== 16) {
+            return false;
+        }
 
         // ==========================================================
         // CHAVE PADRONIZADA PARA COMPARAÇÃO
@@ -136,12 +142,33 @@ const MeusJogos = () => {
                 .join("-");
         };
 
+        // ==========================================================
+        // GERA AS 16 COMBINAÇÕES DE 15
+        // ==========================================================
+        const combinacoesNovoJogo = gerarCombinacoesDe15(jogo16);
+        console.log("======================================");
+        console.log("JOGO 16:", jogo16);
+        console.log("TOTAL:", combinacoesNovoJogo.length);
+
+        combinacoesNovoJogo.forEach((combinacao, indice) => {
+            console.log(
+                `COMBINAÇÃO ${indice + 1}:`,
+                combinacao
+            );
+        });
+
+        // Segurança
+        if (combinacoesNovoJogo.length !== 16) {
+            return false;
+        }
+
 
         // ==========================================================
         // REGRA 1
-        // COMPARAÇÃO DAS 15 DEZENAS CONTRA O HISTÓRICO
+        //
+        // COMPARA AS 16 COMBINAÇÕES DE 15
+        // CONTRA O HISTÓRICO
         // ==========================================================
-
         const historicoChaves = new Set(
             resultados.map(resultado =>
                 criarChave(resultado.dezenas)
@@ -158,33 +185,62 @@ const MeusJogos = () => {
 
         // Se alguma das 16 combinações de 15 já foi sorteada
         if (combinacaoHistorica) {
+            console.log(
+                "REJEITADO — combinação de 15 já existe no histórico."
+            );
             return false;
         }
 
 
         // ==========================================================
         // REGRA 2
-        // COMPARAÇÃO DAS 15 DEZENAS CONTRA NOSSOS JOGOS
+        //
+        // COMPARA AS 16 COMBINAÇÕES DE 15
+        // CONTRA AS COMBINAÇÕES DOS NOSSOS JOGOS
         // ==========================================================
+        const combinacoesJogosAnteriores = jogosAnteriores.flatMap(item => {
 
-        const combinacoesJogosAnteriores = jogosAnteriores.flatMap(
-            jogo => {
+            if (
+                item &&
+                !Array.isArray(item) &&
+                Array.isArray(item.dezenas)
+            ) {
 
-                // Jogos antigos de 16
-                if (jogo.length === 16) {
-                    return gerarCombinacoesDe15(
-                        jogo
-                    );
-                }
+                const jogoAnterior16 = [
+                    ...item.dezenas,
+                    Number(item.dezenaAdicional)
+                ].sort((a, b) => a - b);
 
-                // Compatibilidade com jogos antigos de 15
-                if (jogo.length === 15) {
-                    return [[...jogo]];
-                }
+                return gerarCombinacoesDe15(
+                    jogoAnterior16
+                );
+            };
+            // --------------------------------------------------
+            // COMPATIBILIDADE COM JOGOS ANTIGOS DE 16
+            // --------------------------------------------------
 
-                return [];
+            if (
+                Array.isArray(item) &&
+                item.length === 16
+            ) {
+                return gerarCombinacoesDe15(item);
             }
-        );
+
+
+            // --------------------------------------------------
+            // COMPATIBILIDADE COM JOGOS ANTIGOS DE 15
+            // --------------------------------------------------
+
+            if (
+                Array.isArray(item) &&
+                item.length === 15
+            ) {
+                return [item];
+            }
+
+
+            return [];
+        });
 
 
         const combinacaoJaGerada = combinacoesNovoJogo.some(
@@ -202,33 +258,60 @@ const MeusJogos = () => {
         // Se alguma combinação de 15 já pertence
         // a um dos nossos jogos
         if (combinacaoJaGerada) {
+            console.log(
+                "REJEITADO — combinação de 15 já pertence a outro jogo."
+            );
+
             return false;
         }
 
 
         // ==========================================================
         // REGRA 3
-        // COMPARAÇÃO DOS 16 CONTRA NOSSOS JOGOS
+        //
+        // COMPARAÇÃO DO CONJUNTO COMPLETO DE 16
+        // CONTRA OS NOSSOS JOGOS
         // ==========================================================
 
         const chaveNovoJogo16 = criarChave(jogo16);
 
 
-        const jogo16JaExiste = jogosAnteriores.some(
-            jogo => {
+         const jogo16JaExiste = jogosAnteriores.some(item => {
+            if (
+                item &&
+                !Array.isArray(item) &&
+                Array.isArray(item.dezenas)
+            ){
 
-                // Só compara jogos completos de 16
-                if (jogo.length !== 16) {
-                    return false;
-                }
+                const jogoAnterior16 = [
+                    ...item.dezenas,
+                    Number(item.dezenaAdicional)
+                ];
 
-                return criarChave(jogo) === chaveNovoJogo16;
+                return (
+                    criarChave(jogoAnterior16) ===
+                    chaveNovoJogo16
+                );
             }
-        );
+             if (
+                Array.isArray(item) &&
+                item.length === 16
+            ) {
+                return (
+                    criarChave(item) ===
+                    chaveNovoJogo16
+                );
+            }
+            return false;
+
+        });
 
 
         // Jogo de 16 exatamente igual já existe
         if (jogo16JaExiste) {
+            console.log(
+                "REJEITADO — conjunto de 16 já existe."
+            );
             return false;
         }
 
@@ -236,7 +319,9 @@ const MeusJogos = () => {
         // ==========================================================
         // TODAS AS VALIDAÇÕES PASSARAM
         // ==========================================================
-
+        console.log(
+            "JOGO APROVADO PELA CAMADA 5."
+        );
         return true;
     };
 
@@ -450,8 +535,45 @@ const MeusJogos = () => {
             // Universo de dezenas (1 a 25)
             const todasDezenas = Array.from({ length: 25 }, (_, i) => i + 1);
 
-            // Seleciona a dezena adicional do jogo de 16
-            const selecionarDezenaAdicional = (jogo15) => {
+            // Seleciona a 16ª dezena do jogo.
+            //
+            // Regra:
+            // 1. Se existirem dezenas ausentes no ciclo,
+            //    escolhe uma delas.
+            // 2. Se o ciclo estiver finalizado,
+            //    escolhe uma dezena aleatória fora do jogo de 15.
+            const selecionarDezenaAdicional = (
+                jogo15,
+                dezenasAusentesCiclo
+            ) => {
+
+                // ==========================================================
+                // REGRA 1
+                // PRIORIDADE: DEZENAS AUSENTES DO CICLO
+                // ==========================================================
+
+                const ausentesDisponiveis = dezenasAusentesCiclo.filter(
+                    numero => !jogo15.includes(numero)
+                );
+
+                if (ausentesDisponiveis.length > 0) {
+
+                    return ausentesDisponiveis[
+                        Math.floor(
+                            Math.random() * ausentesDisponiveis.length
+                        )
+                    ];
+                }
+
+
+                // ==========================================================
+                // REGRA 2
+                // CICLO FINALIZADO
+                //
+                // Não existem dezenas ausentes no ciclo.
+                // Nesse caso, escolhe aleatoriamente entre
+                // as dezenas que não pertencem ao jogo de 15.
+                // ==========================================================
 
                 const disponiveis = todasDezenas.filter(
                     numero => !jogo15.includes(numero)
@@ -462,7 +584,9 @@ const MeusJogos = () => {
                 }
 
                 return disponiveis[
-                    Math.floor(Math.random() * disponiveis.length)
+                    Math.floor(
+                        Math.random() * disponiveis.length
+                    )
                 ];
             };
 
@@ -629,7 +753,8 @@ const MeusJogos = () => {
                 // ==========================================================
 
                 const dezenaAdicional = selecionarDezenaAdicional(
-                    novoCartao
+                    novoCartao,
+                    dezenasAusentesCiclo
                 );
 
                 if (!dezenaAdicional) {
@@ -656,7 +781,10 @@ const MeusJogos = () => {
 
                 if (jogoValido) {
 
-                    jogos.push(novoCartao);
+                     jogos.push({
+                        dezenas: novoCartao,
+                        dezenaAdicional: dezenaAdicional
+                    });
 
                     console.log(
                         `Jogo ${jogos.length} aceito:`,
@@ -739,9 +867,17 @@ const MeusJogos = () => {
                 {jogosGerados.length > 0 && (
                     <div className="jogos-container">
                         {jogosGerados.map((jogo, index) => {
-                            const { pares, impares } = contarParesImpares(jogo);
-                            const acertos = contarAcertos(jogo);
-                            const soma = calcularSoma(jogo); // Calcula a soma das dezenas
+
+                            const dezenas = jogo.dezenas;
+                            const adicional = jogo.dezenaAdicional;
+
+                            const { pares, impares } = contarParesImpares(dezenas);
+                            const acertos = contarAcertos([
+                                ...dezenas,
+                                adicional
+                            ]);
+                            const soma = calcularSoma(dezenas);
+                            
                             return (
                                 <div key={index} className="jogo-box">
                                     <div className="jogo-titulo">
@@ -757,7 +893,7 @@ const MeusJogos = () => {
                                         </span>
                                     </div>
                                     <div className="numeros-container">
-                                        {jogo.map((numero, numIndex) => {
+                                        {dezenas.map((numero, numIndex) => {
                                             const numeroAcertado = resultadoConcurso.includes(numero);
                                             return (
                                                 <div
@@ -769,6 +905,25 @@ const MeusJogos = () => {
                                                 </div>
                                             );
                                         })}
+                                        {/* 16ª DEZENA ADICIONAL */}
+                                        <div
+                                            className={`dezena-adicional ${
+                                                resultadoConcurso.includes(adicional)
+                                                    ? 'numero-acertado'
+                                                    : ''
+                                            }`}
+                                            style={
+                                                resultadoConcurso.includes(adicional)
+                                                    ? {
+                                                        borderColor: '#059669',
+                                                        borderWidth: '4px'
+                                                    }
+                                                    : {}
+                                            }
+                                        >
+                                            {adicional}
+                                        </div>
+                                    
                                     </div>
                                 </div>
                             );
