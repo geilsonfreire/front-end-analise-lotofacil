@@ -153,21 +153,6 @@ const ResultLotofacil = ({ onConcursoChange }) => {
                     // ==================================================
                     const cicloProcessado = processarCiclos(resultadosParaCiclo);
 
-                    console.log(
-                        "TOTAL PARA CÁLCULO DO CICLO:",
-                        resultadosParaCiclo.length
-                    );
-
-                    console.log(
-                        "ÚLTIMO CONCURSO USADO NO CÁLCULO:",
-                        resultadosParaCiclo.at(-1)?.concurso
-                    );
-
-                    console.log(
-                        "CICLO ATUAL PROCESSADO:",
-                        cicloProcessado
-                    );
-
                     setCicloAtual(cicloProcessado);
 
                     // ==================================================
@@ -182,10 +167,6 @@ const ResultLotofacil = ({ onConcursoChange }) => {
 
                         setDezenasRestantes(ausentes);
 
-                        console.log(
-                            "DEZENAS AUSENTES NO CICLO ATUAL:",
-                            ausentes
-                        );
                     } else {
                         setDezenasRestantes([]);
                     }
@@ -226,8 +207,7 @@ const ResultLotofacil = ({ onConcursoChange }) => {
             if (resultData) {
                 setLatestResult(resultData);
                 setCurrentConcurso(concurso);
-                onConcursoChange(concurso); // Chamar a função de callback
-                toast.success("Dados atualizados com sucesso!");
+                onConcursoChange(concurso);
             } else {
                 toast.error("Erro ao carregar os dados.");
             }

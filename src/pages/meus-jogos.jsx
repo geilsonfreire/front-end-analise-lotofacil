@@ -830,8 +830,21 @@ const MeusJogos = () => {
     };
 
     // Função para contar acertos
-    const contarAcertos = (jogo) => {
-        return jogo.filter(numero => resultadoConcurso.includes(numero)).length;
+    //const contarAcertos = (jogo) => {
+        //return jogo.filter(numero => resultadoConcurso.includes(numero)).length;
+    //};
+    // Função para contar acertos garantindo tipo Number e 16 dezenas
+    const contarAcertos = (dezenas, adicional) => {
+        if (!resultadoConcurso || resultadoConcurso.length === 0) return 0;
+
+        // Normaliza os resultados do concurso para Number
+        const resultadoNumerico = resultadoConcurso.map(Number);
+
+        // Junta as 15 dezenas com a 16ª adicional e normaliza para Number
+        const todasAsDezenas = [...dezenas, adicional].map(Number);
+
+        // Conta quantos números do jogo estão nas dezenas sorteadas
+        return todasAsDezenas.filter(numero => resultadoNumerico.includes(numero)).length;
     };
 
     // Função para calcular a soma das dezenas
@@ -872,10 +885,7 @@ const MeusJogos = () => {
                             const adicional = jogo.dezenaAdicional;
 
                             const { pares, impares } = contarParesImpares(dezenas);
-                            const acertos = contarAcertos([
-                                ...dezenas,
-                                adicional
-                            ]);
+                            const acertos = contarAcertos(dezenas, adicional);
                             const soma = calcularSoma(dezenas);
                             
                             return (

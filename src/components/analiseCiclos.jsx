@@ -91,23 +91,8 @@ const AnaliseCiclos = () => {
                     return;
                 }
 
-                console.log(
-                    "TOTAL DE RESULTADOS PARA ANÁLISE:",
-                    response.length
-                );
-
                 const dadosOrdenados = [...response].sort(
                     (a, b) => Number(a.concurso) - Number(b.concurso)
-                );
-
-                console.log(
-                    "PRIMEIRO CONCURSO:",
-                    dadosOrdenados[0]?.concurso
-                );
-
-                console.log(
-                    "ÚLTIMO CONCURSO:",
-                    dadosOrdenados.at(-1)?.concurso
                 );
 
                 processarCiclos(dadosOrdenados);

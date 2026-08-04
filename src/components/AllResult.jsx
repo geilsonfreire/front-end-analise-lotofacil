@@ -10,7 +10,7 @@ const AllResult = () => {
     useEffect(() => {
         const fetchResults = async () => {
             try {
-                setResultados(await apiService.getAllResults());
+                setResultados(await apiService.getAllResults());  
             } catch (fetchError) {
                 console.error('Erro ao buscar os resultados:', fetchError);
                 setError('Erro ao buscar os resultados.');
