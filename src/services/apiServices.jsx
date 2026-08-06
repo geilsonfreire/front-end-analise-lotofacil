@@ -4,8 +4,8 @@ import axios from "axios";
 // URL base da API
 // APIs disponíveis (ordem de prioridade)
 const BASE_URLS = [
-    "https://loteriascaixa-api.herokuapp.com/api/lotofacil",
-    "http://localhost:8090/api/lotofacil"
+    "http://localhost:8090/api/lotofacil",
+    "https://loteriascaixa-api.herokuapp.com/api/lotofacil"
 ];
 
 // Faz a requisição tentando todas as APIs
