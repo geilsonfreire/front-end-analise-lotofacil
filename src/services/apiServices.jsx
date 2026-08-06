@@ -2,7 +2,33 @@
 import axios from "axios";
 
 // URL base da API
-const BASE_URL = "https://loteriascaixa-api.herokuapp.com/api/lotofacil";
+// APIs disponíveis (ordem de prioridade)
+const BASE_URLS = [
+    "https://loteriascaixa-api.herokuapp.com/api/lotofacil",
+    "http://localhost:8090/api/lotofacil"
+];
+
+// Faz a requisição tentando todas as APIs
+const requestWithFallback = async (path = "") => {
+    let lastError;
+
+    for (const baseUrl of BASE_URLS) {
+        try {
+            const response = await axios.get(`${baseUrl}${path}`, {
+                timeout: 5000
+            });
+
+            console.log(`✅ API utilizada: ${baseUrl}`);
+            return response.data;
+
+        } catch (error) {
+            console.warn(`⚠️ API indisponível: ${baseUrl}`);
+            lastError = error;
+        }
+    }
+
+    throw lastError;
+};
 
 
 // Função para converter a data de 'DD/MM/YYYY' para 'YYYY-MM-DD'
@@ -18,39 +44,25 @@ const convertDate = (dateString) => {
 
 // Função para obter todos os resultados da Lotofácil
 const getAllResults = async () => {
-    try {
-        const response = await axios.get(BASE_URL); 
-        return response.data;
-    } catch (error) {
-        console.error(`Erro ao obter os resultados: ${error.message}`);
-        throw new Error("Não foi possível obter os resultados."); // Lança exceção
-    }
+    return await requestWithFallback();
 };
 
 // Função para obter o resultado do último concurso
 const getLatestResult = async () => {
-    const url = `${BASE_URL}/latest`;
-    try {
-        const response = await axios.get(url); // Faz a requisição
-        return response.data; // Retorna os dados da API
-    } catch (error) {
-        console.error(`Erro ao obter o resultado do último concurso: ${error.message}`);
-        throw new Error("Não foi possível obter o último resultado."); // Lança exceção
-    }
+    return await requestWithFallback("/latest");
 };
 
 
 // Função para obter o resultado de um concurso específico
 const getResultByContestNumber = async (contestNumber) => {
-    const url = `${BASE_URL}/${contestNumber}`; // Constrói a URL com o número do concurso
-    try {
-        const response = await axios.get(url); // Faz a requisição para a API
-        return response.data; // Retorna os dados da API
-    } catch (error) {
-        console.error(`Erro ao obter o resultado do concurso ${contestNumber}: ${error.message}`);
-        throw new Error(`Não foi possível obter o resultado do concurso ${contestNumber}.`);
-    }
+    return await requestWithFallback(`/${contestNumber}`);
 };
 
+
 // Exporta as funções para serem utilizadas em outros arquivos
-export default { getAllResults, getLatestResult, getResultByContestNumber, convertDate };
+export default {
+    getAllResults,
+    getLatestResult,
+    getResultByContestNumber,
+    convertDate
+};;
