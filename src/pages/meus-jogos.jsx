@@ -830,10 +830,6 @@ const MeusJogos = () => {
     };
 
     // Função para contar acertos
-    //const contarAcertos = (jogo) => {
-        //return jogo.filter(numero => resultadoConcurso.includes(numero)).length;
-    //};
-    // Função para contar acertos garantindo tipo Number e 16 dezenas
     const contarAcertos = (dezenas, adicional) => {
         if (!resultadoConcurso || resultadoConcurso.length === 0) return 0;
 
