@@ -744,7 +744,7 @@ const MeusJogos = () => {
                 }
 
                 // ==========================================================
-                // CAMADA 5: VALIDAÇÃO DE UNICIDADE
+                // CAMADA 6: VALIDAÇÃO DE UNICIDADE
                 // ==========================================================
 
                 const jogoValido = verificarJogoUnico(
