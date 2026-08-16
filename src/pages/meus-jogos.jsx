@@ -8,10 +8,35 @@ import ApiServices from "../services/apiServices";
 import ResultLatest from "../components/resultLatest";
 
 const MeusJogos = () => {
+    const normalizarJogosArmazenados = (jogos) => {
+        if (!Array.isArray(jogos)) return [];
+
+        return jogos
+            .filter(
+                (jogo) =>
+                    jogo &&
+                    Array.isArray(jogo.dezenas) &&
+                    Number.isFinite(Number(jogo.dezenaAdicional)),
+            )
+            .map((jogo) => ({
+                dezenas: jogo.dezenas.map(Number),
+                dezenaAdicional: Number(jogo.dezenaAdicional),
+            }));
+    };
+
     // Constante que armazena os jogos gerados e os armazena no localStorage
     const [jogosGerados, setJogosGerados] = useState(() => {
-        const jogosLocalStorage = localStorage.getItem("jogosLotofacil");
-        return jogosLocalStorage ? JSON.parse(jogosLocalStorage) : [];
+        try {
+            const jogosLocalStorage = localStorage.getItem("jogosLotofacil");
+            const jogosParseados = jogosLocalStorage
+                ? JSON.parse(jogosLocalStorage)
+                : [];
+
+            return normalizarJogosArmazenados(jogosParseados);
+        } catch (error) {
+            console.error("Erro ao carregar jogos do localStorage:", error);
+            return [];
+        }
     });
 
     const [loading, setLoading] = useState(false);
@@ -1149,15 +1174,20 @@ const MeusJogos = () => {
     };
 
     // Função para contar pares e ímpares
-    const contarParesImpares = (jogo) => {
-        const pares = jogo.filter((n) => n % 2 === 0).length;
+    const contarParesImpares = (jogo = []) => {
+        if (!Array.isArray(jogo)) {
+            return { pares: 0, impares: 0 };
+        }
+
+        const pares = jogo.filter((n) => Number(n) % 2 === 0).length;
         const impares = jogo.length - pares;
         return { pares, impares };
     };
 
     // Função para contar acertos
-    const contarAcertos = (dezenas, adicional) => {
+    const contarAcertos = (dezenas = [], adicional = null) => {
         if (!resultadoConcurso || resultadoConcurso.length === 0) return 0;
+        if (!Array.isArray(dezenas)) return 0;
 
         // Normaliza os resultados do concurso para Number
         const resultadoNumerico = resultadoConcurso.map(Number);
@@ -1172,8 +1202,9 @@ const MeusJogos = () => {
     };
 
     // Função para calcular a soma das dezenas
-    const calcularSoma = (jogo) => {
-        return jogo.reduce((acc, num) => acc + num, 0);
+    const calcularSoma = (jogo = []) => {
+        if (!Array.isArray(jogo)) return 0;
+        return jogo.reduce((acc, num) => acc + Number(num || 0), 0);
     };
 
     return (
@@ -1225,81 +1256,95 @@ const MeusJogos = () => {
 
                 {jogosGerados.length > 0 && (
                     <div className='jogos-container'>
-                        {jogosGerados.map((jogo, index) => {
-                            const dezenas = jogo.dezenas;
-                            const adicional = jogo.dezenaAdicional;
+                        {jogosGerados
+                            .filter(
+                                (jogo) =>
+                                    jogo &&
+                                    Array.isArray(jogo.dezenas) &&
+                                    Number.isFinite(
+                                        Number(jogo.dezenaAdicional),
+                                    ),
+                            )
+                            .map((jogo, index) => {
+                                const dezenas = jogo.dezenas;
+                                const adicional = jogo.dezenaAdicional;
 
-                            const { pares, impares } =
-                                contarParesImpares(dezenas);
-                            const acertos = contarAcertos(dezenas, adicional);
-                            const soma = calcularSoma(dezenas);
+                                const { pares, impares } =
+                                    contarParesImpares(dezenas);
+                                const acertos = contarAcertos(
+                                    dezenas,
+                                    adicional,
+                                );
+                                const soma = calcularSoma(dezenas);
 
-                            return (
-                                <div key={index} className='jogo-box'>
-                                    <div className='jogo-titulo'>
-                                        Jogo {index + 1}
-                                        <span className='jogo-info'>
-                                            ({pares} pares, {impares} ímpares)
-                                            <span className='acertos-info'>
-                                                {acertos} acertos
+                                return (
+                                    <div key={index} className='jogo-box'>
+                                        <div className='jogo-titulo'>
+                                            Jogo {index + 1}
+                                            <span className='jogo-info'>
+                                                ({pares} pares, {impares}{" "}
+                                                ímpares)
+                                                <span className='acertos-info'>
+                                                    {acertos} acertos
+                                                </span>
+                                                <span className='soma-info'>
+                                                    Soma: {soma}
+                                                </span>
                                             </span>
-                                            <span className='soma-info'>
-                                                Soma: {soma}
-                                            </span>
-                                        </span>
-                                    </div>
-                                    <div className='numeros-container'>
-                                        {dezenas.map((numero, numIndex) => {
-                                            const numeroAcertado =
-                                                resultadoConcurso.includes(
-                                                    numero,
+                                        </div>
+                                        <div className='numeros-container'>
+                                            {dezenas.map((numero, numIndex) => {
+                                                const numeroAcertado =
+                                                    resultadoConcurso.includes(
+                                                        numero,
+                                                    );
+                                                return (
+                                                    <div
+                                                        key={`${index}-${numero}-${numIndex}`}
+                                                        className={`numero-bolinha ${numeroAcertado ? "numero-acertado" : ""}`}
+                                                        style={
+                                                            numeroAcertado
+                                                                ? {
+                                                                      borderColor:
+                                                                          "#059669",
+                                                                      borderWidth:
+                                                                          "4px",
+                                                                  }
+                                                                : {}
+                                                        }
+                                                    >
+                                                        {numero}
+                                                    </div>
                                                 );
-                                            return (
-                                                <div
-                                                    key={`${index}-${numero}-${numIndex}`}
-                                                    className={`numero-bolinha ${numeroAcertado ? "numero-acertado" : ""}`}
-                                                    style={
-                                                        numeroAcertado
-                                                            ? {
-                                                                  borderColor:
-                                                                      "#059669",
-                                                                  borderWidth:
-                                                                      "4px",
-                                                              }
-                                                            : {}
-                                                    }
-                                                >
-                                                    {numero}
-                                                </div>
-                                            );
-                                        })}
-                                        {/* 16ª DEZENA ADICIONAL */}
-                                        <div
-                                            className={`dezena-adicional ${
-                                                resultadoConcurso.includes(
-                                                    adicional,
-                                                )
-                                                    ? "numero-acertado"
-                                                    : ""
-                                            }`}
-                                            style={
-                                                resultadoConcurso.includes(
-                                                    adicional,
-                                                )
-                                                    ? {
-                                                          borderColor:
-                                                              "#059669",
-                                                          borderWidth: "4px",
-                                                      }
-                                                    : {}
-                                            }
-                                        >
-                                            {adicional}
+                                            })}
+                                            {/* 16ª DEZENA ADICIONAL */}
+                                            <div
+                                                className={`dezena-adicional ${
+                                                    resultadoConcurso.includes(
+                                                        adicional,
+                                                    )
+                                                        ? "numero-acertado"
+                                                        : ""
+                                                }`}
+                                                style={
+                                                    resultadoConcurso.includes(
+                                                        adicional,
+                                                    )
+                                                        ? {
+                                                              borderColor:
+                                                                  "#059669",
+                                                              borderWidth:
+                                                                  "4px",
+                                                          }
+                                                        : {}
+                                                }
+                                            >
+                                                {adicional}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            );
-                        })}
+                                );
+                            })}
                     </div>
                 )}
             </section>
