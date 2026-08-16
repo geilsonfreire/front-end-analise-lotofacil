@@ -93,7 +93,6 @@ const MeusJogos = () => {
     //
     // 3. O conjunto completo de 16 dezenas também não
     //    pode ser igual a outro jogo nosso.
-
     const verificarJogoUnico = (
         novoJogo,
         dezenaAdicional,
@@ -325,6 +324,72 @@ const MeusJogos = () => {
         return ciclosCalculados[ciclosCalculados.length - 1];
     };
 
+    // Função para processar todos os ciclos históricos
+    const processarTodosOsCiclos = (dados) => {
+        const dadosOrdenados = [...dados].sort(
+            (a, b) => Number(a.concurso) - Number(b.concurso),
+        );
+
+        const todasDezenas = new Set(
+            Array.from({ length: 25 }, (_, i) =>
+                String(i + 1).padStart(2, "0"),
+            ),
+        );
+
+        const ciclosCalculados = [];
+
+        let cicloAtual = {
+            numero: 1,
+            concursos: [],
+            dezenasAusentes: new Set(todasDezenas),
+        };
+
+        for (const concurso of dadosOrdenados) {
+            const dezenasSorteadas = new Set(
+                (concurso.dezenas || []).map((dezena) =>
+                    String(dezena).padStart(2, "0"),
+                ),
+            );
+
+            for (const dezena of dezenasSorteadas) {
+                cicloAtual.dezenasAusentes.delete(dezena);
+            }
+
+            cicloAtual.concursos.push({
+                ...concurso,
+                dezenasAusentes: new Set(cicloAtual.dezenasAusentes),
+            });
+
+            if (cicloAtual.dezenasAusentes.size === 0) {
+                cicloAtual.duracao = cicloAtual.concursos.length;
+
+                ciclosCalculados.push({
+                    ...cicloAtual,
+                    concursos: [...cicloAtual.concursos],
+                    dezenasAusentes: new Set(cicloAtual.dezenasAusentes),
+                });
+
+                cicloAtual = {
+                    numero: cicloAtual.numero + 1,
+                    concursos: [],
+                    dezenasAusentes: new Set(todasDezenas),
+                };
+            }
+        }
+
+        if (cicloAtual.concursos.length > 0) {
+            cicloAtual.duracao = cicloAtual.concursos.length;
+
+            ciclosCalculados.push({
+                ...cicloAtual,
+                concursos: [...cicloAtual.concursos],
+                dezenasAusentes: new Set(cicloAtual.dezenasAusentes),
+            });
+        }
+
+        return ciclosCalculados;
+    };
+
     // CAMADA 1: Calcula as 9 dezenas FIXAS do ÚLTIMO concurso com base no histórico estatístico
     const getRankingDezenas = (resultados) => {
         const historico = resultados
@@ -470,6 +535,220 @@ const MeusJogos = () => {
         return shuffleArray(candidatos).slice(0, quantidade);
     };
 
+    // Função para calcular a frequência das dezenas por posição nos ciclos
+    const calcularFrequenciaDezenasPorPosicao = (ciclos) => {
+        const frequencia = {};
+
+        ciclos.forEach((ciclo) => {
+            ciclo.concursos.forEach((concurso, index) => {
+                concurso.dezenasAusentes.forEach((dezena) => {
+                    const numero = Number(dezena);
+
+                    if (!frequencia[numero]) {
+                        frequencia[numero] = {};
+                    }
+
+                    const posicao = index + 1;
+
+                    frequencia[numero][posicao] =
+                        (frequencia[numero][posicao] || 0) + 1;
+                });
+            });
+        });
+
+        return frequencia;
+    };
+
+    // Função para calcular a quantidade de concursos por posição nos ciclos
+    const calcularCiclosPorPosicao = (ciclos) => {
+        const quantidade = {};
+
+        ciclos.forEach((ciclo) => {
+            ciclo.concursos.forEach((_, index) => {
+                const posicao = index + 1;
+
+                quantidade[posicao] = (quantidade[posicao] || 0) + 1;
+            });
+        });
+
+        return quantidade;
+    };
+
+    // Função para calcular o percentual de ocorrência das dezenas por posição nos ciclos
+    const calcularPercentualDezenasPorPosicao = (
+        frequenciaDezenasPorPosicao,
+        ciclosPorPosicao,
+    ) => {
+        const percentual = {};
+
+        for (let dezena = 1; dezena <= 25; dezena++) {
+            percentual[dezena] = {};
+
+            Object.keys(ciclosPorPosicao).forEach((posicao) => {
+                const frequencia =
+                    frequenciaDezenasPorPosicao[dezena]?.[posicao] || 0;
+
+                const totalCiclos = ciclosPorPosicao[posicao] || 0;
+
+                percentual[dezena][posicao] =
+                    totalCiclos > 0
+                        ? Number(((frequencia / totalCiclos) * 100).toFixed(2))
+                        : 0;
+            });
+        }
+
+        return percentual;
+    };
+
+    // Função para calcular a probabilidade condicional das dezenas por posição nos ciclos
+    const calcularProbabilidadeCondicional = (frequenciaDezenasPorPosicao) => {
+        const probabilidades = {};
+
+        for (let dezena = 1; dezena <= 25; dezena++) {
+            probabilidades[dezena] = {};
+
+            const posicoes = frequenciaDezenasPorPosicao[dezena] || {};
+
+            const todasPosicoes = Object.keys(posicoes)
+                .map(Number)
+                .sort((a, b) => a - b);
+
+            todasPosicoes.forEach((posicao) => {
+                if (posicao === 1) {
+                    probabilidades[dezena][posicao] = 100;
+                    return;
+                }
+
+                const frequenciaAnterior = posicoes[posicao - 1] || 0;
+
+                const frequenciaAtual = posicoes[posicao] || 0;
+
+                probabilidades[dezena][posicao] =
+                    frequenciaAnterior > 0
+                        ? Number(
+                              (
+                                  (frequenciaAtual / frequenciaAnterior) *
+                                  100
+                              ).toFixed(2),
+                          )
+                        : 0;
+            });
+        }
+
+        return probabilidades;
+    };
+
+    // Função para calcular o ranking estatístico das dezenas por posição nos ciclos
+    const calcularRankingEstatistico = (
+        percentualDezenasPorPosicao,
+        probabilidadeCondicional,
+        posicaoAtual,
+    ) => {
+        const ranking = [];
+
+        for (let dezena = 1; dezena <= 25; dezena++) {
+            const percentual =
+                percentualDezenasPorPosicao[dezena]?.[posicaoAtual] || 0;
+
+            const probabilidade =
+                probabilidadeCondicional[dezena]?.[posicaoAtual] || 0;
+
+            const score = percentual * 0.6 + probabilidade * 0.4;
+
+            ranking.push({
+                dezena,
+                percentual,
+                probabilidade,
+                score: Number(score.toFixed(2)),
+            });
+        }
+
+        return ranking.sort((a, b) => b.score - a.score);
+    };
+
+    const calcularMedia = (valores) => {
+        if (!Array.isArray(valores) || valores.length === 0) return 0;
+
+        const soma = valores.reduce((total, valor) => total + valor, 0);
+        return Number((soma / valores.length).toFixed(2));
+    };
+
+    const calcularMediana = (valores) => {
+        if (!Array.isArray(valores) || valores.length === 0) return 0;
+
+        const ordenados = [...valores].sort((a, b) => a - b);
+        const meio = Math.floor(ordenados.length / 2);
+
+        if (ordenados.length % 2 === 0) {
+            return Number(
+                ((ordenados[meio - 1] + ordenados[meio]) / 2).toFixed(2),
+            );
+        }
+
+        return Number(ordenados[meio].toFixed(2));
+    };
+
+    const calcularModa = (valores) => {
+        if (!Array.isArray(valores) || valores.length === 0) return 0;
+
+        const frequencias = new Map();
+
+        valores.forEach((valor) => {
+            frequencias.set(valor, (frequencias.get(valor) || 0) + 1);
+        });
+
+        const [moda] = [...frequencias.entries()].sort(
+            (a, b) => b[1] - a[1] || a[0] - b[0],
+        )[0] || [0, 0];
+
+        return Number(moda);
+    };
+
+    const calcularRankingAusentesPorPosicao = (
+        frequenciaDezenasPorPosicao,
+        probabilidadeCondicional,
+        posicaoAtualCiclo,
+    ) => {
+        const ranking = [];
+
+        for (let dezena = 1; dezena <= 25; dezena++) {
+            const ocorrencias = Object.values(
+                frequenciaDezenasPorPosicao[dezena] || {},
+            );
+            const frequencia = ocorrencias.reduce(
+                (total, valor) => total + valor,
+                0,
+            );
+            const percentual =
+                (frequencia / Math.max(1, ocorrencias.length)) * 100 || 0;
+            const media = calcularMedia(ocorrencias);
+            const mediana = calcularMediana(ocorrencias);
+            const moda = calcularModa(ocorrencias);
+            const condicional =
+                probabilidadeCondicional[dezena]?.[posicaoAtualCiclo] || 0;
+
+            const score =
+                percentual * 0.45 +
+                condicional * 0.35 +
+                media * 1.5 +
+                mediana * 1.2 +
+                moda * 1.2;
+
+            ranking.push({
+                dezena,
+                frequencia,
+                percentual: Number(percentual.toFixed(2)),
+                media: Number(media.toFixed(2)),
+                mediana: Number(mediana.toFixed(2)),
+                moda: Number(moda.toFixed(2)),
+                condicional: Number(condicional.toFixed(2)),
+                score: Number(score.toFixed(2)),
+            });
+        }
+
+        return ranking.sort((a, b) => b.score - a.score);
+    };
+
     // Função para gerar jogos
     const gerarJogos = async () => {
         try {
@@ -483,6 +762,11 @@ const MeusJogos = () => {
                 return;
             }
 
+            // ANALISA TODOS OS CICLOS HISTÓRICOS
+            const ciclos = processarTodosOsCiclos(resultados);
+            const cicloAtual = ciclos[ciclos.length - 1];
+            const posicaoAtual = cicloAtual?.concursos.length || 1;
+
             // Identifica o Último Concurso
             const historicoOrdenado = [...resultados].sort(
                 (a, b) => b.concurso - a.concurso,
@@ -495,22 +779,80 @@ const MeusJogos = () => {
             const dezenasAusentesCiclo = [
                 ...cicloProcessado.dezenasAusentes,
             ].map(Number);
+
+            // ==========================================================
+            // CLASSIFICAÇÃO DAS DEZENAS AUSENTES
+            // ==========================================================
+
+            const posicaoAtualCiclo = cicloProcessado.concursos.length;
+
+            // Calcula os ciclos completos e suas estatísticas.
+            const todosOsCiclos = processarTodosOsCiclos([...resultados]);
+
+            // Calcula quantos ciclos chegaram em cada posição.
+            const ciclosPorPosicao = calcularCiclosPorPosicao(todosOsCiclos);
+
+            // Calcula a frequência das dezenas ausentes
+            // em cada posição do ciclo.
+            const frequenciaDezenasPorPosicao =
+                calcularFrequenciaDezenasPorPosicao(todosOsCiclos);
+
+            // Calcula a probabilidade de uma dezena continuar ausente.
+            const probabilidadeCondicional = calcularProbabilidadeCondicional(
+                frequenciaDezenasPorPosicao,
+            );
+
+            const percentualDezenasPorPosicao =
+                calcularPercentualDezenasPorPosicao(
+                    frequenciaDezenasPorPosicao,
+                    ciclosPorPosicao,
+                );
+
+            const rankingEstatistico = calcularRankingEstatistico(
+                percentualDezenasPorPosicao,
+                probabilidadeCondicional,
+                posicaoAtual,
+            );
+
+            const rankingCompleto = getRankingDezenas(resultados);
+
+            // ==========================================================
+            // CAMADA 2: RANKING DAS DEZENAS AUSENTES DO CICLO
+            // COMPORTAMENTO HISTÓRICO DA POSIÇÃO ATUAL
+            // ==========================================================
+            // Se a dezena ainda estiver ausente no ciclo atual, ela recebe
+            // score com base em:
+            // - frequência histórica na posição atual
+            // - percentual de ausência nessa posição
+            // - média / mediana / moda do comportamento individual
+            // - probabilidade condicional de continuar ausente
+            // ==========================================================
+            const rankingAusentes = calcularRankingAusentesPorPosicao(
+                frequenciaDezenasPorPosicao,
+                probabilidadeCondicional,
+                posicaoAtualCiclo,
+            ).filter((item) => dezenasAusentesCiclo.includes(item.dezena));
+
+            const rankingAusentesOrdenado = rankingAusentes.map(
+                (item) => item.dezena,
+            );
+
             const usoAusentes = new Map(
                 dezenasAusentesCiclo.map((num) => [num, 0]),
             );
             // CAMADA 2: histórico das combinações já utilizadas
             const selecoesAusentesGeradas = [];
 
-            // CAMADA 1: Trava 8 ou 9 Dezenas FIXAS (Estatisticamente superiores do último sorteio)
-            const rankingCompleto = getRankingDezenas(resultados);
-            const rankingDezenas = rankingCompleto.map((item) => item.dezena);
+            // CAMADA 1: Calcula as 9 dezenas fixas com base no ranking estatístico
+            const rankingDezenas = rankingEstatistico.map(
+                (item) => item.dezena,
+            );
             const quantidadeFixas = Math.random() < 0.5 ? 8 : 9;
 
-            const dezenasFixas9 = rankingCompleto
+            const dezenasFixas9 = rankingEstatistico
                 .filter((item) => dezenasUltimoConcurso.includes(item.dezena))
-
+                .sort((a, b) => b.score - a.score)
                 .slice(0, quantidadeFixas)
-
                 .map((item) => item.dezena);
 
             setDezenasFixas(dezenasFixas9);
@@ -654,7 +996,9 @@ const MeusJogos = () => {
 
                 const ausentesEscolhidas = selecionarAusentesUnicos(
                     dezenasAusentesCiclo,
-                    rankingDezenas,
+                    rankingAusentesOrdenado.length > 0
+                        ? rankingAusentesOrdenado
+                        : rankingDezenas,
                     usoAusentes,
                     quantidadeAusentes,
                     cartao,
